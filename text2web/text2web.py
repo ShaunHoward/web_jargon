@@ -9,4 +9,8 @@ def text2web(text):
     :param text: the text to control the default web browser
     :return: the text response of the web control service
     """
-    return text
+    # assert input is a string
+    assert type(text) is str
+    controls, status = parse(text)
+    status = control_web(controls)
+    return status
