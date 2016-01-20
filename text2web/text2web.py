@@ -9,6 +9,9 @@ urls = ("/.*", "Text2Web")
 web_app = web.application(urls, globals())
 err_msg = "Error: Command could not be processed.\n"
 
+# use this template to send the text request
+json_template = "{\"request\":\"open my friends list on facebook.\"}"
+
 
 class Text2Web():
     def __init__(self):
@@ -24,7 +27,7 @@ class Text2Web():
             english_request = json_action_request["request"]
             return text2web(english_request)
         except ValueError:
-            print "Could not process english request."
+            print "Could not process English request."
         return err_msg
 
 
