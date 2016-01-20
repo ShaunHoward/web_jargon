@@ -37,7 +37,7 @@ def text2web(text):
     A message is returned to the user in text to describe the status
     of the operation.
     :param text: the text to control the default web browser
-    :return: the text response of the web control service
+    :return: the json text response of the web control service containing web controls to execute
     """
     # assert input is a string
     assert type(text) is str
