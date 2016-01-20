@@ -41,10 +41,9 @@ def text2web(text):
     """
     # assert input is a string
     assert type(text) is str
-    return "Hello"
-    # web_commands = parse_web_commands(text)
-    # web_controls = create_web_controls(web_commands)
-    # return web_controls
+    web_commands = parse_web_commands(text)
+    web_controls = create_web_controls(web_commands)
+    return web_controls
 
 if __name__ == '__main__':
     web_app.run()
