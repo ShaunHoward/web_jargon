@@ -19,3 +19,5 @@ def parse_web_commands(text):
     for sentence in sentences:
         # tokenize the sentence into a sequence of one or more feasible commands
         pass
+
+    return []

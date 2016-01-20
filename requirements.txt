@@ -1,3 +1,4 @@
 nltk==3.1
 selenium==2.49.0
+web.py==0.37
 wheel==0.24.0

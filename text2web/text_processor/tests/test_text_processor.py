@@ -20,13 +20,13 @@ class TextProcessorTest(unittest.TestCase):
 
     def test_parse_good_input(self):
         for test_command in good_web_commands:
-            controls, status = text_processor.parse_web_commands(test_command)
+            controls, status = text_processor.interpret_web_commands(test_command)
             self.validate_controls(controls)
             self.assertTrue(status in success_statuses)
 
     def test_parse_bad_input(self):
         for test_command in bad_web_commands:
-            controls, status = text_processor.parse_web_commands(test_command)
+            controls, status = text_processor.interpret_web_commands(test_command)
             self.assertEqual(len(controls), 0)
             self.assertTrue(status in failure_statuses)
 
