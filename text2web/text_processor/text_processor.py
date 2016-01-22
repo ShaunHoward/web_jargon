@@ -10,7 +10,7 @@ def parse_web_commands(text):
     Parses the provided text into web commands that should be executed
     in a specific order from an English sentence.
     :param text: the input command text
-    :return: the controls list and text status of the operation
+    :return: the controls list, which will be empty if in error
     """
     # tokenize text into sentences
     sentences = nltk.tokenize.sent_tokenize(text)
