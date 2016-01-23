@@ -1,0 +1,4 @@
+SCROLL_LEFT:<function horizontal_scroll(percentage=100%, left=true)>
+SCROLL_RIGHT:<function horizontal_scroll(percentage=100%, left=false)>
+SCROLL_UP:<function vertical_scroll(percentage=100%, up=true)>
+SCROLL_DOWN:<function vertical_scroll(percentage=100%, up=false)>
