@@ -2,7 +2,7 @@ __author__ = 'Shaun Howard'
 import json
 import web
 
-from text_processor.text_processor import parse_web_commands
+from text_processor.text_processor import process_web_action_requests
 from web_control_mapper.mapper import create_web_controls
 
 urls = ("/.*", "Text2Web")
@@ -41,7 +41,7 @@ def text2web(text):
     """
     # assert input is a string
     assert type(text) is str
-    web_commands = parse_web_commands(text)
+    web_commands = process_web_action_requests(text)
     web_controls = create_web_controls(web_commands)
     return web_controls
 
