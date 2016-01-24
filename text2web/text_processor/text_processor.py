@@ -6,24 +6,61 @@ from itertools import chain
 
 from nltk import pos_tag, sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
-from text2web.helpers import normalize_string
+from nltk.tag import StanfordNERTagger, StanfordPOSTagger
 
 SUCCESS = "The operation was successful."
 FAIL = "The operation was unsuccessful."
 
+# context names
+DEFAULT = "default"
+FACEBOOK = "facebook"
+SPOTIFY = "spotify"
+GOOGLE = "google"
+YOUTUBE = "youtube"
+
+# custom tags
+CMD_START = 'start'
+CMD_MOD = 'modifier'
+CMD_ARG = 'argument'
+
 DEFAULT_ACTIONS_PATH = join(getcwd(), '/templates/action_call_templates.txt')
+
+
+def process_web_action_requests(text):
+    """
+    Parses the provided text into web text actions that will be converted into
+    web actions by the web text to action mapper. The order will be maintained.
+    :param text: the input command text
+    :return: the controls list, which will be empty if in error
+    """
+    # tokenize text into sentences
+    sentences = sent_tokenize(text)
+    words_of_sentences = [word_tokenize(sent) for sent in sentences]
+    tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
+
+    # TODO: validate jargon
+    is_valid = [valid_web_jargon(sent) for sent in sentences]
+    web_action_tokens = []
+    for i in range(len(is_valid)):
+        if is_valid[i]:
+            # process sentence for commands
+            web_action_tokens = web_action_tokens + process(sentences[i],
+                                                            words_of_sentences[i],
+                                                            tags_of_words_of_sentences[i])
+    return web_action_tokens
 
 
 def tag_words(words_of_text):
     """
     Tags the provided words of the text with parts of speech.
-    :param text: the text to tag the words of
+    :param words_of_text: the text to tag the words of
     :return: the tags of the words in a map (k=word, v=pos_tag)
     """
     tags = []
-    tag_tuple_list = pos_tag(words_of_text)
+    st = StanfordPOSTagger('models/english-bidirectional-distsim.tagger',
+                'stanford-postagger.jar')
+    tag_tuple_list = st.tag(words_of_text)
     for tag_tuple in tag_tuple_list:
-        word = tag_tuple[0]
         tag = tag_tuple[1]
         tags.append(tag)
     return tags
@@ -56,16 +93,75 @@ def process(sentence, words, tags):
     :param tags: the tags of the words in the sentence
     :return: the web actions tokens and arguments
     """
+    # search for certain POSes in words list
+    command_starts = []
+    conjunctions = []
+    adverbs = []
+    numerals = []
+    particles = []
+    for i in range(len(tags)):
+        if 'CC' in tags[i]:
+            conjunctions.append(i)
+
+    # split up commands by splitting sentence on conjunction
+    commands = []
+    for conjunction in conjunctions:
+        # get all words up to conjunction
+        command_tags = tag_words(words[:conjunction - 1])
+        commands += (words[:conjunction - 1], command_tags)
+
+        # do not want to store conjunction
+        words = words[conjunction + 1:]
+
+    action_requests = []
+    # try to parse web action requests and arguments
+    command_tags = []
+    # must have a context for any actions taking place or default actions are assumed
+    context = "default"
+    for command in commands:
+        words = command[0]
+        tags = command[1]
+        command_start = 0
+        curr_action_request = {CMD_START: "", CMD_MOD: [], CMD_ARG: []}
+        for i in range(len(tags)):
+            tag = tags[i]
+            # look for a command start
+            if 'VB' in tag or 'NNP' in tag:
+                command_start = tags.index(tag)
+                # add command start to dictionary
+                curr_action_request[CMD_START] = words[command_start]
+
+            # look for command modifiers like up, down, etc.
+            if ('RB' in tag or 'RP' in tag) and command_start == 0:
+                if i > command_start:
+                    curr_action_request[CMD_MOD].append(words[i])
+
+            # look for numeral values to feed as arguments to command
+            if 'CD' in tag:
+                curr_action_request[CMD_ARG].append(words[i])
+        action_requests.append(curr_action_request)
+
     # find the available web page controls as stored in a web control map template
     # these can be determined from the webpage context using words and their POS tags
     possible_actions = get_actions_in_webpage(words, tags)
-    # TODO
-    return []
+
+    # search for action requests in the sentence
+    for action in possible_actions:
+        action_split = action.split("_")
+        count = 0
+        for action_request in action_requests:
+            for word in action_split:
+                if word in action_request:
+                    count += 1
+            if count == len(action_split):
+                action_requests.append(action)
+    return action_requests
 
 
 def get_actions_in_webpage(words, tags):
     context = find_webpage_context(words, tags)
     actions = actions_in_context(context)
+    return actions
 
 
 def find_webpage_context(words, tags):
@@ -123,30 +219,6 @@ def train_processor(training_data_dir):
     with open(training_data_dir, 'r') as training_file:
         training_data = training_file.read()
     training_command_list = training_data.split('\n')
-
-
-def process_web_action_requests(text):
-    """
-    Parses the provided text into web text actions that will be converted into
-    web actions by the web text to action mapper. The order will be maintained.
-    :param text: the input command text
-    :return: the controls list, which will be empty if in error
-    """
-    # tokenize text into sentences
-    sentences = sent_tokenize(text)
-    words_of_sentences = [word_tokenize(sent) for sent in sentences]
-    tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
-
-    # TODO: validate jargon
-    is_valid = [valid_web_jargon(sent) for sent in sentences]
-    web_action_tokens = []
-    for i in range(len(is_valid)):
-        if is_valid[i]:
-            # process sentence for commands
-            web_action_tokens = web_action_tokens + process(sentences[i],
-                                                            words_of_sentences[i],
-                                                            tags_of_words_of_sentences[i])
-    return web_action_tokens
 
 
 # def create_bigram_belief_state(self, training_command_list):
