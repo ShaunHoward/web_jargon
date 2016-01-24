@@ -93,27 +93,30 @@ def process(sentence, words, tags):
     :param tags: the tags of the words in the sentence
     :return: the web actions tokens and arguments
     """
-    # search for certain POSes in words list
-    command_starts = []
+    # search for conjunctions to split up commands
     conjunctions = []
-    adverbs = []
-    numerals = []
-    particles = []
     for i in range(len(tags)):
         if 'CC' in tags[i]:
             conjunctions.append(i)
 
-    # split up commands by splitting sentence on conjunction
+    # split up commands by splitting sentence on conjunctions
     commands = []
-    for conjunction in conjunctions:
-        # get all words up to conjunction
-        command_tags = tag_words(words[:conjunction - 1])
-        commands += (words[:conjunction - 1], command_tags)
-
-        # do not want to store conjunction
-        words = words[conjunction + 1:]
-
+    command_tags = []
+    split_indices = [x for x in conjunctions]
+    for i in range(len(split_indices)):
+        split_index = split_indices[i]
+        if split_index == 0 or split_index == len(words):
+            continue
+        if i == 0:
+            command = words[:split_index-1]
+            tags_ = tags[:split_index-1]
+        elif i == len(split_indices) - 1:
+            command = words[split_index+1:]
+            tags_ = tags[split_index+1:]
+        commands.append(command)
+        command_tags.append(tags_)
     action_requests = []
+
     # try to parse web action requests and arguments
     command_tags = []
     # must have a context for any actions taking place or default actions are assumed
@@ -145,7 +148,8 @@ def process(sentence, words, tags):
     # these can be determined from the webpage context using words and their POS tags
     possible_actions = get_actions_in_webpage(words, tags)
 
-    # search for action requests in the sentence
+    web_actions = []
+    # search for web action requests in the sentence
     for action in possible_actions:
         action_split = action.split("_")
         count = 0
@@ -154,8 +158,8 @@ def process(sentence, words, tags):
                 if word in action_request:
                     count += 1
             if count == len(action_split):
-                action_requests.append(action)
-    return action_requests
+                web_actions.append((action_request, action))
+    return web_actions
 
 
 def get_actions_in_webpage(words, tags):
