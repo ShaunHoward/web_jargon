@@ -3,7 +3,7 @@ import json
 import web
 
 from text_processor.text_processor import process_web_action_requests
-from web_control_mapper.mapper import create_web_controls
+from web_control_mapper.mapper import create_web_actions
 
 urls = ("/.*", "Text2Web")
 web_app = web.application(urls, globals())
@@ -45,8 +45,8 @@ def text2web(text):
     # assert input is a string
     assert type(text) is str
     web_commands = process_web_action_requests(text)
-    web_controls = create_web_controls(web_commands)
-    return web_controls
+    web_actions = create_web_actions(web_commands)
+    return web_actions
 
 if __name__ == '__main__':
     if not TEST_MODE:

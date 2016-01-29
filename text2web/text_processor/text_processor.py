@@ -7,6 +7,10 @@ from nltk import pos_tag, sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordNERTagger, StanfordPOSTagger
 
+NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
+              "ninth": 9, "tenth": 10, "eleventh": 11, "twelvefth": 12, "thirteenth": 13, "fourteenth": 14,
+              "fifteenth": 15}
+
 SUCCESS = "The operation was successful."
 FAIL = "The operation was unsuccessful."
 
@@ -20,8 +24,10 @@ YOUTUBE = "youtube"
 # custom tags
 CMD = 'command'
 CMD_ARGS = 'arguments'
+CMD_START = 'VB|NN'
+CONTEXT = 'context'
+DEFAULT_ACTION_CONTEXT = "default"
 DIR = path.dirname(path.dirname(__file__))
-DEFAULT_ACTIONS_PATH = DIR + '/templates/action_call_templates.txt'
 PARENT_DIR = path.dirname(DIR)
 STANFORD_JAR_PATH = PARENT_DIR + '/postagger/stanford-postagger.jar'
 BIDIR_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-bidirectional-distsim.tagger'
@@ -46,9 +52,8 @@ def process_web_action_requests(text):
     for i in range(len(is_valid)):
         if is_valid[i]:
             # process sentence for commands
-            web_action_tokens = web_action_tokens + process(sentences[i],
-                                                            words_of_sentences[i],
-                                                            tags_of_words_of_sentences[i])
+            web_action_tokens = web_action_tokens + extract_action_requests(words_of_sentences[i],
+                                                                            tags_of_words_of_sentences[i])
     return web_action_tokens
 
 
@@ -85,11 +90,10 @@ def similar_words(word, meaning):
     return synonyms
 
 
-def process(sentence, words, tags):
+def extract_action_requests(words, tags):
     """
     Figure out the web actions that exist in the provided sentence using
     the given words and tags.
-    :param sentence: the sentence to find web actions/commands given in
     :param words: the words of the sentence
     :param tags: the tags of the words in the sentence
     :return: the web actions tokens and arguments
@@ -125,100 +129,46 @@ def process(sentence, words, tags):
         command_tags.append(tags)
 
     action_requests = []
-
-    # must have a context for any actions taking place or default actions are assumed
-    context = "default"
     for i in range(len(commands)):
         command_words = commands[i]
         command_tags = command_tags[i]
         command_start = 0
-        curr_action_request = {CMD: "", CMD_ARGS: []}
+        # must have a context for any actions taking place or default actions are assumed
+        action_context = determine_action_context(command_words, command_tags)
+        curr_action_request = {CMD: "", CMD_ARGS: [], CONTEXT: action_context}
+        tag_list = []
         for j in range(len(command_tags)):
             tag = command_tags[j]
             # look for a command start
-            if 'VB' in tag or 'NNP' in tag:
+            if ('VB' in tag and CMD_START not in tag_list) or\
+                    ('NN' in tag and CMD_START not in tag_list):
+                tag_list.append(CMD_START)
                 command_start = j
                 # add command start to dictionary
                 curr_action_request[CMD] = command_words[command_start]
-
             # look for command modifiers like up, down, etc.
-            elif ('RB' in tag or 'RP' in tag) and command_start == 0:
+            elif ('RB' in tag or 'RP' in tag or
+                    ('VB' in tag and CMD_START in tag_list) or
+                    ('NN' in tag and CMD_START in tag_list)) and\
+                    command_start == 0:
                 if j > command_start:
+                    tag_list.append('RB|RP|VB')
                     curr_action_request[CMD] += ''.join([' ', command_words[j]])
-
             # look for numeral values to feed as arguments to command
-            elif 'CD' in tag:
-                curr_action_request[CMD_ARGS].append(command_words[j])
+            elif 'CD' in tag or 'JJ' in tag:
+                tag_list.append('CD|JJ')
+                # try to parse a number out of the numeral
+                if 'JJ' in tag and command_words[j] in NUM_TO_INT.keys():
+                    num_arg = NUM_TO_INT[command_words[j]]
+                    curr_action_request[CMD_ARGS].append(num_arg)
+                else:
+                    curr_action_request[CMD_ARGS].append(command_words[j])
         action_requests.append(curr_action_request)
-
-    # find the available web page controls as stored in a web control map template
-    # these can be determined from the webpage context using words and their POS tags
-    possible_actions = get_actions_in_webpage(words, tags)
-
-    web_actions = []
-    # search for web action requests in the sentence
-    for action in possible_actions:
-        action_split = action.split("_")
-        count = 0
-        for action_request in action_requests:
-            for word in action_split:
-                if word in action_request:
-                    count += 1
-            if count == len(action_split):
-                web_actions.append((action_request, action))
-    return web_actions
+    return action_requests
 
 
-def get_actions_in_webpage(words, tags):
-    context = find_webpage_context(words, tags)
-    actions = actions_in_context(context)
-    return actions
-
-
-def find_webpage_context(words, tags):
-    return ''
-
-
-def actions_in_context(context):
-    """
-    Load the actions for the specified context given action call
-    template files for various websites that are well-known.
-    By default, return the default available action list.
-    :param context:
-    :return:
-    """
-    default_action_list = load_action_template(DEFAULT_ACTIONS_PATH)
-    return default_action_list
-
-
-def load_action_template(template_path):
-    # read actions file
-    with open(template_path, 'r') as f:
-        actions_string = f.read()
-
-    # determine each of the actions from string
-    actions = actions_string.split('\n')
-
-    # filter out comments from actions
-    filtered_actions = []
-    for action in actions:
-        if not action.startswith("#"):
-            filtered_actions.append(action)
-
-    # create a map from token to action function call
-    action_map = dict()
-    for action in filtered_actions:
-        # split up action token and function call parts
-        toke_and_func = action.split(':')
-        action_key = toke_and_func[0].strip()
-        action_value = toke_and_func[1].strip()
-
-        # strip <> and trailing whitespace from function call
-        action_value = action_value.lstrip('<').rstrip('>').strip()
-        if len(action_map[action_key]) == 0:
-            action_map[action_key] = []
-        action_map[action[0]].append(action_value)
-    return action_map
+def determine_action_context(words, tags):
+    return DEFAULT_ACTION_CONTEXT
 
 
 def valid_web_jargon(sent):
