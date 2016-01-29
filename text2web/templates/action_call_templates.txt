@@ -1,7 +1,7 @@
 # **these are comments that will not be parsed as actions
 # percentage is of one page scroll in any direction
 # so 50% to the left would be 50% of one page to the left
-SCROLL_LEFT:<function horizontal_scroll(percentage=100, left=true)>
-SCROLL_RIGHT:<function horizontal_scroll(percentage=100, left=false)>
-SCROLL_UP:<function vertical_scroll(percentage=100, up=true)>
-SCROLL_DOWN:<function vertical_scroll(percentage=100, up=false)>
+SCROLL_LEFT:<function scrollLeft()>
+SCROLL_RIGHT:<function scrollRight()>
+SCROLL_UP:<function scrollUp()>
+SCROLL_DOWN:<function scrollDown()>

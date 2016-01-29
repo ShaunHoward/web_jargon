@@ -6,8 +6,8 @@ from text2web.text_processor import text_processor as tp
 from text2web.web_control_mapper import mapper as mp
 
 # TODO read in these functions from dict or something
-SCROLL_UP = ''
-SCROLL_DOWN = ''
+SCROLL_UP = 'function scrollUp()'
+SCROLL_DOWN = 'function scrollDown()'
 
 
 class MapperTest(unittest.TestCase):
