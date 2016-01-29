@@ -11,45 +11,64 @@ def create_web_actions(action_requests):
     Creates the web action function calls using the
     action call templates.
     :param action_requests: the list of commands to turn into web action sequences
-    :return:
+    :return: a list of web actions for the given web action requests
     """
-
+    web_actions = []
     for action_request in action_requests:
         # find the available web page controls as stored in a web control map template
-        # these can be determined from the webpage context using words and their POS tags
-        possible_actions = get_actions_in_webpage(action_request[CONTEXT])
+        # these can be determined from the web page context using words and their POS tags
+        possible_actions = get_actions_in_context(action_request[CONTEXT])
 
-        web_actions = []
-        # search for web action requests in the sentence
+        # search for the correct web action
         for action in possible_actions:
             action_split = action.split("_")
             count = 0
-            for action_request in action_requests:
-                for word in action_split:
-                    if word in action_request:
-                        count += 1
-                if count == len(action_split):
-                    web_actions.append((action_request, action))
+            for word in action_split:
+                if word.lower() in action_request[CMD].lower():
+                    count += 1
+            if count == len(action_split):
+                args = ', '.join([action_request[CMD_ARGS]])
+                web_action = insert_args_into_action(args, action)
+                web_actions.append(web_action)
+    return web_actions
 
 
-def get_actions_in_webpage(context):
-    actions = actions_in_context(context)
-    return actions
+def insert_args_into_action(args, action):
+    # begin bracket of parameters
+    up_to_params = action.index("(")
+    before_params = action[:up_to_params]
+
+    # end bracket of parameters
+    after_params_ind = action.index(")")
+    after_params = action[after_params_ind:]
+
+    # get params and divide them by comma
+    params = action[up_to_params+1:after_params-1]
+    param_list = params.split(",")
+
+    # clean up any preceding/trailing whitespace
+    param_list = [param.strip() for param in param_list]
+
+    # TODO: do something with params
+    return ''.join([before_params, ', '.join(param_list), after_params])
 
 
-def actions_in_context(context):
+def get_actions_in_context(context):
     """
     Load the actions for the specified context given action call
     template files for various websites that are well-known.
     By default, return the default available action list.
-    :param context:
-    :return:
+    :param context: the context of the web page to control
+    :return: a list of available actions in this context
     """
     action_template_mappings = {DEFAULT_ACTION_CONTEXT: DEFAULT_ACTIONS_PATH}
     if context in action_template_mappings.keys():
+        # try to load a custom action mapping
         available_actions_list = load_action_template(action_template_mappings[context])
-    default_action_list = load_action_template(DEFAULT_ACTIONS_PATH)
-    return default_action_list
+    else:
+        # load the default action mappings by default
+        available_actions_list = load_action_template(action_template_mappings[DEFAULT_ACTION_CONTEXT])
+    return available_actions_list
 
 
 def load_action_template(template_path):
@@ -74,9 +93,10 @@ def load_action_template(template_path):
         action_key = toke_and_func[0].strip()
         action_value = toke_and_func[1].strip()
 
-        # strip <> and trailing whitespace from function call
-        action_value = action_value.lstrip('<').rstrip('>').strip()
-        if len(action_map[action_key]) == 0:
-            action_map[action_key] = []
-        action_map[action[0]].append(action_value)
+        if len(action_key) > 0 and len(action_value) > 0:
+            # strip <> and trailing whitespace from function call
+            action_value = action_value.lstrip('<').rstrip('>').strip()
+            if action_key not in action_map.keys():
+                action_map[action_key] = []
+            action_map[action_key].append(action_value)
     return action_map
