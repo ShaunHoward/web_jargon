@@ -1,7 +1,11 @@
 __author__ = 'shaun'
 from os import path
-from text2web.text_processor.text_processor import CMD, CMD_ARGS, CONTEXT, DEFAULT_ACTION_CONTEXT
 
+
+CMD = 'command'
+CMD_ARGS = 'arguments'
+CONTEXT = 'context'
+DEFAULT_ACTION_CONTEXT = "default"
 DIR = path.dirname(path.dirname(__file__))
 DEFAULT_ACTIONS_PATH = DIR + '/templates/action_call_templates.txt'
 

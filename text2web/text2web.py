@@ -3,7 +3,7 @@ import json
 import web
 
 from text_processor.text_processor import process_web_action_requests
-from web_control_mapper.mapper import create_web_actions
+from web_control_mapper import mapper as mp
 
 urls = ("/.*", "Text2Web")
 web_app = web.application(urls, globals())
@@ -12,7 +12,7 @@ err_msg = "Error: Command could not be processed.\n"
 # use this template to send the text request
 json_template = "{\"request\":\"open my friends list on facebook.\"}"
 
-TEST_MODE = True
+TEST_MODE = False
 TEST_COMMAND = "Scroll down one page."
 
 
@@ -25,9 +25,10 @@ class Text2Web():
 
     def POST(self):
         try:
-            recvd_action_request = web.data()
-            json_action_request = json.loads(recvd_action_request)
-            english_request = json_action_request["request"]
+            # recvd_action_request = web.data()
+            # json_action_request = json.loads(recvd_action_request)
+            # english_request = json_action_request["request"]
+            english_request = web.data()
             return text2web(english_request)
         except ValueError:
             print "Could not process English request."
@@ -51,7 +52,7 @@ def text2web(text):
     # assert input is a string
     assert type(text) is str
     web_commands = process_web_action_requests(text)
-    web_actions = create_web_actions(web_commands)
+    web_actions = mp.create_web_actions(web_commands)
     json_action_response = wrap_actions_in_json(web_actions)
     return json_action_response
 
