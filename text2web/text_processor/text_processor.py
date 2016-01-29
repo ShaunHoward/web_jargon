@@ -1,7 +1,6 @@
 __author__ = 'shaun'
 
-from os import getcwd
-from os.path import join
+from os import getcwd, path
 from itertools import chain
 
 from nltk import pos_tag, sent_tokenize, word_tokenize
@@ -19,11 +18,14 @@ GOOGLE = "google"
 YOUTUBE = "youtube"
 
 # custom tags
-CMD_START = 'start'
-CMD_MOD = 'modifier'
-CMD_ARG = 'argument'
-
-DEFAULT_ACTIONS_PATH = join(getcwd(), '/templates/action_call_templates.txt')
+CMD = 'command'
+CMD_ARGS = 'arguments'
+DIR = path.dirname(path.dirname(__file__))
+DEFAULT_ACTIONS_PATH = DIR + '/templates/action_call_templates.txt'
+PARENT_DIR = path.dirname(DIR)
+STANFORD_JAR_PATH = PARENT_DIR + '/postagger/stanford-postagger.jar'
+BIDIR_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-bidirectional-distsim.tagger'
+TWORD_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-left3words-distsim.tagger'
 
 
 def process_web_action_requests(text):
@@ -57,8 +59,7 @@ def tag_words(words_of_text):
     :return: the tags of the words in a map (k=word, v=pos_tag)
     """
     tags = []
-    st = StanfordPOSTagger('models/english-bidirectional-distsim.tagger',
-                'stanford-postagger.jar')
+    st = StanfordPOSTagger(TWORD_STANFORD_TAGGER_PATH, STANFORD_JAR_PATH)
     tag_tuple_list = st.tag(words_of_text)
     for tag_tuple in tag_tuple_list:
         tag = tag_tuple[1]
@@ -94,54 +95,60 @@ def process(sentence, words, tags):
     :return: the web actions tokens and arguments
     """
     # search for conjunctions to split up commands
-    conjunctions = []
-    for i in range(len(tags)):
-        if 'CC' in tags[i]:
-            conjunctions.append(i)
-
-    # split up commands by splitting sentence on conjunctions
     commands = []
     command_tags = []
-    split_indices = [x for x in conjunctions]
-    for i in range(len(split_indices)):
-        split_index = split_indices[i]
-        if split_index == 0 or split_index == len(words):
-            continue
-        if i == 0:
-            command = words[:split_index-1]
-            tags_ = tags[:split_index-1]
-        elif i == len(split_indices) - 1:
-            command = words[split_index+1:]
-            tags_ = tags[split_index+1:]
-        commands.append(command)
-        command_tags.append(tags_)
+    if 'CC' in tags:
+        conjunctions = []
+        for i in range(len(tags)):
+            if 'CC' in tags[i]:
+                conjunctions.append(i)
+
+        # split up commands by splitting sentence on conjunctions
+        commands = []
+        command_tags = []
+        split_indices = [x for x in conjunctions]
+        for i in range(len(split_indices)):
+            split_index = split_indices[i]
+            if split_index == 0 or split_index == len(words):
+                continue
+            if i == 0:
+                command = words[:split_index-1]
+                tags_ = tags[:split_index-1]
+            elif i == len(split_indices) - 1:
+                command = words[split_index+1:]
+                tags_ = tags[split_index+1:]
+            if len(command) > 0 and len(tags_) > 0:
+                commands.append(command)
+                command_tags.append(tags_)
+    else:
+        commands.append(words)
+        command_tags.append(tags)
+
     action_requests = []
 
-    # try to parse web action requests and arguments
-    command_tags = []
     # must have a context for any actions taking place or default actions are assumed
     context = "default"
-    for command in commands:
-        words = command[0]
-        tags = command[1]
+    for i in range(len(commands)):
+        command_words = commands[i]
+        command_tags = command_tags[i]
         command_start = 0
-        curr_action_request = {CMD_START: "", CMD_MOD: [], CMD_ARG: []}
-        for i in range(len(tags)):
-            tag = tags[i]
+        curr_action_request = {CMD: "", CMD_ARGS: []}
+        for j in range(len(command_tags)):
+            tag = command_tags[j]
             # look for a command start
             if 'VB' in tag or 'NNP' in tag:
-                command_start = tags.index(tag)
+                command_start = j
                 # add command start to dictionary
-                curr_action_request[CMD_START] = words[command_start]
+                curr_action_request[CMD] = command_words[command_start]
 
             # look for command modifiers like up, down, etc.
-            if ('RB' in tag or 'RP' in tag) and command_start == 0:
-                if i > command_start:
-                    curr_action_request[CMD_MOD].append(words[i])
+            elif ('RB' in tag or 'RP' in tag) and command_start == 0:
+                if j > command_start:
+                    curr_action_request[CMD] += ''.join([' ', command_words[j]])
 
             # look for numeral values to feed as arguments to command
-            if 'CD' in tag:
-                curr_action_request[CMD_ARG].append(words[i])
+            elif 'CD' in tag:
+                curr_action_request[CMD_ARGS].append(command_words[j])
         action_requests.append(curr_action_request)
 
     # find the available web page controls as stored in a web control map template

@@ -12,6 +12,9 @@ err_msg = "Error: Command could not be processed.\n"
 # use this template to send the text request
 json_template = "{\"request\":\"open my friends list on facebook.\"}"
 
+TEST_MODE = True
+TEST_COMMAND = "Scroll down one page."
+
 
 class Text2Web():
     def __init__(self):
@@ -46,4 +49,7 @@ def text2web(text):
     return web_controls
 
 if __name__ == '__main__':
-    web_app.run()
+    if not TEST_MODE:
+        web_app.run()
+    else:
+        print text2web(TEST_COMMAND)
