@@ -1,17 +1,22 @@
 /**
- * Called when a command is recieved from the server
+ * Called from the background page.
  */
-function executeCommand(command){
-  alert("executing "+command);
-  chrome.tabs.executeScript(null, { code: command.func=";"/*"scrollUp();"*/});
-}
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (typeof window[request.func] == 'function') {
+      window[request.func]();
+    } else{
+      sendResponse({msg: "not found"}); 
+    }   
+  });
 
 function appendToLinks(){
     $("a").append("yep");
 }
 
 function createTab(){
-  chrome.tabs.create({ url: "http://cnn.com" });
+  alert("yep");
+  chrome.tabs.create({ url: "http://www.cnn.com" });
 }
 
 function scrollDown(){
