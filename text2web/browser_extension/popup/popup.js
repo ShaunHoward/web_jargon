@@ -15,4 +15,5 @@ $("#textInput").submit(function( event ) {
     }
   });
   //executeCommand("dostuff");//TODO remove
+  var msg = chrome.extension.getBackgroundPage().testEditor("scrollDown");
 });
