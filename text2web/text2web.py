@@ -37,7 +37,7 @@ class Text2Web():
 
 def wrap_actions_in_json(web_actions):
     json_dict = dict()
-    json_dict["actions"] = "[" + ", ".join([str(x) for x in web_actions]) + "]"
+    json_dict["actions"] = web_actions
     return json.dumps(json_dict)
 
 
