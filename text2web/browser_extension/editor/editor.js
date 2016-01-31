@@ -14,11 +14,6 @@ function appendToLinks(){
     $("a").append("yep");
 }
 
-function createTab(){
-  alert("yep");
-  chrome.tabs.create({ url: "http://www.cnn.com" });
-}
-
 function scrollDown(){
   var current = $(document).scrollTop();
   var dest = current + $(window).height();

@@ -1,4 +1,4 @@
-function testRequest(){
+function createTab(){
   chrome.tabs.create({ url: "http://www.cnn.com" });
 }
 
