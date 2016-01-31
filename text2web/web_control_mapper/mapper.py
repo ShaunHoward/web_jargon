@@ -55,6 +55,8 @@ def insert_args_into_action(args, action):
         param_list = [param.strip() for param in param_list]
         # TODO: do something with params
         action_call = ''.join([before_params, ', '.join(param_list), after_params])
+    else:
+        action_call = action_call[:len(action_call)-2]
     return action_call
 
 
