@@ -5,3 +5,4 @@ SCROLL_LEFT:<scrollLeft()>
 SCROLL_RIGHT:<scrollRight()>
 SCROLL_UP:<scrollUp()>
 SCROLL_DOWN:<scrollDown()>
+CREATE_TAB:<createTab()>
