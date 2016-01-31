@@ -6,14 +6,8 @@ $("#textInput").submit(function( event ) {
   var inputText = $("input:first").val();
   event.preventDefault();
   $.post( server, inputText, function( data ) {
-    if(typeof data == "string"){
-      $("#JargonPopup").append("</br>"+data);
-    } else {
-      for(command in JSON.parse(data)){
-        executeCommand(command);
-      }
-    }
+  $("#JargonPopup").append("</br>"+data);
+  var commands = JSON.parse(data)["actions"];
+  var msg = chrome.extension.getBackgroundPage().testEditor(commands);
   });
-  //executeCommand("dostuff");//TODO remove
-  var msg = chrome.extension.getBackgroundPage().testEditor("scrollDown");
 });
