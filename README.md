@@ -25,4 +25,4 @@
 * Provide access to change IP address and port of API server<br />
 * Provide a Setup Page for Voice and API Server<br />
 
-Web Jargon requires the user to have the internet, either to browse or use the API in general given it will run on a server we host.
+Web Jargon requires the user to have the Internet unless they setup and host the API server themselves and are browsing locally.
