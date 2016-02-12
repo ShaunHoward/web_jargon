@@ -1,6 +1,6 @@
 __author__ = 'shaun howard'
 import unittest
-from text2web import text2web as tw
+from web_jargon import web_jargon as tw
 
 
 class Text2WebText(unittest.TestCase):

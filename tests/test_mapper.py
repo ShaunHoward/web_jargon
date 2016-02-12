@@ -2,8 +2,8 @@ __author__ = 'shaun howard'
 
 import os
 import unittest
-from text2web.text_processor import text_processor as tp
-from text2web.web_control_mapper import mapper as mp
+from web_jargon.text_processor import text_processor as tp
+from web_jargon.web_control_mapper import mapper as mp
 
 # TODO read in these functions from dict or something
 SCROLL_UP = 'function scrollUp()'
@@ -13,7 +13,7 @@ SCROLL_DOWN = 'function scrollDown()'
 class MapperTest(unittest.TestCase):
 
     def setUp(self):
-        os.chdir('../text2web/')
+        os.chdir('../web_jargon/')
 
     def test_scroll_updown_create_web_actions_simple(self):
         scroll_up = "Scroll up."
