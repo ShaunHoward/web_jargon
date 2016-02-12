@@ -16,7 +16,7 @@ TEST_MODE = False
 TEST_COMMAND = "Scroll down one page."
 
 
-class Text2Web():
+class WebJargon():
     def __init__(self):
         pass
 
@@ -29,7 +29,7 @@ class Text2Web():
             # json_action_request = json.loads(recvd_action_request)
             # english_request = json_action_request["request"]
             english_request = web.data()
-            return text2web(english_request)
+            return extract_web_actions(english_request)
         except ValueError:
             print "Could not process English request."
         return err_msg
@@ -41,7 +41,7 @@ def wrap_actions_in_json(web_actions):
     return json.dumps(json_dict)
 
 
-def text2web(text):
+def extract_web_actions(text):
     """
     Interprets the provided text as a web control command if possible.
     A message may be returned to the user in json to describe the status
@@ -60,4 +60,4 @@ if __name__ == '__main__':
     if not TEST_MODE:
         web_app.run()
     else:
-        print text2web(TEST_COMMAND)
+        print extract_web_actions(TEST_COMMAND)
