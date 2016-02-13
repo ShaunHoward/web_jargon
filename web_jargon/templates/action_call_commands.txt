@@ -51,7 +51,7 @@ PLAY_VIDEO:<"play video", "play", "start video", "start", "play movie", "start m
 PAUSE_VIDEO:<"pause video", "pause", "pause movie", "stop video", "stop movie", "stop">
 RESTART_VIDEO:<"restart video", "restart", "restart movie", "replay movie", "replay video", "replay">
 OPEN_FULLSCREEN:<"fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen", "toggle full screen">
-CLOSE_FULLSCREEN:<"close fullscreen", "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off">
+CLOSE_FULLSCREEN:<"escape", "quit", "quit fullscreen", "close fullscreen", "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off">
 
 # requirement 4.12
 PLAY_MUSIC:<"play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)", "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music", "play my music", "play song", "play tune", "play">
