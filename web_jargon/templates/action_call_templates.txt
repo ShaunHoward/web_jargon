@@ -19,7 +19,7 @@ BACKWARD_PAGE:<backwardPage()>
 REFRESH:<refresh()>
 
 # requirement 4.6
-CLICK:<click(NAME)>
+CLICK:<click(ELEMENT_NAME)>
 OPEN_LINK:<openLink(LINK_NAME)>
 
 # requirement 4.7
