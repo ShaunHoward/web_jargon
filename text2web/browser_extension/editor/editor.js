@@ -10,6 +10,15 @@ chrome.runtime.onMessage.addListener(
     }   
   });
 
+
+function _askForAudio(){
+  alert("asking in popup");
+  //$("document").append("<webview src='chrome-extension://"+chrome.runtime.id+"/requestAudio.html' width='640' height='480'></webview>");
+  //$("document").append("<webview src='google.com' width='640' height='480'></webview>");
+
+}
+
+
 function appendToLinks(){
     $("a").append("yep");
 }
