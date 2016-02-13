@@ -1,7 +1,0 @@
-# **these are comments that will not be parsed as actions
-# percentage is of one page scroll in any direction
-# so 50% to the left would be 50% of one page to the left
-SCROLL_LEFT:<scrollLeft()>
-SCROLL_RIGHT:<scrollRight()>
-SCROLL_UP:<scrollUp()>
-SCROLL_DOWN:<scrollDown()>

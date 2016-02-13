@@ -1,7 +1,7 @@
 __author__ = 'shaun howard'
 import os
 import unittest
-from text2web.text_processor import text_processor as tp
+from web_jargon.text_processor import text_processor as tp
 
 
 class TextProcessorTest(unittest.TestCase):
