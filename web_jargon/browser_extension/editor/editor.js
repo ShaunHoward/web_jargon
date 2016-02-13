@@ -1,4 +1,8 @@
 /**
+The editor controls tab-specific functions. It recieves commands from the background page.
+*/
+
+/**
  * Called from the background page.
  */
 chrome.runtime.onMessage.addListener(
@@ -9,15 +13,6 @@ chrome.runtime.onMessage.addListener(
       sendResponse({msg: "not found"}); 
     }   
   });
-
-
-function _askForAudio(){
-  alert("asking in popup");
-  //$("document").append("<webview src='chrome-extension://"+chrome.runtime.id+"/requestAudio.html' width='640' height='480'></webview>");
-  //$("document").append("<webview src='google.com' width='640' height='480'></webview>");
-
-}
-
 
 function appendToLinks(){
     $("a").append("yep");
