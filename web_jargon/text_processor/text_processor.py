@@ -71,7 +71,7 @@ def similar_words(word, meaning):
 def extract_action_requests(words, tags):
     """
     Figure out the web actions that exist in the provided sentence using
-    the given words and tags.
+    the given words and tags as well as action command templates.
     :param words: the words of the sentence
     :param tags: the tags of the words in the sentence
     :return: the web actions tokens and arguments
@@ -106,43 +106,63 @@ def extract_action_requests(words, tags):
         commands.append(words)
         command_tags.append(tags)
 
+    # interpret actions
     action_requests = []
     for i in range(len(commands)):
         command_words = commands[i]
         command_tags = command_tags[i]
-        command_start = 0
-        # must have a context for any actions taking place or default actions are assumed
-        action_context = determine_action_context(command_words, command_tags)
-        curr_action_request = {h.CMD: "", h.CMD_ARGS: [], CONTEXT: action_context}
-        tag_list = []
-        for j in range(len(command_tags)):
-            tag = command_tags[j]
-            # look for a command start
-            if ('VB' in tag and CMD_START not in tag_list) or\
-                    ('NN' in tag and CMD_START not in tag_list):
-                tag_list.append(CMD_START)
-                command_start = j
-                # add command start to dictionary
-                curr_action_request[h.CMD] = command_words[command_start]
-            # look for command modifiers like up, down, etc.
-            elif ('RB' in tag or 'RP' in tag or
-                    ('VB' in tag and CMD_START in tag_list) or
-                    ('NN' in tag and CMD_START in tag_list)) and\
-                    command_start == 0:
-                if j > command_start:
-                    tag_list.append('RB|RP|VB')
-                    curr_action_request[h.CMD] += ''.join([' ', command_words[j]])
-            # look for numeral values to feed as arguments to command
-            elif 'CD' in tag or 'JJ' in tag:
-                tag_list.append('CD|JJ')
-                # try to parse a number out of the numeral
-                if 'JJ' in tag and command_words[j] in NUM_TO_INT.keys():
-                    num_arg = NUM_TO_INT[command_words[j]]
-                    curr_action_request[h.CMD_ARGS].append(num_arg)
-                else:
-                    curr_action_request[h.CMD_ARGS].append(command_words[j])
-        action_requests.append(curr_action_request)
+        curr_action_request = {h.CMD: "", h.CMD_ARGS: {}}
+
+        # first try to use templates to determine desired actions
+        curr_action_request = template_action_interpreter(command_tags, command_words, curr_action_request)
+
+        # next try to use the fuzzy nlp interpreter to determine desired actions
+        if len(curr_action_request) == 0:
+            curr_action_request = fuzzy_action_interpreter(command_tags, command_words, curr_action_request)
+
+        # add actions if intent determine, otherwise print error message
+        if len(curr_action_request) > 0:
+            action_requests.append(curr_action_request)
+        else:
+            print "error in interpreting desired actions"
+
     return action_requests
+
+
+def template_action_interpreter(command_tags, command_words, curr_action_request):
+    return curr_action_request
+
+
+def fuzzy_action_interpreter(command_tags, command_words, curr_action_request):
+    # do fuzzy action interpretation
+    tag_list = []
+    for j in range(len(command_tags)):
+        tag = command_tags[j]
+        # look for a command start
+        if ('VB' in tag and CMD_START not in tag_list) or\
+                ('NN' in tag and CMD_START not in tag_list):
+            tag_list.append(CMD_START)
+            command_start = j
+            # add command start to dictionary
+            curr_action_request[h.CMD] = command_words[command_start]
+        # look for command modifiers like up, down, etc.
+        elif ('RB' in tag or 'RP' in tag or
+                ('VB' in tag and CMD_START in tag_list) or
+                ('NN' in tag and CMD_START in tag_list)) and\
+                command_start == 0:
+            if j > command_start:
+                tag_list.append('RB|RP|VB')
+                curr_action_request[h.CMD] += ''.join([' ', command_words[j]])
+        # look for numeral values to feed as arguments to command
+        elif 'CD' in tag or 'JJ' in tag:
+            tag_list.append('CD|JJ')
+            # try to parse a number out of the numeral
+            if 'JJ' in tag and command_words[j] in NUM_TO_INT.keys():
+                num_arg = NUM_TO_INT[command_words[j]]
+                curr_action_request[h.CMD_ARGS].append(num_arg)
+            else:
+                curr_action_request[h.CMD_ARGS].append(command_words[j])
+    return curr_action_request
 
 
 def determine_action_context(words, tags):
