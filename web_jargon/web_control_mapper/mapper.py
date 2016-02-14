@@ -89,7 +89,8 @@ def load_action_template(template_path):
     # filter out comments from actions
     filtered_actions = []
     for action in actions:
-        if not action.startswith("#"):
+        action = action.strip()
+        if not action.startswith("#") and len(action) > 3:
             filtered_actions.append(action)
 
     # create a map from token to action function call
