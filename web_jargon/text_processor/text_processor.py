@@ -7,6 +7,8 @@ from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordPOSTagger
 
+from web_jargon import helpers as h
+
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
               "ninth": 9, "tenth": 10, "eleventh": 11, "twelvefth": 12, "thirteenth": 13, "fourteenth": 14,
               "fifteenth": 15}
@@ -22,13 +24,12 @@ GOOGLE = "google"
 YOUTUBE = "youtube"
 
 # custom tags
-CMD = 'command'
-CMD_ARGS = 'arguments'
 CMD_START = 'VB|NN'
 CONTEXT = 'context'
 DEFAULT_ACTION_CONTEXT = "default"
 DIR = path.dirname(path.dirname(__file__))
 PARENT_DIR = path.dirname(DIR)
+DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 STANFORD_JAR_PATH = PARENT_DIR + '/postagger/stanford-postagger.jar'
 BIDIR_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-bidirectional-distsim.tagger'
 TWORD_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-left3words-distsim.tagger'
@@ -135,7 +136,7 @@ def extract_action_requests(words, tags):
         command_start = 0
         # must have a context for any actions taking place or default actions are assumed
         action_context = determine_action_context(command_words, command_tags)
-        curr_action_request = {CMD: "", CMD_ARGS: [], CONTEXT: action_context}
+        curr_action_request = {h.CMD: "", h.CMD_ARGS: [], CONTEXT: action_context}
         tag_list = []
         for j in range(len(command_tags)):
             tag = command_tags[j]
@@ -145,7 +146,7 @@ def extract_action_requests(words, tags):
                 tag_list.append(CMD_START)
                 command_start = j
                 # add command start to dictionary
-                curr_action_request[CMD] = command_words[command_start]
+                curr_action_request[h.CMD] = command_words[command_start]
             # look for command modifiers like up, down, etc.
             elif ('RB' in tag or 'RP' in tag or
                     ('VB' in tag and CMD_START in tag_list) or
@@ -153,16 +154,16 @@ def extract_action_requests(words, tags):
                     command_start == 0:
                 if j > command_start:
                     tag_list.append('RB|RP|VB')
-                    curr_action_request[CMD] += ''.join([' ', command_words[j]])
+                    curr_action_request[h.CMD] += ''.join([' ', command_words[j]])
             # look for numeral values to feed as arguments to command
             elif 'CD' in tag or 'JJ' in tag:
                 tag_list.append('CD|JJ')
                 # try to parse a number out of the numeral
                 if 'JJ' in tag and command_words[j] in NUM_TO_INT.keys():
                     num_arg = NUM_TO_INT[command_words[j]]
-                    curr_action_request[CMD_ARGS].append(num_arg)
+                    curr_action_request[h.CMD_ARGS].append(num_arg)
                 else:
-                    curr_action_request[CMD_ARGS].append(command_words[j])
+                    curr_action_request[h.CMD_ARGS].append(command_words[j])
         action_requests.append(curr_action_request)
     return action_requests
 
@@ -180,6 +181,29 @@ def train_processor(training_data_dir):
     with open(training_data_dir, 'r') as training_file:
         training_data = training_file.read()
     training_command_list = training_data.split('\n')
+
+
+def normalize_nested_dict(dict_of_dict):
+    new_dict_of_dict = dict()
+    for key_1 in dict_of_dict.keys():
+        new_dict_of_dict[key_1] = dict()
+        for key_2 in dict_of_dict[key_1].keys():
+            new_dict_of_dict[key_1][key_2] = 0
+            max_val = max(dict_of_dict[key_1][key_2])
+            min_val = min(dict_of_dict[key_1][key_2])
+            for val in dict_of_dict[key_1][key_2]:
+                belief = (val - min_val) / (max_val - min_val)
+                new_dict_of_dict[key_1][key_2] = belief
+    return new_dict_of_dict
+
+
+class TextProcessor():
+    action_text_mappings = dict()
+
+    def __init__(self):
+        self.action_text_mappings = h.load_web_action_template(DEFAULT_ACTIONS_PATH, False)
+
+
 
 
 # def create_bigram_belief_state(self, training_command_list):
@@ -211,18 +235,3 @@ def train_processor(training_data_dir):
 #         elif i == len(word_tokenized_commands) - 1:
 #             bigrams = [(word, word_tokenized_commands[i - 1])]
 #     return bigrams
-
-def normalize_nested_dict(dict_of_dict):
-    new_dict_of_dict = dict()
-    for key_1 in dict_of_dict.keys():
-        new_dict_of_dict[key_1] = dict()
-        for key_2 in dict_of_dict[key_1].keys():
-            new_dict_of_dict[key_1][key_2] = 0
-            max_val = max(dict_of_dict[key_1][key_2])
-            min_val = min(dict_of_dict[key_1][key_2])
-            for val in dict_of_dict[key_1][key_2]:
-                belief = (val - min_val) / (max_val - min_val)
-                new_dict_of_dict[key_1][key_2] = belief
-    return new_dict_of_dict
-
-
