@@ -117,7 +117,7 @@ def parse_arguments(arguments):
         # remove parentheses from arguments
         arguments = arguments[1:len(arguments)-1]
 
-        # do shit
+        # split args up
         arg_list = arguments.split(",")
         for arg in arg_list:
             arg = arg.strip()
