@@ -12,7 +12,7 @@ class TextProcessorTest(unittest.TestCase):
         for phrase in phrases:
             web_actions = tp.process_web_action_requests(phrase)
             self.assertEqual(len(web_actions), 1)
-            self.assertEqual(web_actions[0][tp.CMD], action)
+            self.assertEqual(action, web_actions[0][tp.CMD])
 
     def test_scroll_left(self):
         template_phrases = ["scroll left", "left scroll"]

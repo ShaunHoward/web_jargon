@@ -3,7 +3,7 @@ import json
 import web
 
 from text_processor.text_processor import process_web_action_requests
-from web_control_mapper import mapper as mp
+from web_control_mapper.mapper import Mapper
 
 urls = ("/.*", "WebJargon")
 web_app = web.application(urls, globals())
@@ -17,8 +17,10 @@ TEST_COMMAND = "Scroll down one page."
 
 
 class WebJargon():
+    mapper = None
+
     def __init__(self):
-        pass
+        self.mapper = Mapper()
 
     def GET(self):
         return 'Provide Web Jargon with an English text web action request.'
@@ -29,7 +31,7 @@ class WebJargon():
             # json_action_request = json.loads(recvd_action_request)
             # english_request = json_action_request["request"]
             english_request = web.data()
-            return extract_web_actions(english_request)
+            return extract_web_actions(english_request, self.mapper)
         except ValueError:
             print "Could not process English request."
         return err_msg
@@ -41,18 +43,19 @@ def wrap_actions_in_json(web_actions):
     return json.dumps(json_dict)
 
 
-def extract_web_actions(text):
+def extract_web_actions(text, mapper):
     """
     Interprets the provided text as a web control command if possible.
     A message may be returned to the user in json to describe the status
     of the operation.
     :param text: the text to control the default web browser
+    :param mapper: the mapper instance for determine action list
     :return: the json text response of the web control service containing web actions to execute
     """
     # assert input is a string
     assert type(text) is str
     web_commands = process_web_action_requests(text)
-    web_actions = mp.create_web_actions(web_commands)
+    web_actions = mapper.create_web_actions(web_commands)
     json_action_response = wrap_actions_in_json(web_actions)
     return json_action_response
 

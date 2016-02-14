@@ -8,33 +8,8 @@ CONTEXT = 'context'
 DEFAULT_ACTION_CONTEXT = "default"
 DIR = path.dirname(path.dirname(__file__))
 DEFAULT_ACTIONS_PATH = DIR + '/templates/action_call_templates.txt'
-
-
-def create_web_actions(action_requests):
-    """
-    Creates the web action function calls using the
-    action call templates.
-    :param action_requests: the list of commands to turn into web action sequences
-    :return: a list of web actions for the given web action requests
-    """
-    web_actions = []
-    for action_request in action_requests:
-        # find the available web page controls as stored in a web control map template
-        # these can be determined from the web page context using words and their POS tags
-        action_map = get_actions_in_context(action_request[CONTEXT])
-
-        # search for the correct web action
-        for action_key in action_map.keys():
-            action_split = action_key.split("_")
-            count = 0
-            for word in action_split:
-                if word.lower() in action_request[CMD].lower():
-                    count += 1
-            if count == len(action_split):
-                args = ', '.join(action_request[CMD_ARGS])
-                web_action = insert_args_into_action(args, action_map[action_key][0])
-                web_actions.append(web_action)
-    return web_actions
+LPAREN = "("
+RPAREN = ")"
 
 
 def insert_args_into_action(args, action):
@@ -60,25 +35,30 @@ def insert_args_into_action(args, action):
     return action_call
 
 
-def get_actions_in_context(context):
-    """
-    Load the actions for the specified context given action call
-    template files for various websites that are well-known.
-    By default, return the default available action list.
-    :param context: the context of the web page to control
-    :return: a list of available actions in this context
-    """
-    action_template_mappings = {DEFAULT_ACTION_CONTEXT: DEFAULT_ACTIONS_PATH}
-    if context in action_template_mappings.keys():
-        # try to load a custom action mapping
-        action_map = load_action_template(action_template_mappings[context])
-    else:
-        # load the default action mappings by default
-        action_map = load_action_template(action_template_mappings[DEFAULT_ACTION_CONTEXT])
-    return action_map
+# def get_actions_in_context(context):
+#     """
+#     Load the actions for the specified context given action call
+#     template files for various websites that are well-known.
+#     By default, return the default available action list.
+#     :param context: the context of the web page to control
+#     :return: a list of available actions in this context
+#     """
+#     action_template_mappings = {DEFAULT_ACTION_CONTEXT: DEFAULT_ACTIONS_PATH}
+#     if context in action_template_mappings.keys():
+#         # try to load a custom action mapping
+#         action_map = load_action_template(action_template_mappings[context])
+#     else:
+#         # load the default action mappings by default
+#         action_map = load_action_template(action_template_mappings[DEFAULT_ACTION_CONTEXT])
+#     return action_map
 
 
 def load_action_template(template_path):
+    """
+    Generate an action template for creating action sequences.
+    :param template_path: the path of the action call template file.
+    :return: the action template map, ready to use and fill in
+    """
     # read actions file
     with open(template_path, 'r') as f:
         actions_string = f.read()
@@ -104,7 +84,85 @@ def load_action_template(template_path):
         if len(action_key) > 0 and len(action_value) > 0:
             # strip <> and trailing whitespace from function call
             action_value = action_value.lstrip('<').rstrip('>').strip()
-            if action_key not in action_map.keys():
-                action_map[action_key] = []
-            action_map[action_key].append(action_value)
+
+            if len(action_value) > 0:
+                # separate functions from arguments
+                l_paren_index = action_value.index(LPAREN)
+                action_args = action_value[l_paren_index:]
+                action_value = action_value[:l_paren_index]
+
+                # parse arguments into a list template
+                action_args_list = parse_arguments(action_args)
+
+                # create the action call template as a dictionary with command and arguments
+                if action_key not in action_map.keys():
+                    action_map[action_key] = dict()
+
+                # store the action and the arguments to it
+                action_map[action_key][CMD_ARGS] = action_args_list
+                action_map[action_key][CMD] = action_value
     return action_map
+
+
+def parse_arguments(arguments):
+    """
+    Parse the argument string from the action call template,
+    where arguments are surrounded in parenthesis. Make sure
+    to parse and store default values as well.
+    :param arguments: the argument string from the action call templates
+    :return: the dict from argument to value
+    """
+    args = dict()
+    if len(arguments) > 2:
+        # remove parentheses from arguments
+        arguments = arguments[1:len(arguments)-1]
+
+        # do shit
+        arg_list = arguments.split(",")
+        for arg in arg_list:
+            arg = arg.strip()
+
+            # handle "OR" parameters
+            or_args = arg.split("|")
+            for or_arg in or_args:
+                # handle default values
+                arg_vals = or_arg.split("=")
+                if len(arg_vals) == 2:
+                    args[arg_vals[0]] = arg_vals[1]
+                else:
+                    args[or_arg] = ""
+
+    return args
+
+
+class Mapper():
+    action_map = dict()
+
+    def __init__(self):
+        self.action_map = load_action_template(DEFAULT_ACTIONS_PATH)
+
+    def create_web_actions(self, action_requests):
+        """
+        Creates the web action function calls using the
+        action call templates.
+        :param action_requests: the list of commands to turn into web action sequences
+        :return: a list of web actions for the given web action requests
+        """
+        web_actions = []
+        for action_request in action_requests:
+            # find the available web page controls as stored in a web control map template
+            # these can be determined from the web page context using words and their POS tags
+            # action_map = get_actions_in_context(action_request[CONTEXT])
+
+            # search for the correct web action
+            for action_key in self.action_map.keys():
+                action_split = action_key.split("_")
+                count = 0
+                for word in action_split:
+                    if word.lower() in action_request[CMD].lower():
+                        count += 1
+                if count == len(action_split):
+                    args = ', '.join(action_request[CMD_ARGS])
+                    web_action = insert_args_into_action(args, self.action_map[action_key][0])
+                    web_actions.append(web_action)
+        return web_actions
