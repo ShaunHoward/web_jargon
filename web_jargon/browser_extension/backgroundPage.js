@@ -62,11 +62,7 @@ Checks background page functions first, then checks current tab functions
 */
 function _doCommand(cmd, params){
   if (typeof window[cmd] == 'function') { 
-    if(params.length == 0){
-      window[cmd]();
-    } else{
-      window[cmd](params[0]);
-    }
+    window[cmd].apply(null, params);
     return;
   }
   //if function not found in backgound page, check content script
@@ -80,7 +76,6 @@ function _doCommand(cmd, params){
 }
 
 function _getAudioPermission(){
-  alert("asking for permission");
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
 }
 
