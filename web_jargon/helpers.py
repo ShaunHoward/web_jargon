@@ -88,8 +88,16 @@ def load_web_action_template(template_path, action_call=True):
                     action_map[action_key][CMD] = action_value
                 else:
                     # run action command template parser
-                    pass
-
+                    # split values on commas
+                    utterances = action_value.split(",")
+                    # clean up whitespace
+                    utterances = [x.strip() for x in utterances]
+                    # strip off quotes
+                    utterances = [x[1:len(x)-1] for x in utterances]
+                    # create the action command template as a dictionary with command and arguments
+                    if action_key not in action_map.keys():
+                        action_map[action_key] = []
+                    action_map[action_key] = action_map[action_key] + utterances
     return action_map
 
 

@@ -35,29 +35,6 @@ BIDIR_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-bidirection
 TWORD_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-left3words-distsim.tagger'
 
 
-def process_web_action_requests(text):
-    """
-    Parses the provided text into web text actions that will be converted into
-    web actions by the web text to action mapper. The order will be maintained.
-    :param text: the input command text
-    :return: the controls list, which will be empty if in error
-    """
-    # tokenize text into sentences
-    sentences = sent_tokenize(text)
-    words_of_sentences = [word_tokenize(sent) for sent in sentences]
-    tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
-
-    # TODO: validate jargon
-    is_valid = [valid_web_jargon(sent) for sent in sentences]
-    web_action_tokens = []
-    for i in range(len(is_valid)):
-        if is_valid[i]:
-            # process sentence for commands
-            web_action_tokens = web_action_tokens + extract_action_requests(words_of_sentences[i],
-                                                                            tags_of_words_of_sentences[i])
-    return web_action_tokens
-
-
 def tag_words(words_of_text):
     """
     Tags the provided words of the text with parts of speech.
@@ -203,6 +180,27 @@ class TextProcessor():
     def __init__(self):
         self.action_text_mappings = h.load_web_action_template(DEFAULT_ACTIONS_PATH, False)
 
+    def process_web_action_requests(self, text):
+        """
+        Parses the provided text into web text actions that will be converted into
+        web actions by the web text to action mapper. The order will be maintained.
+        :param text: the input command text
+        :return: the controls list, which will be empty if in error
+        """
+        # tokenize text into sentences
+        sentences = sent_tokenize(text)
+        words_of_sentences = [word_tokenize(sent) for sent in sentences]
+        tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
+
+        # TODO: validate jargon
+        is_valid = [valid_web_jargon(sent) for sent in sentences]
+        web_action_tokens = []
+        for i in range(len(is_valid)):
+            if is_valid[i]:
+                # process sentence for commands
+                web_action_tokens = web_action_tokens + extract_action_requests(words_of_sentences[i],
+                                                                                tags_of_words_of_sentences[i])
+        return web_action_tokens
 
 
 
