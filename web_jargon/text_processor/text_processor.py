@@ -68,71 +68,6 @@ def similar_words(word, meaning):
     return synonyms
 
 
-def extract_action_requests(words, tags):
-    """
-    Figure out the web actions that exist in the provided sentence using
-    the given words and tags as well as action command templates.
-    :param words: the words of the sentence
-    :param tags: the tags of the words in the sentence
-    :return: the web actions tokens and arguments
-    """
-    # search for conjunctions to split up commands
-    commands = []
-    command_tags = []
-    if 'CC' in tags:
-        conjunctions = []
-        for i in range(len(tags)):
-            if 'CC' in tags[i]:
-                conjunctions.append(i)
-
-        # split up commands by splitting sentence on conjunctions
-        commands = []
-        command_tags = []
-        split_indices = [x for x in conjunctions]
-        for i in range(len(split_indices)):
-            split_index = split_indices[i]
-            if split_index == 0 or split_index == len(words):
-                continue
-            if i == 0:
-                command = words[:split_index-1]
-                tags_ = tags[:split_index-1]
-            elif i == len(split_indices) - 1:
-                command = words[split_index+1:]
-                tags_ = tags[split_index+1:]
-            if len(command) > 0 and len(tags_) > 0:
-                commands.append(command)
-                command_tags.append(tags_)
-    else:
-        commands.append(words)
-        command_tags.append(tags)
-
-    # interpret actions
-    action_requests = []
-    for i in range(len(commands)):
-        command_words = commands[i]
-        command_tags = command_tags[i]
-        curr_action_request = {h.CMD: "", h.CMD_ARGS: {}}
-
-        # first try to use templates to determine desired actions
-        curr_action_request = template_action_interpreter(command_tags, command_words, curr_action_request)
-
-        # next try to use the fuzzy nlp interpreter to determine desired actions
-        if len(curr_action_request) == 0:
-            curr_action_request = fuzzy_action_interpreter(command_tags, command_words, curr_action_request)
-
-        # add actions if intent determine, otherwise print error message
-        if len(curr_action_request) > 0:
-            action_requests.append(curr_action_request)
-        else:
-            print "error in interpreting desired actions"
-
-    return action_requests
-
-
-def template_action_interpreter(command_tags, command_words, curr_action_request):
-    return curr_action_request
-
-
 def fuzzy_action_interpreter(command_tags, command_words, curr_action_request):
     # do fuzzy action interpretation
     tag_list = []
@@ -218,11 +153,156 @@ class TextProcessor():
         for i in range(len(is_valid)):
             if is_valid[i]:
                 # process sentence for commands
-                web_action_tokens = web_action_tokens + extract_action_requests(words_of_sentences[i],
-                                                                                tags_of_words_of_sentences[i])
+                web_action_tokens = web_action_tokens + self.extract_action_requests(text, words_of_sentences[i],
+                                                                                     tags_of_words_of_sentences[i])
         return web_action_tokens
 
+    def extract_action_requests(self, text, words, tags):
+        """
+        Figure out the web actions that exist in the provided sentence using
+        the given words and tags as well as action command templates.
+        :param text: the text said by the user
+        :param words: the words of the sentence
+        :param tags: the tags of the words in the sentence
+        :return: the web actions tokens and arguments
+        """
+        # search for conjunctions to split up commands
+        commands = []
+        command_tags = []
+        if 'CC' in tags:
+            conjunctions = []
+            for i in range(len(tags)):
+                if 'CC' in tags[i]:
+                    conjunctions.append(i)
 
+            # split up commands by splitting sentence on conjunctions
+            commands = []
+            command_tags = []
+            split_indices = [x for x in conjunctions]
+            for i in range(len(split_indices)):
+                split_index = split_indices[i]
+                if split_index == 0 or split_index == len(words):
+                    continue
+                if i == 0:
+                    command = words[:split_index-1]
+                    tags_ = tags[:split_index-1]
+                elif i == len(split_indices) - 1:
+                    command = words[split_index+1:]
+                    tags_ = tags[split_index+1:]
+                if len(command) > 0 and len(tags_) > 0:
+                    commands.append(command)
+                    command_tags.append(tags_)
+        else:
+            commands.append(words)
+            command_tags.append(tags)
+
+        # interpret actions
+        action_requests = []
+        for i in range(len(commands)):
+            command_words = commands[i]
+            command_tags = command_tags[i]
+            curr_action_request = {h.CMD: "", h.CMD_ARGS: {}}
+
+            # first try to use templates to determine desired actions
+            curr_action_request = self.template_action_interpreter(text, command_tags, command_words,
+                                                                   curr_action_request)
+
+            # next try to use the fuzzy nlp interpreter to determine desired actions
+            if len(curr_action_request) == 0:
+                curr_action_request = fuzzy_action_interpreter(command_tags, command_words, curr_action_request)
+
+            # add actions if intent determine, otherwise print error message
+            if len(curr_action_request) > 0:
+                action_requests.append(curr_action_request)
+            else:
+                print "error in interpreting desired actions"
+
+        return action_requests
+
+    def template_action_interpreter(self, command_text, command_tags, command_words, curr_action_request):
+        """
+        This method will not always work. multiple instances of the same string may be detected
+        in matching and may throw off the interpreter.
+        :param command_tags:
+        :param command_words:
+        :param curr_action_request:
+        :return:
+        """
+
+        values = []
+        # try to find match of an action key in the command
+        for key in self.action_text_mappings.keys():
+            # split on underscore
+            s = key.split("_")
+
+            indices = []
+            # try to find if the key is in the command to narrow search
+            for st in s:
+                if st in command_words:
+                    indices.append(command_words.index(st))
+
+            prev = -1
+            c = 0
+            # see if the words were encountered in the proper order
+            for i in indices:
+                if i > prev:
+                    prev = i
+                    c += 1
+                else:
+                    break
+
+            # we already know what command to use by this point, no need for nlp
+            if c == len(indices):
+                curr_action_request[h.CMD] = key
+                values = self.action_text_mappings[key]
+
+        has_action_request = False
+        # at this point, the command should either be found or this part should be skipped
+        for action_text in values:
+            if not has_action_request:
+                parts_list = []
+                args_list = []
+                # split on rparen for arguments
+                s = action_text.split("(")
+                parts_list.append(s[0])
+
+                # extract necessary argument fields
+                if len(s) > 1:
+                    # already stored the first element
+                    s = s[1:]
+                    # pull out all arguments
+                    for st in s:
+                        strs = st.split(")")
+                        args_list.append(strs[0])
+                        if len(strs) > 1:
+                            parts_list.append(strs[1])
+
+                indices = []
+                for part in parts_list:
+                    if part in command_words:
+                        indices.append(command_words.index(part))
+                prev = -1
+                c = 0
+                # see if the words were encountered in the proper order
+                for i in indices:
+                    if i > prev:
+                        prev = i
+                        c += 1
+                    else:
+                        # break from i loop
+                        break
+                    if c == len(indices):
+                        curr_action_request[h.CMD_ARGS] = self.generate_args(command_text, args_list, action_text)
+                        has_action_request = True
+                        break
+        return curr_action_request
+
+    def generate_args(self, command_words, args_list, action_text):
+        arg_map = dict()
+
+        # search for each argument set in the string
+
+        return arg_map
 
 # def create_bigram_belief_state(self, training_command_list):
 #     for command in training_command_list:
