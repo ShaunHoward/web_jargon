@@ -5,7 +5,7 @@ import web
 from text_processor.text_processor import process_web_action_requests
 from web_control_mapper import mapper as mp
 
-urls = ("/.*", "Text2Web")
+urls = ("/.*", "WebJargon")
 web_app = web.application(urls, globals())
 err_msg = "Error: Command could not be processed.\n"
 
