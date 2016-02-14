@@ -6,7 +6,7 @@
   "version": "1.0",
 
   "browser_action": {
-    "default_icon": "popup/icon.png",
+    "default_icon": "popup/plugin_ready.png",
     "default_popup": "popup/popup.html"
   },
 
@@ -26,6 +26,6 @@
   ],
 
   "background": {
-    "scripts": ["backgroundPage.js"]
+    "scripts": ["jquery-2.2.0.min.js","backgroundPage.js"]
   }
 }

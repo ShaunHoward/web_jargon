@@ -105,3 +105,12 @@ function _startListening(){
   }
   recognition.start();
 }
+
+function _setIcon(file){
+  chrome.browserAction.setIcon({
+    path: file
+  });
+}
+function _setIconReady(){_setIcon("popup/plugin_ready.png");}
+function _setIconBusy(){_setIcon("popup/plugin_busy.png");}
+function _setIconError(){_setIcon("popup/plugin_error.png");}
