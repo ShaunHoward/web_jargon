@@ -252,16 +252,16 @@ class TextProcessor():
                 if st in command_words:
                     indices.append(command_words.index(st))
 
-            prev = -1
-            c = 0
-            # see if the words were encountered in the proper order
-            for i in indices:
-                if i > prev:
-                    prev = i
-                    c += 1
-                else:
-                    break
-
+            # prev = -1
+            # c = 0
+            # # see if the words were encountered in the proper order
+            # for i in indices:
+            #     if i > prev:
+            #         prev = i
+            #         c += 1
+            #     else:
+            #         break
+            c = len(indices)
             # we already know what command to use by this point, no need for nlp
             if c == len(s) or c == len(command_words) and c > 0:
                 curr_action_request[h.CMD] = key
@@ -293,17 +293,17 @@ class TextProcessor():
                 for part in parts_list:
                     if part in command_text:
                         indices.append(command_text.index(part))
-                prev = -1
-                c = 0
-                # see if the words were encountered in the proper order
-                for i in indices:
-                    if i > prev:
-                        prev = i
-                        c += 1
-                    else:
-                        # break from i loop
-                        break
-
+                # prev = -1
+                # c = 0
+                # # see if the words were encountered in the proper order
+                # for i in indices:
+                #     if i > prev:
+                #         prev = i
+                #         c += 1
+                #     else:
+                #         # break from i loop
+                #         break
+                c = len(indices)
                 if c == len(parts_list):
                     curr_action_request[h.CMD_ARGS] = self.generate_args(command_text, args_list, action_text)
                     break

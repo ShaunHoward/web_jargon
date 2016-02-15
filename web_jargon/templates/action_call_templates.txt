@@ -18,8 +18,8 @@ CLOSE_TAB:<closeTab(TAB_INDEX|TAB_NAME)>
 SWITCH_TAB:<switchTab(TAB_INDEX|TAB_NAME)>
 
 # requirement 4.6
-FORWARD_PAGE:<forwardPage()>
-BACKWARD_PAGE:<backwardPage()>
+FORWARD:<forwardPage()>
+BACKWARD:<backwardPage()>
 REFRESH:<refresh()>
 
 # requirement 4.7

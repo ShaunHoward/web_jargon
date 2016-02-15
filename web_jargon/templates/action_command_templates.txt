@@ -19,8 +19,8 @@ CLOSE_TAB:<"close tab", "close this tab", "close my tab", "exit this tab", "leav
 SWITCH_TAB:<"switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME)">
 
 # requirement 4.6
-FORWARD_PAGE:<"forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead">
-BACKWARD_PAGE:<"backward", "go backward", "go backward a page", "go back a page", "go to the previous page", "previous page", "back a page", "backward a page", "one page backward", "page backward", "page back">
+FORWARD:<"forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead">
+BACKWARD:<"backward", "go backward", "go backward a page", "go back a page", "go to the previous page", "previous page", "back a page", "backward a page", "one page backward", "page backward", "page back">
 REFRESH:<"refresh the page", "refresh page", "page refresh", "refresh this page">
 
 # requirement 4.7
