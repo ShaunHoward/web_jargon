@@ -15,40 +15,41 @@ class TextProcessorTest(unittest.TestCase):
         for phrase in phrases:
             web_actions = self.tp.process_web_action_requests(phrase)
             self.assertEqual(len(web_actions), 1)
+            self.assertTrue(web_actions[0][CMD] in self.tp.action_text_mappings.keys())
             # for w in web_actions[0][CMD].split("_"):
             #     if len(w) > 0:
             #         self.assertTrue(w.lower() in action)
-
-            command_text = phrase.lower().strip()
-            indices = []
-            # try to find match of an action key in the command
-            if web_actions[0][CMD] in self.tp.action_text_mappings.keys():
-                potential_winners = []
-                for utterance in self.tp.action_text_mappings[web_actions[0][CMD]]:
-                    u = utterance.split(" ")
-                    s = command_text.split(" ")
-                    for st in s:
-                        if st in utterance:
-                            indices.append(utterance.index(st))
-                    #
-                    # prev = -1
-                    # c = 0
-                    # # see if the words were encountered in the proper order
-                    # for i in indices:
-                    #     if i > prev:
-                    #         prev = i
-                    #         c += 1
-                    #     else:
-                    #         break
-                    c = len(indices)
-                    # we already know what command to use by this point, no need for nlp
-                    if c == len(s) or c == len(u) and c > 0:
-                        potential_winners.append(utterance)
-                        break
-                self.assertTrue(len(potential_winners) > 0)
-            elif len(web_actions[0][CMD]) == 0:
-                print "action length 0"
-                self.fail("action is not valid")
+            #
+            # command_text = phrase.lower().strip()
+            # indices = []
+            # # try to find match of an action key in the command
+            # if web_actions[0][CMD] in self.tp.action_text_mappings.keys():
+            #     potential_winners = []
+            #     for utterance in self.tp.action_text_mappings[web_actions[0][CMD]]:
+            #         u = utterance.split(" ")
+            #         s = command_text.split(" ")
+            #         for st in s:
+            #             if st in utterance:
+            #                 indices.append(utterance.index(st))
+            #         #
+            #         # prev = -1
+            #         # c = 0
+            #         # # see if the words were encountered in the proper order
+            #         # for i in indices:
+            #         #     if i > prev:
+            #         #         prev = i
+            #         #         c += 1
+            #         #     else:
+            #         #         break
+            #         c = len(indices)
+            #         # we already know what command to use by this point, no need for nlp
+            #         if c == len(s) or c == len(u) and c > 0:
+            #             potential_winners.append(utterance)
+            #             break
+            #     self.assertTrue(len(potential_winners) > 0)
+            # elif len(web_actions[0][CMD]) == 0:
+            #     print "action length 0"
+            #     self.fail("action is not valid")
 
     def test_scroll_left(self):
         template_phrases = ["scroll left", "left scroll"]
@@ -90,7 +91,7 @@ class TextProcessorTest(unittest.TestCase):
         template_phrases = ["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab",
                             "exit the tab"]
         phrases = ["Close the third tab."]
-        self.validate_phrases(phrases, "close tab")
+        self.validate_phrases(template_phrases, "close tab")
 
     def test_switch_tab(self):
         template_phrases = ["switch to tab three", "switch to tab google.com", "switch to Facebook", "change to CNN",

@@ -240,88 +240,54 @@ class TextProcessor():
         command_text = command_text.lower().strip()
         values = []
         # try to find match of an action key in the command
-        for key in self.action_text_mappings.keys():
-            # split on underscore
-            s = key.split("_")
-            # only use lower case
-            s = [x.lower() for x in s]
+        # for key in self.action_text_mappings.keys():
+        #     # split on underscore
+        #     s = key.split("_")
+        #     # only use lower case
+        #     s = [x.lower() for x in s]
+        #
+        #     indices = []
+        #     # try to find if the key is in the command to narrow search
+        #     for st in s:
+        #         if st in command_words:
+        #             indices.append(command_words.index(st))
+        #
+        #     # prev = -1
+        #     # c = 0
+        #     # # see if the words were encountered in the proper order
+        #     # for i in indices:
+        #     #     if i > prev:
+        #     #         prev = i
+        #     #         c += 1
+        #     #     else:
+        #     #         break
+        #     c = len(indices)
+        #     # we already know what command to use by this point, no need for nlp
+        #     if c == len(s) or c == len(command_words) and c > 0:
+        #         curr_action_request[h.CMD] = key
+        #         values = self.action_text_mappings[key]
+        #         break
 
-            indices = []
-            # try to find if the key is in the command to narrow search
-            for st in s:
-                if st in command_words:
-                    indices.append(command_words.index(st))
+        found_action = False
+        # try to find match for command in templates
+        for action_key in self.action_text_mappings.keys():
+            if not found_action:
+                for u_map in self.action_text_mappings[action_key]:
+                    indices = []
+                    for part in u_map[h.PARTS]:
+                        # check if part of the utterance is in the command
+                        if part in command_text:
+                            indices.append(command_text.index(part))
 
-            # prev = -1
-            # c = 0
-            # # see if the words were encountered in the proper order
-            # for i in indices:
-            #     if i > prev:
-            #         prev = i
-            #         c += 1
-            #     else:
-            #         break
-            c = len(indices)
-            # we already know what command to use by this point, no need for nlp
-            if c == len(s) or c == len(command_words) and c > 0:
-                curr_action_request[h.CMD] = key
-                values = self.action_text_mappings[key]
-                break
-
-        has_action_request = False
-        # at this point, the command should either be found or this part should be skipped
-        for action_text in values:
-            if not has_action_request:
-                parts_list = []
-                args_list = []
-                # split on rparen for arguments
-                s = action_text.split("(")
-                parts_list.append(s[0])
-
-                # extract necessary argument fields
-                if len(s) > 1:
-                    # already stored the first element
-                    s = s[1:]
-                    # pull out all arguments
-                    for st in s:
-                        strs = st.split(")")
-                        args_list.append(strs[0].strip())
-                        if len(strs) > 1 and len(strs[1]) > 0:
-                            parts_list.append(strs[1].lower())
-
-                indices = []
-                for part in parts_list:
-                    if part in command_text:
-                        indices.append(command_text.index(part))
-                # prev = -1
-                # c = 0
-                # # see if the words were encountered in the proper order
-                # for i in indices:
-                #     if i > prev:
-                #         prev = i
-                #         c += 1
-                #     else:
-                #         # break from i loop
-                #         break
-                c = len(indices)
-                if c == len(parts_list):
-                    curr_action_request[h.CMD_ARGS] = self.generate_args(command_text, args_list, action_text)
-                    break
+                    if len(indices) == len(u_map[h.PARTS]):
+                        curr_action_request[h.CMD] = action_key
+                        # TODO smart arg parsing
+                        curr_action_request[h.CMD_ARGS] = u_map[h.CMD_ARGS]
+                        # action has been found, can exit all loops
+                        found_action = True
+                        break
 
         return curr_action_request
-
-    def generate_args(self, command_text, args_list, action_text):
-        arg_map = dict()
-        for arg in args_list:
-            # handle parameters with default values
-            s = arg.split("=")
-
-            # store value if has it
-            if len(s) > 1:
-                arg_map[s[0]] = s[1]
-
-        # TODO search for arguments in string
-        return arg_map
 
 # def create_bigram_belief_state(self, training_command_list):
 #     for command in training_command_list:

@@ -2,6 +2,7 @@ __author__ = 'Shaun Howard'
 
 CMD = 'command'
 CMD_ARGS = 'arguments'
+PARTS = 'parts'
 LPAREN = "("
 RPAREN = ")"
 
@@ -90,14 +91,50 @@ def load_web_action_template(template_path, action_call=True):
                     # run action command template parser
                     # split values on commas
                     utterances = action_value.split(",")
+
                     # clean up whitespace
-                    utterances = [x.strip() for x in utterances]
+                    utterances = [x.strip() for x in utterances if len(x.strip()) > 0]
+
                     # strip off quotes
                     utterances = [x[1:len(x)-1] for x in utterances]
                     # create the action command template as a dictionary with command and arguments
                     if action_key not in action_map.keys():
                         action_map[action_key] = []
-                    action_map[action_key] = action_map[action_key] + utterances
+                    for u in utterances:
+                        # construct an utterance template
+                        u_map = dict()
+                        u_map[CMD] = u
+                        u_map[PARTS] = []
+                        u_map[CMD_ARGS] = dict()
+
+                        # split on rparen for arguments
+                        s = u.split("(")
+                        u_map[PARTS].append(s[0].strip().lower())
+
+                        # extract necessary argument fields
+                        if len(s) > 1:
+                            # already stored the first element
+                            s = s[1:]
+                            # pull out all arguments
+                            for st in s:
+                                strs = st.split(")")
+
+                                # extract default values
+                                arg = strs[0].strip()
+                                split_arg = arg.split("=")
+
+                                # add the argument and default value to the dictionary
+                                if len(split_arg) > 1:
+                                    u_map[CMD_ARGS][split_arg[0]] = split_arg[1]
+                                else:
+                                    # or add argument and default value of nothing
+                                    u_map[CMD_ARGS][split_arg[0]] = ''
+
+                                if len(strs) > 1 and len(strs[1]) > 0:
+                                    u_map[PARTS].append(strs[1].strip().lower())
+
+                        # add utterance map to action map
+                        action_map[action_key].append(u_map)
     return action_map
 
 
