@@ -145,7 +145,7 @@ class TextProcessor():
         # tokenize text into sentences
         sentences = sent_tokenize(text)
         words_of_sentences = [word_tokenize(sent) for sent in sentences]
-        tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
+        # tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
 
         # TODO: validate jargon
         is_valid = [valid_web_jargon(sent) for sent in sentences]
@@ -153,11 +153,11 @@ class TextProcessor():
         for i in range(len(is_valid)):
             if is_valid[i]:
                 # process sentence for commands
-                web_action_tokens = web_action_tokens + self.extract_action_requests(text, words_of_sentences[i],
-                                                                                     tags_of_words_of_sentences[i])
+                web_action_tokens = web_action_tokens + self.extract_action_requests(text, words_of_sentences[i])
+                                                                                     # tags_of_words_of_sentences[i])
         return web_action_tokens
 
-    def extract_action_requests(self, text, words, tags):
+    def extract_action_requests(self, text, words, tags=None):
         """
         Figure out the web actions that exist in the provided sentence using
         the given words and tags as well as action command templates.
@@ -167,40 +167,43 @@ class TextProcessor():
         :return: the web actions tokens and arguments
         """
         # search for conjunctions to split up commands
-        commands = []
-        command_tags = []
-        if 'CC' in tags:
-            conjunctions = []
-            for i in range(len(tags)):
-                if 'CC' in tags[i]:
-                    conjunctions.append(i)
+        commands = [words]
+        # command_tags = tags
 
-            # split up commands by splitting sentence on conjunctions
-            commands = []
-            command_tags = []
-            split_indices = [x for x in conjunctions]
-            for i in range(len(split_indices)):
-                split_index = split_indices[i]
-                if split_index == 0 or split_index == len(words):
-                    continue
-                if i == 0:
-                    command = words[:split_index-1]
-                    tags_ = tags[:split_index-1]
-                elif i == len(split_indices) - 1:
-                    command = words[split_index+1:]
-                    tags_ = tags[split_index+1:]
-                if len(command) > 0 and len(tags_) > 0:
-                    commands.append(command)
-                    command_tags.append(tags_)
-        else:
-            commands.append(words)
-            command_tags.append(tags)
+        # don't do this for now
+        # if 'CC' in tags:
+        #     conjunctions = []
+        #     for i in range(len(tags)):
+        #         if 'CC' in tags[i]:
+        #             conjunctions.append(i)
+        #
+        #     # split up commands by splitting sentence on conjunctions
+        #     commands = []
+        #     command_tags = []
+        #     split_indices = [x for x in conjunctions]
+        #     for i in range(len(split_indices)):
+        #         split_index = split_indices[i]
+        #         if split_index == 0 or split_index == len(words):
+        #             continue
+        #         if i == 0:
+        #             command = words[:split_index-1]
+        #             tags_ = tags[:split_index-1]
+        #         elif i == len(split_indices) - 1:
+        #             command = words[split_index+1:]
+        #             tags_ = tags[split_index+1:]
+        #         if len(command) > 0 and len(tags_) > 0:
+        #             commands.append(command)
+        #             command_tags.append(tags_)
+        # else:
+        #     commands.append(words)
+        #     command_tags.append(tags)
 
         # interpret actions
         action_requests = []
         for i in range(len(commands)):
             command_words = commands[i]
-            command_tags = command_tags[i]
+            # command_tags = command_tags[i]
+            command_tags = []
             curr_action_request = {h.CMD: "", h.CMD_ARGS: {}}
 
             # first try to use templates to determine desired actions
@@ -223,17 +226,25 @@ class TextProcessor():
         """
         This method will not always work. multiple instances of the same string may be detected
         in matching and may throw off the interpreter.
+        :param command_text
         :param command_tags:
         :param command_words:
         :param curr_action_request:
         :return:
         """
 
+        # store lowercase of all strings
+        command_words = [x.lower() for x in command_words]
+
+        # store lowercase, stripped version of command text input
+        command_text = command_text.lower().strip()
         values = []
         # try to find match of an action key in the command
         for key in self.action_text_mappings.keys():
             # split on underscore
             s = key.split("_")
+            # only use lower case
+            s = [x.lower() for x in s]
 
             indices = []
             # try to find if the key is in the command to narrow search
@@ -252,9 +263,10 @@ class TextProcessor():
                     break
 
             # we already know what command to use by this point, no need for nlp
-            if c == len(indices):
+            if c == len(s) or c == len(command_words) and c > 0:
                 curr_action_request[h.CMD] = key
                 values = self.action_text_mappings[key]
+                break
 
         has_action_request = False
         # at this point, the command should either be found or this part should be skipped
@@ -273,14 +285,14 @@ class TextProcessor():
                     # pull out all arguments
                     for st in s:
                         strs = st.split(")")
-                        args_list.append(strs[0])
-                        if len(strs) > 1:
-                            parts_list.append(strs[1])
+                        args_list.append(strs[0].strip())
+                        if len(strs) > 1 and len(strs[1]) > 0:
+                            parts_list.append(strs[1].lower())
 
                 indices = []
                 for part in parts_list:
-                    if part in command_words:
-                        indices.append(command_words.index(part))
+                    if part in command_text:
+                        indices.append(command_text.index(part))
                 prev = -1
                 c = 0
                 # see if the words were encountered in the proper order
@@ -291,17 +303,24 @@ class TextProcessor():
                     else:
                         # break from i loop
                         break
-                    if c == len(indices):
-                        curr_action_request[h.CMD_ARGS] = self.generate_args(command_text, args_list, action_text)
-                        has_action_request = True
-                        break
+
+                if c == len(parts_list):
+                    curr_action_request[h.CMD_ARGS] = self.generate_args(command_text, args_list, action_text)
+                    break
+
         return curr_action_request
 
-    def generate_args(self, command_words, args_list, action_text):
+    def generate_args(self, command_text, args_list, action_text):
         arg_map = dict()
+        for arg in args_list:
+            # handle parameters with default values
+            s = arg.split("=")
 
-        # search for each argument set in the string
+            # store value if has it
+            if len(s) > 1:
+                arg_map[s[0]] = s[1]
 
+        # TODO search for arguments in string
         return arg_map
 
 # def create_bigram_belief_state(self, training_command_list):

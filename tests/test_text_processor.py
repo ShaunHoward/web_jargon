@@ -1,18 +1,23 @@
 __author__ = 'shaun howard'
 import unittest
-from web_jargon.text_processor import text_processor as tp
+from web_jargon.text_processor.text_processor import TextProcessor
+from web_jargon.helpers import CMD
 
 
 class TextProcessorTest(unittest.TestCase):
 
+    tp = None
+
     def setUp(self):
-        pass
+        self.tp = TextProcessor()
 
     def validate_phrases(self, phrases, action):
         for phrase in phrases:
-            web_actions = tp.process_web_action_requests(phrase)
+            web_actions = self.tp.process_web_action_requests(phrase)
             self.assertEqual(len(web_actions), 1)
-            self.assertEqual(action, web_actions[0][tp.CMD])
+            for w in web_actions[0][CMD].split("_"):
+                if len(w) > 0:
+                    self.assertTrue(w.lower() in action)
 
     def test_scroll_left(self):
         template_phrases = ["scroll left", "left scroll"]

@@ -4,6 +4,7 @@ from web_jargon import web_jargon as wj
 from web_jargon.web_control_mapper.mapper import Mapper
 from web_jargon.text_processor.text_processor import TextProcessor
 
+
 class Text2WebText(unittest.TestCase):
     mapper = None
     processor = None
