@@ -1,10 +1,35 @@
 __author__ = 'Shaun Howard'
 
+ACTION = 'action'
+ACTIONS = 'actions'
 CMD = 'command'
 CMD_ARGS = 'arguments'
 PARTS = 'parts'
 LPAREN = "("
 RPAREN = ")"
+
+# action tokens
+SCROLL_UP = 'SCROLL_UP'
+SCROLL_DOWN = 'SCROLL_DOWN'
+SCROLL_LEFT = 'SCROLL_LEFT'
+SCROLL_RIGHT = 'SCROLL_RIGHT'
+ZOOM_IN = 'ZOOM_IN'
+ZOOM_OUT = 'ZOOM_OUT'
+OPEN_TAB = 'OPEN_TAB'
+CLOSE_TAB = 'CLOSE_TAB'
+SWITCH_TAB = 'SWITCH_TAB'
+FORWARD = 'FORWARD'
+BACKWARD = 'BACKWARD'
+REFRESH = 'REFRESH'
+CLICK = 'CLICK'
+OPEN_URL = 'OPEN_URL'
+ENTER_TEXT = 'ENTER_TEXT'
+SUBMIT_TEXT = 'SUBMIT_TEXT'
+ENTER_AND_SUBMIT = 'ENTER_AND_SUBMIT'
+OPEN_HELP = 'OPEN_HELP'
+CLOSE_HELP = 'CLOSE_HELP'
+OPEN_CHEAT_SHEET = 'OPEN_CHEAT_SHEET'
+CLOSE_CHEAT_SHEET = 'CLOSE_CHEAT_SHEET'
 
 
 def parse_arguments(arguments):
@@ -38,6 +63,29 @@ def parse_arguments(arguments):
     return args
 
 
+def load_action_token_list(template_path):
+    # read actions file
+    with open(template_path, 'r') as f:
+        actions_string = f.read()
+
+    # determine each of the actions from string
+    actions = actions_string.split('\n')
+
+    # filter out comments from actions
+    filtered_actions = []
+    for action in actions:
+        action = action.strip()
+        if not action.startswith("#") and len(action) > 3:
+            filtered_actions.append(action)
+
+    # create a list of action tokens
+    action_token_list = []
+    for action in filtered_actions:
+        # split up action token and function call parts
+        toke_and_func = action.split(':')
+        action_token_list.append(toke_and_func[0].strip())
+
+
 def load_web_action_template(template_path, action_call=True):
     """
     Generate an action template for creating action sequences.
@@ -67,8 +115,8 @@ def load_web_action_template(template_path, action_call=True):
         action_value = toke_and_func[1].strip()
 
         if len(action_key) > 0 and len(action_value) > 0:
-            # strip <> and trailing whitespace from function call
-            action_value = action_value.lstrip('<').rstrip('>').strip()
+            # strip [] and trailing whitespace from function call
+            action_value = action_value.lstrip('[').rstrip(']').strip()
             if len(action_value) > 0:
                 # run action call template parser
                 if action_call:
@@ -86,7 +134,8 @@ def load_web_action_template(template_path, action_call=True):
 
                     # store the action and the arguments to it
                     action_map[action_key][CMD_ARGS] = action_args_list
-                    action_map[action_key][CMD] = action_value
+                    action_map[action_key][CMD] = action_key
+                    action_map[action_key][ACTION] = action_value
                 else:
                     # run action command template parser
                     # split values on commas
@@ -140,3 +189,35 @@ def load_web_action_template(template_path, action_call=True):
 
 def normalize_string(text):
     return text.lower().strip()
+
+
+def load_action_command_samples(file_path):
+    # read actions file
+    with open(file_path, 'r') as f:
+        actions_string = f.read()
+
+    # determine each of the actions from string
+    actions = actions_string.split('\n')
+
+    # filter out comments from actions
+    filtered_actions = []
+    for action in actions:
+        action = action.strip()
+        if not action.startswith("#") and len(action) > 3:
+            filtered_actions.append(action)
+
+    # create a map from token to action function call
+    action_map = dict()
+    for action in filtered_actions:
+        # split up action token and function call parts
+        toke_and_func = action.split(':')
+        action_key = toke_and_func[0].strip()
+        action_commands = toke_and_func[1].strip()
+
+        if len(action_key) > 0 and len(action_commands) > 0:
+            # strip [] and trailing whitespace from function call
+            action_commands = action_commands.lstrip('[').rstrip(']').strip()
+            action_commands = action_commands.split(", ")
+            if len(action_commands) > 0:
+                action_map[action_key] = action_commands
+    return action_map

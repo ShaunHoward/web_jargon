@@ -236,8 +236,8 @@ class TextProcessor():
         # store lowercase of all strings
         command_words = [x.lower() for x in command_words]
 
-        # store lowercase, stripped version of command text input
-        command_text = command_text.lower().strip()
+        # store lowercase, parens removed, stripped version of command text input
+        command_text = command_text.lower()[1:len(command_text)-1].strip()
         values = []
         # try to find match of an action key in the command
         # for key in self.action_text_mappings.keys():
@@ -268,10 +268,12 @@ class TextProcessor():
         #         values = self.action_text_mappings[key]
         #         break
 
-        found_action = False
+        # found_action = False
+        # store matches list
+        matches = []
         # try to find match for command in templates
         for action_key in self.action_text_mappings.keys():
-            if not found_action:
+            # if not found_action:
                 for u_map in self.action_text_mappings[action_key]:
                     indices = []
                     for part in u_map[h.PARTS]:
@@ -279,13 +281,44 @@ class TextProcessor():
                         if part in command_text:
                             indices.append(command_text.index(part))
 
+                    # store match if parts are in command
                     if len(indices) == len(u_map[h.PARTS]):
-                        curr_action_request[h.CMD] = action_key
+                        matches.append((action_key, " ".join(u_map[h.PARTS]), u_map[h.CMD_ARGS], min(indices)))
+                        # curr_action_request[h.CMD] = action_key
                         # TODO smart arg parsing
-                        curr_action_request[h.CMD_ARGS] = u_map[h.CMD_ARGS]
+                        # curr_action_request[h.CMD_ARGS] = u_map[h.CMD_ARGS]
                         # action has been found, can exit all loops
-                        found_action = True
-                        break
+                        # found_action = True
+                        # break
+
+        curr_action_request = dict()
+        # select the earliest and/or longest command match for the current action request
+        if len(matches) > 0:
+            longest_phrase = 0
+            longest_index = 0
+            earliest_pos = 0
+            earliest_index = 0
+            ctr = 0
+            for match in matches:
+                # get length of parts string that matched command
+                mlen = len(match[1])
+                # get start pos of command match
+                start_pos = match[3]
+
+                # look for longer phrase
+                if mlen > longest_phrase:
+                    longest_phrase = mlen
+                    longest_index = ctr
+
+                # look for same length phrase with earlier command match
+                if start_pos < earliest_pos or (start_pos == earliest_pos and mlen == longest_phrase):
+                    earliest_pos = start_pos
+                    earliest_index = ctr
+                ctr += 1
+
+                # set command and args from action text mappings
+                curr_action_request[h.CMD] = matches[earliest_index][0]
+                curr_action_request[h.CMD_ARGS] = matches[earliest_index][2]
 
         return curr_action_request
 
