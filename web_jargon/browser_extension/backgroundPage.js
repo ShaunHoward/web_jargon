@@ -67,9 +67,9 @@ function _doCommand(cmd, params){
   }
   //if function not found in backgound page, check content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {func : cmd}, function(response) {
+    chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
       if(response.msg){
-        alert(response.msg);
+        //nothing
       }
   });
 });
