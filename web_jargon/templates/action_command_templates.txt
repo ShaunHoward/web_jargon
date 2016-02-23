@@ -1,0 +1,64 @@
+# these are comments that will not be parsed as actions
+# capitalized parameters are expected as input
+# lowercase parameters are fed as default values
+# quotes are used to determine strings
+
+# requirement 4.3
+SCROLL_LEFT:["scroll left", "left scroll"]
+SCROLL_RIGHT:["scroll right", "right scroll"]
+SCROLL_UP:["scroll up (NUM_PAGES=1)", "up scroll"]
+SCROLL_DOWN:["scroll down (NUM_PAGES=1)", "down scroll"]
+
+# requirement 4.4
+ZOOM_IN:["zoom in by (PERCENT)", "zoom in (PERCENT)", "zoom (PERCENT)", "zoom larger", "zoom in"]
+ZOOM_OUT:["zoom out by (PERCENT)", "zoom out (PERCENT)", "zoom away (PERCENT)", "zoom smaller", "zoom out"]
+
+# requirement 4.5
+OPEN_TAB:["open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab", "create new tab"]
+CLOSE_TAB:["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab", "exit the tab"]
+SWITCH_TAB:["switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME)", "open the (TAB_INDEX) tab"]
+
+# requirement 4.6
+FORWARD:["forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead"]
+BACKWARD:["backward", "go backward", "go backward a page", "go back a page", "go to the previous page", "previous page", "back a page", "backward a page", "one page backward", "page backward", "page back"]
+REFRESH:["refresh the page", "refresh page", "page refresh", "refresh this page"]
+
+# requirement 4.7
+# allow only part of element name (fuzzy string search using html web page from plugin)
+CLICK:["click (ELEMENT_NAME)", "click (ELEMENT_NAME) button", "click the (ELEMENT_NAME) button", "open link (LINK_NAME)", "open (LINK_NAME)", "enter (LINK_NAME)"]
+
+# requirement 4.8
+OPEN_URL:["open (URL) in the current tab (IN_CURRENT_TAB=true)", "open (URL) (IN_CURRENT_TAB=false)", "open new (URL) (IN_CURRENT_TAB=false)", "open (URL) in this tab (IN_CURRENT_TAB=true)", "open (URL) in new tab (IN_CURRENT_TAB=false)"]
+
+# requirement 4.9
+# submit depends on enter
+ENTER_TEXT:["enter text into form (FORM_NAME) (BEFORE_WAIT=10) (EXCERPT) (AFTER_WAIT=10)", "write (EXCERPT)", "enter text (EXCERPT)"]
+SUBMIT_TEXT:["submit text using (BUTTON_NAME)", "submit", "submit text (BUTTON_NAME)", "submit (BUTTON_NAME)", "click (BUTTON_NAME) to submit"]
+ENTER_AND_SUBMIT:["enter text (EXCERPT) (AFTER_WAIT=2) and submit (BUTTON_NAME)", "enter text (EXCERPT) (AFTER_WAIT=2) submit (BUTTON_NAME)", "enter text into form (FORM_NAME) (BEFORE_WAIT=10) (EXCERPT) (AFTER_WAIT=10) submit"]
+
+# requirement 4.10
+OPEN_HELP:["help please", "please help", "open help", "open browsing assistance", "browsing assistance", "assistance", "assistant", "helper", "help window", "help me", "show hints", "open hints", "display hints", "list functions", "list commands", "list actions", "show actions", "show commands"]
+CLOSE_HELP:["close help", "I'm good", "thanks", "I am good"]
+OPEN_CHEAT_SHEET:["open cheat sheet", "let me cheat", "display cheats", "show cheats", "show me cheats", "open cheats", "open functions", "list all functions", "list all commands", "list all actions", "show all actions", "show all commands", "show all hints", "open all hints", "display all hints"]
+CLOSE_CHEAT_SHEET:["close cheat sheet", "close cheats", "hide cheats", "hide cheat sheet", "hide sheet"]
+
+# requirement 4.11
+OPEN_SETUP_PAGE:["display setup", "display setup page", "open setup", "open setup page", "show setup", "show setup page"]
+CLOSE_SETUP_PAGE:["hide setup", "close setup", "exit setup"]
+
+# requirement 4.12
+PLAY_VIDEO:["play video", "play", "start video", "start", "play movie", "start movie"]
+PAUSE_VIDEO:["pause video", "pause", "pause movie", "stop video", "stop movie", "stop"]
+RESTART_VIDEO:["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
+OPEN_FULLSCREEN:["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen", "toggle full screen"]
+CLOSE_FULLSCREEN:["escape", "quit", "quit fullscreen", "close fullscreen", "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off"]
+
+# requirement 4.13
+PLAY_MUSIC:["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)", "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music", "play my music", "play song", "play tune", "play"]
+PAUSE_MUSIC:["pause spotify (IS_SPOTIFY=true)", "pause pandora (IS_SPOTIFY=false)", "pause on spotify (IS_SPOTIFY=true)", "pause on pandora (IS_SPOTIFY=false)", "pause music", "pause my music", "pause song", "pause tune", "pause"]
+NEXT_SONG:["next on spotify (IS_SPOTIFY=true)", "next on pandora (IS_SPOTIFY=false)", "next song on spotify (IS_SPOTIFY=true)", "next song on pandora (IS_SPOTIFY=false)", "next song", "next"]
+SEARCH_MUSIC:["search for (ARTIST, ALBUM, SONG)", "search for (ARTIST, ALBUM, SONG) in spotify (IS_SPOTIFY=true)", "search for (ARTIST, ALBUM, SONG) in pandora (IS_SPOTIFY=false)" ]
+
+# requirement 4.14
+SEARCH_PDF:["search for (EXCERPT)", "search (EXCERPT)"]
+GO_TO_PDF_PAGE:["go to page number (PAGE_NUM)", "go to page (PAGE_NUM)", "go to (PAGE_NUM)"

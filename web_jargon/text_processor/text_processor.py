@@ -7,6 +7,8 @@ from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordPOSTagger
 
+from web_jargon import helpers as h
+
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
               "ninth": 9, "tenth": 10, "eleventh": 11, "twelvefth": 12, "thirteenth": 13, "fourteenth": 14,
               "fifteenth": 15}
@@ -22,39 +24,15 @@ GOOGLE = "google"
 YOUTUBE = "youtube"
 
 # custom tags
-CMD = 'command'
-CMD_ARGS = 'arguments'
 CMD_START = 'VB|NN'
 CONTEXT = 'context'
 DEFAULT_ACTION_CONTEXT = "default"
 DIR = path.dirname(path.dirname(__file__))
 PARENT_DIR = path.dirname(DIR)
+DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 STANFORD_JAR_PATH = PARENT_DIR + '/postagger/stanford-postagger.jar'
 BIDIR_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-bidirectional-distsim.tagger'
 TWORD_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-left3words-distsim.tagger'
-
-
-def process_web_action_requests(text):
-    """
-    Parses the provided text into web text actions that will be converted into
-    web actions by the web text to action mapper. The order will be maintained.
-    :param text: the input command text
-    :return: the controls list, which will be empty if in error
-    """
-    # tokenize text into sentences
-    sentences = sent_tokenize(text)
-    words_of_sentences = [word_tokenize(sent) for sent in sentences]
-    tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
-
-    # TODO: validate jargon
-    is_valid = [valid_web_jargon(sent) for sent in sentences]
-    web_action_tokens = []
-    for i in range(len(is_valid)):
-        if is_valid[i]:
-            # process sentence for commands
-            web_action_tokens = web_action_tokens + extract_action_requests(words_of_sentences[i],
-                                                                            tags_of_words_of_sentences[i])
-    return web_action_tokens
 
 
 def tag_words(words_of_text):
@@ -90,81 +68,36 @@ def similar_words(word, meaning):
     return synonyms
 
 
-def extract_action_requests(words, tags):
-    """
-    Figure out the web actions that exist in the provided sentence using
-    the given words and tags.
-    :param words: the words of the sentence
-    :param tags: the tags of the words in the sentence
-    :return: the web actions tokens and arguments
-    """
-    # search for conjunctions to split up commands
-    commands = []
-    command_tags = []
-    if 'CC' in tags:
-        conjunctions = []
-        for i in range(len(tags)):
-            if 'CC' in tags[i]:
-                conjunctions.append(i)
-
-        # split up commands by splitting sentence on conjunctions
-        commands = []
-        command_tags = []
-        split_indices = [x for x in conjunctions]
-        for i in range(len(split_indices)):
-            split_index = split_indices[i]
-            if split_index == 0 or split_index == len(words):
-                continue
-            if i == 0:
-                command = words[:split_index-1]
-                tags_ = tags[:split_index-1]
-            elif i == len(split_indices) - 1:
-                command = words[split_index+1:]
-                tags_ = tags[split_index+1:]
-            if len(command) > 0 and len(tags_) > 0:
-                commands.append(command)
-                command_tags.append(tags_)
-    else:
-        commands.append(words)
-        command_tags.append(tags)
-
-    action_requests = []
-    for i in range(len(commands)):
-        command_words = commands[i]
-        command_tags = command_tags[i]
-        command_start = 0
-        # must have a context for any actions taking place or default actions are assumed
-        action_context = determine_action_context(command_words, command_tags)
-        curr_action_request = {CMD: "", CMD_ARGS: [], CONTEXT: action_context}
-        tag_list = []
-        for j in range(len(command_tags)):
-            tag = command_tags[j]
-            # look for a command start
-            if ('VB' in tag and CMD_START not in tag_list) or\
-                    ('NN' in tag and CMD_START not in tag_list):
-                tag_list.append(CMD_START)
-                command_start = j
-                # add command start to dictionary
-                curr_action_request[CMD] = command_words[command_start]
-            # look for command modifiers like up, down, etc.
-            elif ('RB' in tag or 'RP' in tag or
-                    ('VB' in tag and CMD_START in tag_list) or
-                    ('NN' in tag and CMD_START in tag_list)) and\
-                    command_start == 0:
-                if j > command_start:
-                    tag_list.append('RB|RP|VB')
-                    curr_action_request[CMD] += ''.join([' ', command_words[j]])
-            # look for numeral values to feed as arguments to command
-            elif 'CD' in tag or 'JJ' in tag:
-                tag_list.append('CD|JJ')
-                # try to parse a number out of the numeral
-                if 'JJ' in tag and command_words[j] in NUM_TO_INT.keys():
-                    num_arg = NUM_TO_INT[command_words[j]]
-                    curr_action_request[CMD_ARGS].append(num_arg)
-                else:
-                    curr_action_request[CMD_ARGS].append(command_words[j])
-        action_requests.append(curr_action_request)
-    return action_requests
+def fuzzy_action_interpreter(command_tags, command_words, curr_action_request):
+    # do fuzzy action interpretation
+    tag_list = []
+    for j in range(len(command_tags)):
+        tag = command_tags[j]
+        # look for a command start
+        if ('VB' in tag and CMD_START not in tag_list) or\
+                ('NN' in tag and CMD_START not in tag_list):
+            tag_list.append(CMD_START)
+            command_start = j
+            # add command start to dictionary
+            curr_action_request[h.CMD] = command_words[command_start]
+        # look for command modifiers like up, down, etc.
+        elif ('RB' in tag or 'RP' in tag or
+                ('VB' in tag and CMD_START in tag_list) or
+                ('NN' in tag and CMD_START in tag_list)) and\
+                command_start == 0:
+            if j > command_start:
+                tag_list.append('RB|RP|VB')
+                curr_action_request[h.CMD] += ''.join([' ', command_words[j]])
+        # look for numeral values to feed as arguments to command
+        elif 'CD' in tag or 'JJ' in tag:
+            tag_list.append('CD|JJ')
+            # try to parse a number out of the numeral
+            if 'JJ' in tag and command_words[j] in NUM_TO_INT.keys():
+                num_arg = NUM_TO_INT[command_words[j]]
+                curr_action_request[h.CMD_ARGS].append(num_arg)
+            else:
+                curr_action_request[h.CMD_ARGS].append(command_words[j])
+    return curr_action_request
 
 
 def determine_action_context(words, tags):
@@ -181,6 +114,213 @@ def train_processor(training_data_dir):
         training_data = training_file.read()
     training_command_list = training_data.split('\n')
 
+
+def normalize_nested_dict(dict_of_dict):
+    new_dict_of_dict = dict()
+    for key_1 in dict_of_dict.keys():
+        new_dict_of_dict[key_1] = dict()
+        for key_2 in dict_of_dict[key_1].keys():
+            new_dict_of_dict[key_1][key_2] = 0
+            max_val = max(dict_of_dict[key_1][key_2])
+            min_val = min(dict_of_dict[key_1][key_2])
+            for val in dict_of_dict[key_1][key_2]:
+                belief = (val - min_val) / (max_val - min_val)
+                new_dict_of_dict[key_1][key_2] = belief
+    return new_dict_of_dict
+
+
+class TextProcessor():
+    action_text_mappings = dict()
+
+    def __init__(self):
+        self.action_text_mappings = h.load_web_action_template(DEFAULT_ACTIONS_PATH, False)
+
+    def process_web_action_requests(self, text):
+        """
+        Parses the provided text into web text actions that will be converted into
+        web actions by the web text to action mapper. The order will be maintained.
+        :param text: the input command text
+        :return: the controls list, which will be empty if in error
+        """
+        # tokenize text into sentences
+        sentences = sent_tokenize(text)
+        words_of_sentences = [word_tokenize(sent) for sent in sentences]
+        # tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
+
+        # TODO: validate jargon
+        is_valid = [valid_web_jargon(sent) for sent in sentences]
+        web_action_tokens = []
+        for i in range(len(is_valid)):
+            if is_valid[i]:
+                # process sentence for commands
+                web_action_tokens = web_action_tokens + self.extract_action_requests(text, words_of_sentences[i])
+                                                                                     # tags_of_words_of_sentences[i])
+        return web_action_tokens
+
+    def extract_action_requests(self, text, words, tags=None):
+        """
+        Figure out the web actions that exist in the provided sentence using
+        the given words and tags as well as action command templates.
+        :param text: the text said by the user
+        :param words: the words of the sentence
+        :param tags: the tags of the words in the sentence
+        :return: the web actions tokens and arguments
+        """
+        # search for conjunctions to split up commands
+        commands = [words]
+        # command_tags = tags
+
+        # don't do this for now
+        # if 'CC' in tags:
+        #     conjunctions = []
+        #     for i in range(len(tags)):
+        #         if 'CC' in tags[i]:
+        #             conjunctions.append(i)
+        #
+        #     # split up commands by splitting sentence on conjunctions
+        #     commands = []
+        #     command_tags = []
+        #     split_indices = [x for x in conjunctions]
+        #     for i in range(len(split_indices)):
+        #         split_index = split_indices[i]
+        #         if split_index == 0 or split_index == len(words):
+        #             continue
+        #         if i == 0:
+        #             command = words[:split_index-1]
+        #             tags_ = tags[:split_index-1]
+        #         elif i == len(split_indices) - 1:
+        #             command = words[split_index+1:]
+        #             tags_ = tags[split_index+1:]
+        #         if len(command) > 0 and len(tags_) > 0:
+        #             commands.append(command)
+        #             command_tags.append(tags_)
+        # else:
+        #     commands.append(words)
+        #     command_tags.append(tags)
+
+        # interpret actions
+        action_requests = []
+        for i in range(len(commands)):
+            command_words = commands[i]
+            # command_tags = command_tags[i]
+            command_tags = []
+            curr_action_request = {h.CMD: "", h.CMD_ARGS: {}}
+
+            # first try to use templates to determine desired actions
+            curr_action_request = self.template_action_interpreter(text, command_tags, command_words,
+                                                                   curr_action_request)
+
+            # next try to use the fuzzy nlp interpreter to determine desired actions
+            if len(curr_action_request) == 0:
+                curr_action_request = fuzzy_action_interpreter(command_tags, command_words, curr_action_request)
+
+            # add actions if intent determine, otherwise print error message
+            if len(curr_action_request) > 0:
+                action_requests.append(curr_action_request)
+            else:
+                print "error in interpreting desired actions"
+
+        return action_requests
+
+    def template_action_interpreter(self, command_text, command_tags, command_words, curr_action_request):
+        """
+        This method will not always work. multiple instances of the same string may be detected
+        in matching and may throw off the interpreter.
+        :param command_text
+        :param command_tags:
+        :param command_words:
+        :param curr_action_request:
+        :return:
+        """
+
+        # store lowercase of all strings
+        command_words = [x.lower() for x in command_words]
+
+        # store lowercase, parens removed, stripped version of command text input
+        command_text = command_text.lower()[1:len(command_text)-1].strip()
+        values = []
+        # try to find match of an action key in the command
+        # for key in self.action_text_mappings.keys():
+        #     # split on underscore
+        #     s = key.split("_")
+        #     # only use lower case
+        #     s = [x.lower() for x in s]
+        #
+        #     indices = []
+        #     # try to find if the key is in the command to narrow search
+        #     for st in s:
+        #         if st in command_words:
+        #             indices.append(command_words.index(st))
+        #
+        #     # prev = -1
+        #     # c = 0
+        #     # # see if the words were encountered in the proper order
+        #     # for i in indices:
+        #     #     if i > prev:
+        #     #         prev = i
+        #     #         c += 1
+        #     #     else:
+        #     #         break
+        #     c = len(indices)
+        #     # we already know what command to use by this point, no need for nlp
+        #     if c == len(s) or c == len(command_words) and c > 0:
+        #         curr_action_request[h.CMD] = key
+        #         values = self.action_text_mappings[key]
+        #         break
+
+        # found_action = False
+        # store matches list
+        matches = []
+        # try to find match for command in templates
+        for action_key in self.action_text_mappings.keys():
+            # if not found_action:
+                for u_map in self.action_text_mappings[action_key]:
+                    indices = []
+                    for part in u_map[h.PARTS]:
+                        # check if part of the utterance is in the command
+                        if part in command_text:
+                            indices.append(command_text.index(part))
+
+                    # store match if parts are in command
+                    if len(indices) == len(u_map[h.PARTS]):
+                        matches.append((action_key, " ".join(u_map[h.PARTS]), u_map[h.CMD_ARGS], min(indices)))
+                        # curr_action_request[h.CMD] = action_key
+                        # TODO smart arg parsing
+                        # curr_action_request[h.CMD_ARGS] = u_map[h.CMD_ARGS]
+                        # action has been found, can exit all loops
+                        # found_action = True
+                        # break
+
+        curr_action_request = dict()
+        # select the earliest and/or longest command match for the current action request
+        if len(matches) > 0:
+            longest_phrase = 0
+            longest_index = 0
+            earliest_pos = 0
+            earliest_index = 0
+            ctr = 0
+            for match in matches:
+                # get length of parts string that matched command
+                mlen = len(match[1])
+                # get start pos of command match
+                start_pos = match[3]
+
+                # look for longer phrase
+                if mlen > longest_phrase:
+                    longest_phrase = mlen
+                    longest_index = ctr
+
+                # look for same length phrase with earlier command match
+                if start_pos < earliest_pos or (start_pos == earliest_pos and mlen == longest_phrase):
+                    earliest_pos = start_pos
+                    earliest_index = ctr
+                ctr += 1
+
+                # set command and args from action text mappings
+                curr_action_request[h.CMD] = matches[earliest_index][0]
+                curr_action_request[h.CMD_ARGS] = matches[earliest_index][2]
+
+        return curr_action_request
 
 # def create_bigram_belief_state(self, training_command_list):
 #     for command in training_command_list:
@@ -211,18 +351,3 @@ def train_processor(training_data_dir):
 #         elif i == len(word_tokenized_commands) - 1:
 #             bigrams = [(word, word_tokenized_commands[i - 1])]
 #     return bigrams
-
-def normalize_nested_dict(dict_of_dict):
-    new_dict_of_dict = dict()
-    for key_1 in dict_of_dict.keys():
-        new_dict_of_dict[key_1] = dict()
-        for key_2 in dict_of_dict[key_1].keys():
-            new_dict_of_dict[key_1][key_2] = 0
-            max_val = max(dict_of_dict[key_1][key_2])
-            min_val = min(dict_of_dict[key_1][key_2])
-            for val in dict_of_dict[key_1][key_2]:
-                belief = (val - min_val) / (max_val - min_val)
-                new_dict_of_dict[key_1][key_2] = belief
-    return new_dict_of_dict
-
-

@@ -3,58 +3,59 @@
 # lowercase parameters are fed as default values
 
 # requirement 4.3
-SCROLL_LEFT:<scrollLeft()>
-SCROLL_RIGHT:<scrollRight()>
-SCROLL_UP:<scrollUp(NUM_PAGES=1)>
-SCROLL_DOWN:<scrollDown(NUM_PAGES=1)>
+SCROLL_LEFT:[scrollLeft()]
+SCROLL_RIGHT:[scrollRight()]
+SCROLL_UP:[scrollUp(NUM_PAGES=1)]
+SCROLL_DOWN:[scrollDown(NUM_PAGES=1)]
 
 # requirement 4.4
-OPEN_TAB:<openTab()>
-CLOSE_TAB:<closeTab(TAB_INDEX|TAB_NAME)>
-SWITCH_TAB:<switchTab(TAB_INDEX|TAB_NAME)>
+ZOOM_IN:[zoomIn(PERCENT=10)]
+ZOOM_OUT:[zoomOut(PERCENT=10)]
 
 # requirement 4.5
-FORWARD_PAGE:<forwardPage()>
-BACKWARD_PAGE:<backwardPage()>
-REFRESH:<refresh()>
+OPEN_TAB:[openTab()]
+CLOSE_TAB:[closeTab(TAB_INDEX|TAB_NAME)]
+SWITCH_TAB:[switchTab(TAB_INDEX|TAB_NAME)]
 
 # requirement 4.6
-CLICK:<click(ELEMENT_NAME)>
-OPEN_LINK:<openLink(LINK_NAME)>
+FORWARD:[forwardPage()]
+BACKWARD:[backwardPage()]
+REFRESH:[refresh()]
 
 # requirement 4.7
-OPEN_URL:<openURL(URL, IN_CURRENT_TAB=false)>
+CLICK:[click(ELEMENT_NAME|LINK_NAME)]
 
 # requirement 4.8
-# submit depends on enter
-ENTER_TEXT:<enterText(EXCERPT)>
-SUBMIT_TEXT:<submitText(BUTTON_NAME)>
+OPEN_URL:[openURL(URL, IN_CURRENT_TAB=false)]
 
 # requirement 4.9
-OPEN_HELP:<displayHelp(true)>
-CLOSE_HELP:<displayHelp(false)>
-OPEN_CHEAT_SHEET:<displayCheatSheet(true)>
-CLOSE_CHEAT_SHEET:<displayCheatSheet(false)>
+# submit depends on enter
+ENTER_TEXT:[enterText(EXCERPT)]
+SUBMIT_TEXT:[submitText(BUTTON_NAME)]
 
 # requirement 4.10
-OPEN_SETUP_PAGE:<displaySetup(true)>
-CLOSE_SETUP_PAGE:<displaySetup(false)>
+OPEN_HELP:[displayHelp(SHOW=true)]
+CLOSE_HELP:[displayHelp(SHOW=false)]
+OPEN_CHEAT_SHEET:[displayCheatSheet(SHOW=true)]
+CLOSE_CHEAT_SHEET:[displayCheatSheet(SHOW=false)]
 
 # requirement 4.11
-PLAY_VIDEO:<playVideo()>
-PAUSE_VIDEO:<pauseVideo()>
-RESTART_VIDEO:<restartVideo()>
-OPEN_FULLSCREEN:<toggleFullscreen(true)>
-CLOSE_FULLSCREEN:<toggleFullscreen(false)>
+OPEN_SETUP_PAGE:[displaySetup(SHOW=true)]
+CLOSE_SETUP_PAGE:[displaySetup(SHOW=false)]
 
 # requirement 4.12
-PLAY_MUSIC:<playMusic(IS_SPOTIFY=false)>
-PAUSE_MUSIC:<pauseMusic(IS_SPOTIFY=false)>
-NEXT_SONG:<nextSong(IS_SPOTIFY=false)>
-SEARCH_MUSIC:<searchMusic(ARTIST="", ALBUM="", SONG="")>
+PLAY_VIDEO:[playVideo()]
+PAUSE_VIDEO:[pauseVideo()]
+RESTART_VIDEO:[restartVideo()]
+OPEN_FULLSCREEN:[toggleFullscreen(ON=true)]
+CLOSE_FULLSCREEN:[toggleFullscreen(ON=false)]
 
 # requirement 4.13
-SEARCH_PDF:<searchPDF(EXCERPT)>
-GO_TO_PDF_PAGE:<goToPage(PAGE_NUM)>
-ZOOM_IN:<zoomIn(PERCENT=100)>
-ZOOM_OUT:<zoomOut(PERCENT=100)>
+PLAY_MUSIC:[playMusic(IS_SPOTIFY=false)]
+PAUSE_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
+NEXT_SONG:[nextSong(IS_SPOTIFY=false)]
+SEARCH_MUSIC:[searchMusic(ARTIST, ALBUM, SONG)]
+
+# requirement 4.14
+SEARCH_PDF:[searchPDF(EXCERPT)]
+GO_TO_PDF_PAGE:[goToPage(PAGE_NUM)]
