@@ -1,5 +1,7 @@
 __author__ = 'Shaun Howard'
 
+import re
+
 ACTION = 'action'
 ACTIONS = 'actions'
 CMD = 'command'
@@ -30,6 +32,64 @@ OPEN_HELP = 'OPEN_HELP'
 CLOSE_HELP = 'CLOSE_HELP'
 OPEN_CHEAT_SHEET = 'OPEN_CHEAT_SHEET'
 CLOSE_CHEAT_SHEET = 'CLOSE_CHEAT_SHEET'
+
+PATTERN_DICT = {'ELEMENT_NAME': '[a-zA-Z]+',
+                'NUM_PAGES': '(one page|(two|three|four|five|six|seven|eight|nine|ten) pages)',
+                'PERCENT': '', 'TAB_INDEX': '', 'TAB_NAME': '',
+                'URL': '', 'FORM_NAME': '', 'EXCERPT': '', 'BUTTON_NAME': '', 'PAGE_NUM': ''}
+
+
+def match_arg(arg_type, command_words, arg_sections):
+    parsed_arg = ''
+    if arg_type in PATTERN_DICT.keys():
+        # extract the correct argument pattern and compile it
+        pattern = PATTERN_DICT[arg_type]
+        pat = re.compile(pattern)
+
+        # try to match to words first
+        for word in command_words:
+            match = pat.match(word)
+            if match is not None and len(match.group()) > 0:
+                parsed_arg = match.group()
+                break
+
+        # otherwise, try to match to argument phrase sections
+        for arg_section in arg_sections:
+            match = pat.match(arg_section)
+            if match is not None and len(match.group()) > 0:
+                parsed_arg = match.group()
+                break
+
+    return parsed_arg
+
+
+def extract_arg_sections(command_str, part_indices):
+    arg_indices = []
+    index_list = []
+    arg_sections = []
+
+    if len(part_indices) > 2:
+        for part_index in part_indices:
+            index_list.append(part_index[0])
+            index_list.append(part_index[1])
+
+        arg_start = -1
+        for i in range(len(index_list)):
+            # get arg start
+            if i > 0 and i % 2 == 0 and arg_start == -1:
+                arg_start = index_list[i]
+            else:
+                # get arg end
+                if arg_start >= 0:
+                    arg_end = index_list[i]
+                    arg_indices.append((arg_start, arg_end))
+                    arg_start = -1
+
+        for index_pair in arg_indices:
+            part_start = index_pair[0]
+            part_end = index_pair[1]
+            arg_sections.append(command_str[part_start:part_end])
+    return arg_sections
 
 
 def parse_arguments(arguments):

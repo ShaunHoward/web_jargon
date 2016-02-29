@@ -13,7 +13,7 @@ ZOOM_IN:[zoomIn(PERCENT=10)]
 ZOOM_OUT:[zoomOut(PERCENT=10)]
 
 # requirement 4.5
-OPEN_TAB:[openTab()]
+OPEN_TAB:[openTab(DOMAIN_NAME)]
 CLOSE_TAB:[closeTab(TAB_INDEX|TAB_NAME)]
 SWITCH_TAB:[switchTab(TAB_INDEX|TAB_NAME)]
 

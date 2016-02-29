@@ -233,11 +233,11 @@ class TextProcessor():
         :return:
         """
 
-        # store lowercase of all strings
-        command_words = [x.lower() for x in command_words]
+        # store lowercase of all strings and filter out quotes
+        command_words = [x.lower() for x in command_words if x != '``' and x != '\'\'']
 
         # store lowercase, parens removed, stripped version of command text input
-        command_text = command_text.lower()[1:len(command_text)-1].strip()
+        command_text = command_text.lower().strip()
         values = []
         # try to find match of an action key in the command
         # for key in self.action_text_mappings.keys():
@@ -276,20 +276,38 @@ class TextProcessor():
             # if not found_action:
                 for u_map in self.action_text_mappings[action_key]:
                     indices = []
+                    curr_command_text = command_text
+                    curr_command_words = command_words
                     for part in u_map[h.PARTS]:
                         # check if part of the utterance is in the command
-                        if part in command_text:
-                            indices.append(command_text.index(part))
+                        if part in curr_command_text:
+                            part_start = command_text.index(part)
+                            part_end = part_start + len(part)
+                            indices.append((part_start, part_end))
+                            # replace that part of string with underscore to signify removal
+                            curr_command_text = curr_command_text.replace(part, '_')
+                            # remove this part from the word list (if not in list, problem but neglect)
+                            part_split = part.split(" ")
+                            for p in part_split:
+                                if p in curr_command_words:
+                                    curr_command_words.remove(p)
+                                else:
+                                    print p + " not in current command word list..."
 
                     # store match if parts are in command
                     if len(indices) == len(u_map[h.PARTS]):
-                        matches.append((action_key, " ".join(u_map[h.PARTS]), u_map[h.CMD_ARGS], min(indices)))
-                        # curr_action_request[h.CMD] = action_key
-                        # TODO smart arg parsing
-                        # curr_action_request[h.CMD_ARGS] = u_map[h.CMD_ARGS]
-                        # action has been found, can exit all loops
-                        # found_action = True
-                        # break
+
+                        # store indices where args will be extracted from in string
+                        arg_sections = h.extract_arg_sections(command_text, indices)
+
+                        # do smart argument parsing use regex, parse trees, etc.
+                        args = dict()
+                        for arg_type in u_map[h.CMD_ARGS]:
+                            # extract argument using argument type
+                            parsed_arg = h.match_arg(arg_type, curr_command_words, arg_sections)
+                            if len(parsed_arg) > 0:
+                                args[arg_type] = parsed_arg
+                        matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0])))
 
         curr_action_request = dict()
         # select the earliest and/or longest command match for the current action request

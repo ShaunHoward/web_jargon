@@ -1,12 +1,12 @@
 /**
-The backgroud page controls extension-level, window-level, and high-level tab functions
-Functions starting with underscore(_) are not callable by the api. They are helper-functions only
+The background page controls extension-level, window-level, and high-level tab functions
+Functions starting with underscore(_) are not callable by the api. They are helper-functions only.
 */
 
 /**
 Opens a new tab with the input url
 */
-function createTab(u){
+function openTab(u){
   chrome.tabs.create({ url: "http://www."+u+".com" });
 }
 
@@ -57,7 +57,7 @@ function switchTab(tabId){
 }
 
 /**
-Exectues input command
+Executes input command
 Checks background page functions first, then checks current tab functions
 */
 function _doCommand(cmd, params){

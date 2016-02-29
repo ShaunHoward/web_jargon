@@ -1,5 +1,5 @@
 /**
-The editor controls tab-specific functions. It recieves commands from the background page.
+The editor controls tab-specific functions. It receives commands from the background page.
 */
 
 /**
@@ -47,11 +47,11 @@ function refresh(){
   location.reload();
 }
 
-function back(){
+function backwardPage(){
   parent.history.back();
 }
 
-function forward(){
+function forwardPage(){
   parent.history.forward();
 }
 
