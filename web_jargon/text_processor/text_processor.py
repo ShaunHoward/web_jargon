@@ -6,8 +6,7 @@ from itertools import chain
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordPOSTagger
-
-from web_jargon import helpers as h
+import helpers as h
 
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
               "ninth": 9, "tenth": 10, "eleventh": 11, "twelvefth": 12, "thirteenth": 13, "fourteenth": 14,

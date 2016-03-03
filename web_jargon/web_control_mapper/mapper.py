@@ -1,7 +1,7 @@
 __author__ = 'shaun'
 from os import path
 
-from web_jargon import helpers as h
+import helpers as h
 
 
 CONTEXT = 'context'
