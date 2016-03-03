@@ -9,9 +9,12 @@ $("#textInput").submit(function( event ) {
   var inputText = $("input:first").val();
   event.preventDefault();
   $.post( server, inputText, function( data ) {
-  $("#JargonPopup").append("</br>"+data);
-  var commands = JSON.parse(data)["actions"];
-  var msg = backgroundPage._doCommand(commands, params);
+    addLine(data);
+    var commands = JSON.parse(data)["actions"];
+    var msg = backgroundPage._doCommand(commands, params);
+  })
+  .fail(function() {
+    addLine("could not connect");
   });
 });
 
@@ -20,6 +23,10 @@ $("#listenButton").click(function( event ) {
   if (!('webkitSpeechRecognition' in window)) {
     upgrade();
   } else{
-    backgroundPage._startListening();
+    backgroundPage._toggleListening();
   }
 });
+
+function addLine(str){
+  $("#JargonPopup").append("</br>"+str);
+}
