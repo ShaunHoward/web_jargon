@@ -43,7 +43,7 @@ recognition.onstart = function(){
 /**
 Opens a new tab with the input url
 */
-function openTab(u){
+function openUrl(u){
   chrome.tabs.create({ url: "http://www."+u+".com" });
 }
 

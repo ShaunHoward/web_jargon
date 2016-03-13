@@ -3,6 +3,7 @@ The editor controls tab-specific functions. It receives commands from the backgr
 */
 var zoomLevel = .25;
 var currentZoom = parseInt($('body').css('zoom'));//TODO css is not updated after a zoom
+var lastEditedInput = null;
 
 /**
  * Called from the background page.
@@ -67,6 +68,41 @@ function zoomOut(){
 function click(str){
   var b = $("a:contains("+str+")").first();
   b[0].click();
+}
+
+function enterText(name, str){
+  var e = $("input[placeholder*='"+name+"']")
+  e.val(str);
+  lastEditedInput = e;
+}
+
+function submitForm(){
+  if(lastEditedInput != null){
+    lastEditedInput.closest('form').submit();
+  }
+}
+
+function playVideo(){
+  $("button[aria-label='Play']").click();
+}
+
+function pauseVideo(){
+  $("button[aria-label='Pause']").click();
+}
+
+function startFullscreen(){
+  $("button[title='Full screen']").click();
+}
+
+function stopFullscreen(){
+  $("button[title='Exit full screen']").click();
+}
+
+function playMusic(){
+  var frame = $("#app-player");
+  var contents = frame.contents();
+  var btn = contents.find("button[id='play-pause']");
+  btn.click();
 }
 
 function _zetZoom(z){
