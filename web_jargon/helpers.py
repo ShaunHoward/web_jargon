@@ -1,7 +1,7 @@
 __author__ = 'Shaun Howard'
 
 import re
-
+from text_processor.arg_parsers import WordsToNumbers
 ACTION = 'action'
 ACTIONS = 'actions'
 CMD = 'command'
@@ -33,32 +33,69 @@ CLOSE_HELP = 'CLOSE_HELP'
 OPEN_CHEAT_SHEET = 'OPEN_CHEAT_SHEET'
 CLOSE_CHEAT_SHEET = 'CLOSE_CHEAT_SHEET'
 
-PATTERN_DICT = {'ELEMENT_NAME': '[a-zA-Z]+',
-                'NUM_PAGES': '(one page|(two|three|four|five|six|seven|eight|nine|ten) pages)',
-                'PERCENT': '', 'TAB_INDEX': '', 'TAB_NAME': '',
+NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
+              "ninth": 9, "tenth": 10, "eleventh": 11, "twelfth": 12, "thirteenth": 13, "fourteenth": 14,
+              "fifteenth": 15, "sixteenth": 16, "seventeenth": 17, "eighteenth": 18, "nineteenth": 19, "twentieth": 20}
+
+
+def tab_index(words):
+    result = WordsToNumbers().parse(words)
+    if result < 0:
+        result = get_index(words.split(" "))
+    return result
+
+
+def get_index(words):
+    result = -1
+    for word in words:
+        if word in NUM_TO_INT.keys():
+            result = NUM_TO_INT[word]
+            break
+    return result
+
+PATTERN_DICT = {'ELEMENT_NAME': '[a-zA-Z\s]+$',
+                'NUM_PAGES': WordsToNumbers().parse, 'PERCENT': WordsToNumbers().parse,
+                'TAB_INDEX': tab_index, 'TAB_NAME': '[a-zA-Z\s]+$',
                 'URL': '', 'FORM_NAME': '', 'EXCERPT': '', 'BUTTON_NAME': '', 'PAGE_NUM': ''}
 
 
 def match_arg(arg_type, command_words, arg_sections):
+    arg_sections = [x.strip() for x in arg_sections]
     parsed_arg = ''
-    if arg_type in PATTERN_DICT.keys():
-        # extract the correct argument pattern and compile it
-        pattern = PATTERN_DICT[arg_type]
-        pat = re.compile(pattern)
+    if "|" in arg_type:
+        arg_types = arg_type.split("|")
+    else:
+        arg_types = [arg_type]
+    for arg_type in arg_types:
+        if len(command_words) > 0 and len(arg_sections) > 0 and arg_type in PATTERN_DICT.keys():
+            # extract the correct argument pattern and compile it
+            pattern = PATTERN_DICT[arg_type]
+            if type(pattern) is str:
+                pat = re.compile(pattern)
 
-        # try to match to words first
-        for word in command_words:
-            match = pat.match(word)
-            if match is not None and len(match.group()) > 0:
-                parsed_arg = match.group()
-                break
+                # try to match to words first
+                for word in command_words:
+                    match = pat.match(word)
+                    if match is not None and len(match.group()) > 0:
+                        parsed_arg = match.group()
+                        break
 
-        # otherwise, try to match to argument phrase sections
-        for arg_section in arg_sections:
-            match = pat.match(arg_section)
-            if match is not None and len(match.group()) > 0:
-                parsed_arg = match.group()
-                break
+                # otherwise, try to match to argument phrase sections
+                for arg_section in arg_sections:
+                    match = pat.match(arg_section)
+                    if match is not None and len(match.group()) > 0:
+                        parsed_arg = match.group()
+                        break
+            else:
+                valid_match = False
+                for arg_section in arg_sections:
+                    match = pattern(arg_section)
+                    valid_match = (type(match) == int and match > 0) or (type(match) != int and match is not None)
+                    if valid_match:
+                        parsed_arg = match
+                        break
+                if valid_match:
+                    break
 
     return parsed_arg
 
@@ -89,6 +126,22 @@ def extract_arg_sections(command_str, part_indices):
             part_start = index_pair[0]
             part_end = index_pair[1]
             arg_sections.append(command_str[part_start:part_end])
+    elif len(part_indices) == 1 and part_indices[0][1] < len(command_str):
+        part_start = part_indices[0][1] + 1
+        part_end = len(command_str)
+        arg_sections.append(command_str[part_start:part_end])
+    elif len(part_indices) == 2:
+        # see if there is room for arguments at front of phrase
+        if part_indices[0][0] > 0:
+            arg_sections.append(command_str[0:part_indices[0][0]])
+
+        # see if there is room for args between first and second phrase
+        if part_indices[1][0] > part_indices[0][1]:
+            arg_sections.append(command_str[part_indices[0][1]:part_indices[1][0]])
+
+        # see if there is room for args at end of phrase
+        if part_indices[1][1] < len(command_str):
+            arg_sections.append(command_str[part_indices[1][1]])
     return arg_sections
 
 
@@ -241,6 +294,8 @@ def load_web_action_template(template_path, action_call=True):
 
                                 if len(strs) > 1 and len(strs[1]) > 0:
                                     u_map[PARTS].append(strs[1].strip().lower())
+                        if '' in u_map[PARTS]:
+                            u_map[PARTS] = [x for x in u_map[PARTS] if len(x) > 0]
 
                         # add utterance map to action map
                         action_map[action_key].append(u_map)

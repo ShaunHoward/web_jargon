@@ -6,7 +6,7 @@ from itertools import chain
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordPOSTagger
-import helpers as h
+import web_jargon.helpers as h
 
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
               "ninth": 9, "tenth": 10, "eleventh": 11, "twelvefth": 12, "thirteenth": 13, "fourteenth": 14,
@@ -284,14 +284,12 @@ class TextProcessor():
                             part_end = part_start + len(part)
                             indices.append((part_start, part_end))
                             # replace that part of string with underscore to signify removal
-                            curr_command_text = curr_command_text.replace(part, '_')
+                            curr_command_text = curr_command_text.replace(part, '')
                             # remove this part from the word list (if not in list, problem but neglect)
                             part_split = part.split(" ")
                             for p in part_split:
                                 if p in curr_command_words:
                                     curr_command_words.remove(p)
-                                else:
-                                    print p + " not in current command word list..."
 
                     # store match if parts are in command
                     if len(indices) == len(u_map[h.PARTS]):
@@ -301,18 +299,26 @@ class TextProcessor():
 
                         # do smart argument parsing use regex, parse trees, etc.
                         args = dict()
+                        num_args = 0
                         for arg_type in u_map[h.CMD_ARGS]:
                             # extract argument using argument type
                             parsed_arg = h.match_arg(arg_type, curr_command_words, arg_sections)
-                            if len(parsed_arg) > 0:
+                            if (type(parsed_arg) == int and parsed_arg > 0) or (type(parsed_arg) != int and len(parsed_arg) > 0):
                                 args[arg_type] = parsed_arg
-                        matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0])))
+                                num_args += 1
+                        # this is an exact match
+                        if len(curr_command_words) == 0:
+                            matches = [(action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args)]
+                        else:
+                            # otherwise, keep appending matches
+                            matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args))
 
         curr_action_request = dict()
         # select the earliest and/or longest command match for the current action request
         if len(matches) > 0:
             longest_phrase = 0
             longest_index = 0
+            most_args = 0
             earliest_pos = 0
             earliest_index = 0
             ctr = 0
@@ -322,6 +328,9 @@ class TextProcessor():
                 # get start pos of command match
                 start_pos = match[3]
 
+                # get the number of args matched from phrase
+                num_args = match[4]
+
                 # look for longer phrase
                 if mlen > longest_phrase:
                     longest_phrase = mlen
@@ -329,8 +338,10 @@ class TextProcessor():
 
                 # look for same length phrase with earlier command match
                 if start_pos < earliest_pos or (start_pos == earliest_pos and mlen == longest_phrase):
-                    earliest_pos = start_pos
-                    earliest_index = ctr
+                    if most_args < num_args:
+                        most_args = num_args
+                        earliest_pos = start_pos
+                        earliest_index = ctr
                 ctr += 1
 
                 # set command and args from action text mappings

@@ -16,7 +16,7 @@ ZOOM_OUT:["zoom out by (PERCENT)", "zoom out (PERCENT)", "zoom away (PERCENT)", 
 # requirement 4.5
 OPEN_TAB:["open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab", "create new tab"]
 CLOSE_TAB:["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab", "exit the tab"]
-SWITCH_TAB:["switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME)", "open the (TAB_INDEX) tab"]
+SWITCH_TAB:["switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME) tab", "change to (TAB_INDEX|TAB_NAME)", "open the (TAB_INDEX) tab"]
 
 # requirement 4.6
 FORWARD:["forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead"]
