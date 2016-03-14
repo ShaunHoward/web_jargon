@@ -32,6 +32,20 @@ OPEN_HELP = 'OPEN_HELP'
 CLOSE_HELP = 'CLOSE_HELP'
 OPEN_CHEAT_SHEET = 'OPEN_CHEAT_SHEET'
 CLOSE_CHEAT_SHEET = 'CLOSE_CHEAT_SHEET'
+OPEN_SETUP_PAGE = 'OPEN_SETUP_PAGE'
+CLOSE_SETUP_PAGE = 'CLOSE_SETUP_PAGE'
+PLAY_VIDEO = 'PLAY_VIDEO'
+PAUSE_VIDEO = 'PAUSE_VIDEO'
+RESTART_VIDEO = 'RESTART_VIDEO'
+OPEN_FULLSCREEN = 'OPEN_FULLSCREEN'
+CLOSE_FULLSCREEN = 'CLOSE_FULLSCREEN'
+PLAY_MUSIC = 'PLAY_MUSIC'
+PAUSE_MUSIC = 'PAUSE_MUSIC'
+NEXT_SONG = 'NEXT_SONG'
+SEARCH_MUSIC = 'SEARCH_MUSIC'
+SEARCH_PDF = 'SEARCH_PDF'
+GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
+
 
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
               "ninth": 9, "tenth": 10, "eleventh": 11, "twelfth": 12, "thirteenth": 13, "fourteenth": 14,
@@ -53,10 +67,24 @@ def get_index(words):
             break
     return result
 
+
+def url(words):
+    parsed_arg = ''
+    words.replace('dot ', '.')
+    words.replace('dot', '.')
+    words.replace('w w w ', 'www')
+    words.replace('w w w', 'www')
+    match = re.match('.*(\.|dot) ?[a-z]{2,3}', words)
+    if match is not None and len(match.group()) > 0:
+        if len(match.group()) == len(words):
+            parsed_arg = match.group()
+    return parsed_arg
+
+
 PATTERN_DICT = {'ELEMENT_NAME': '[a-zA-Z\s]+$',
                 'NUM_PAGES': WordsToNumbers().parse, 'PERCENT': WordsToNumbers().parse,
                 'TAB_INDEX': tab_index, 'TAB_NAME': '[a-zA-Z\s]+$',
-                'URL': '', 'FORM_NAME': '', 'EXCERPT': '', 'BUTTON_NAME': '', 'PAGE_NUM': ''}
+                'URL': url, 'FORM_NAME': '', 'EXCERPT': '', 'BUTTON_NAME': '', 'PAGE_NUM': ''}
 
 
 def match_arg(arg_type, command_words, arg_sections):

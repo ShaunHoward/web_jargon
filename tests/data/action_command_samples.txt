@@ -15,17 +15,17 @@ OPEN_URL: ["open www.google.com in the current tab", "open facebook.com", "open 
 ENTER_TEXT: ["enter text into form status (BEFORE_WAIT=3) I feel great today for some reason (AFTER_WAIT=3)", "write I feel great today and want to go on vacation", "enter text the wheels on the car are worth $2500"]
 SUBMIT_TEXT: ["submit text using post", "submit", "submit text post", "submit post"]
 #ENTER_AND_SUBMIT:
-#OPEN_HELP:
-#CLOSE_HELP:
-#OPEN_CHEAT_SHEET:
-#CLOSE_CHEAT_SHEET:
-#OPEN_SETUP_PAGE:
-#CLOSE_SETUP_PAGE:
-#PLAY_VIDEO:
-#PAUSE_VIDEO:
-#RESTART_VIDEO:
-#OPEN_FULLSCREEN:
-#CLOSE_FULLSCREEN:
+OPEN_HELP:["help please", "please help", "open help", "open browsing assistance", "browsing assistance", "assistance", "assistant", "helper", "help window", "help me", "show hints", "open hints", "display hints", "list functions", "list commands", "list actions", "show actions", "show commands"]
+CLOSE_HELP:["close help", "I'm good", "thanks", "I am good"]
+OPEN_CHEAT_SHEET:["open cheat sheet", "let me cheat", "display cheats", "show cheats", "show me cheats", "open cheats", "open functions", "list all functions", "list all commands", "list all actions", "show all actions", "show all commands", "show all hints", "open all hints", "display all hints"]
+CLOSE_CHEAT_SHEET:["close cheat sheet", "close cheats", "hide cheats", "hide cheat sheet", "hide sheet"]
+OPEN_SETUP_PAGE:["display setup", "display setup page", "open setup", "open setup page", "show setup", "show setup page"]
+CLOSE_SETUP_PAGE:["hide setup", "close setup", "exit setup"]
+PLAY_VIDEO:["play video", "play", "start video", "start", "play movie", "start movie"]
+PAUSE_VIDEO:["pause video", "pause", "pause movie", "stop video", "stop movie", "stop"]
+RESTART_VIDEO:["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
+OPEN_FULLSCREEN:["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen", "toggle full screen"]
+CLOSE_FULLSCREEN:["escape", "quit", "quit fullscreen", "close fullscreen", "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off"]
 #PLAY_MUSIC:
 #PAUSE_MUSIC:
 #NEXT_SONG:

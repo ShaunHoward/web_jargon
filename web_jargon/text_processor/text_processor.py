@@ -270,13 +270,14 @@ class TextProcessor():
         # found_action = False
         # store matches list
         matches = []
+        has_exact_match = False
         # try to find match for command in templates
         for action_key in self.action_text_mappings.keys():
-            # if not found_action:
+            if not has_exact_match:
                 for u_map in self.action_text_mappings[action_key]:
                     indices = []
                     curr_command_text = command_text
-                    curr_command_words = command_words
+                    curr_command_words = [x for x in command_words]
                     for part in u_map[h.PARTS]:
                         # check if part of the utterance is in the command
                         if part in curr_command_text:
@@ -309,6 +310,8 @@ class TextProcessor():
                         # this is an exact match
                         if len(curr_command_words) == 0:
                             matches = [(action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args)]
+                            has_exact_match = True
+                            break
                         else:
                             # otherwise, keep appending matches
                             matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args))
@@ -335,6 +338,10 @@ class TextProcessor():
                 if mlen > longest_phrase:
                     longest_phrase = mlen
                     longest_index = ctr
+                    # take longer phrase (still same starting location)
+                    if start_pos == earliest_pos:
+                        earliest_pos = start_pos
+                        earliest_index = ctr
 
                 # look for same length phrase with earlier command match
                 if start_pos < earliest_pos or (start_pos == earliest_pos and mlen == longest_phrase):
