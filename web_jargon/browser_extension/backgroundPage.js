@@ -3,10 +3,47 @@ The background page controls extension-level, window-level, and high-level tab f
 Functions starting with underscore(_) are not callable by the api. They are helper-functions only.
 */
 
+var listening = false;
+var keepListening = true;
+
+var recognition = new webkitSpeechRecognition();
+recognition.continuous = true;
+recognition.interimResults = true;
+
+recognition.onerror = function(event) {
+  //check if microphone is available
+  if(event.error == 'not-allowed'){
+    _getAudioPermission();
+  }
+}
+recognition.onresult = function(event) {
+  var final_transcript = "";
+  var interim_transcript = "";
+  for (var i = event.resultIndex; i < event.results.length; ++i) {
+    if (event.results[i].isFinal) {
+      final_transcript += event.results[i][0].transcript;
+      alert(event.results[i][0].transcript);
+    } else {
+      interim_transcript += event.results[i][0].transcript;
+    }
+  }
+}
+recognition.onend = function() {
+  if(keepListening){
+    recognition.start();
+  } else{
+    listening = false;
+  }
+}
+recognition.onstart = function(){
+  listening = true;
+}
+
+
 /**
 Opens a new tab with the input url
 */
-function openTab(u){
+function openUrl(u){
   chrome.tabs.create({ url: "http://www."+u+".com" });
 }
 
@@ -79,31 +116,13 @@ function _getAudioPermission(){
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
 }
 
-function _startListening(){
-  var recognition = new webkitSpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-
-  recognition.onerror = function(event) {
-    //check if microphone is available
-    if(event.error == 'not-allowed'){
-      _getAudioPermission();
-    }
+function _toggleListening(){
+  if(listening){
+    keepListening = false;
+    recognition.stop();
+  } else{
+    recognition.start();
   }
-  recognition.onresult = function(event) {
-    var final_transcript = "";
-    var interim_transcript = "";
-    for (var i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        final_transcript += event.results[i][0].transcript;
-	alert(event.results[i][0].transcript);
-      } else {
-        interim_transcript += event.results[i][0].transcript;
-      }
-    }
-    
-  }
-  recognition.start();
 }
 
 function _setIcon(file){

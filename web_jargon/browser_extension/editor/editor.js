@@ -1,6 +1,9 @@
 /**
 The editor controls tab-specific functions. It receives commands from the background page.
 */
+var zoomLevel = .25;
+var currentZoom = parseInt($('body').css('zoom'));//TODO css is not updated after a zoom
+var lastEditedInput = null;
 
 /**
  * Called from the background page.
@@ -10,7 +13,6 @@ chrome.runtime.onMessage.addListener(
     if (typeof window[request.func] == 'function') {
       window[request.func].apply(null, request.params);
     } else{
-      //_addBox();
       sendResponse({msg: "not found"}); 
     }   
   });
@@ -55,9 +57,57 @@ function forwardPage(){
   parent.history.forward();
 }
 
+function zoomIn(){
+  _zetZoom(currentZoom + zoomLevel);
+}
+
+function zoomOut(){
+  _zetZoom(currentZoom - zoomLevel);
+}
+
 function click(str){
   var b = $("a:contains("+str+")").first();
   b[0].click();
+}
+
+function enterText(name, str){
+  var e = $("input[placeholder*='"+name+"']")
+  e.val(str);
+  lastEditedInput = e;
+}
+
+function submitForm(){
+  if(lastEditedInput != null){
+    lastEditedInput.closest('form').submit();
+  }
+}
+
+function playVideo(){
+  $("button[aria-label='Play']").click();
+}
+
+function pauseVideo(){
+  $("button[aria-label='Pause']").click();
+}
+
+function startFullscreen(){
+  $("button[title='Full screen']").click();
+}
+
+function stopFullscreen(){
+  $("button[title='Exit full screen']").click();
+}
+
+function playMusic(){
+  var frame = $("#app-player");
+  var contents = frame.contents();
+  var btn = contents.find("button[id='play-pause']");
+  btn.click();
+}
+
+function _zetZoom(z){
+  $('body').css('zoom', z.toString());
+  currentZoom = z;
 }
 
 function _scrollHorizontal(dest){
@@ -72,6 +122,6 @@ function _scrollVertical(dest){
   }, 1000);
 }
 
-function _addBox(){
-  $('html').append('<div style="position:absolute;color:white;background-color:black;right:30px;top:30px;width:100px;height:60px;">heyoooooo</div>');
+function _addBox(str){
+  $('html').append('<div style="position:absolute;color:white;background-color:black;right:30px;top:30px;width:100px;height:60px;">'+str+'</div>');
 }
