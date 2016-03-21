@@ -109,6 +109,14 @@ class TextProcessorTest(unittest.TestCase):
                 ['spotify.com']]
         self.validate_phrases(template_phrases, h.OPEN_URL, args)
 
+    def test_select_element(self):
+        template_phrases = ["select search box", "select what are you interested in?", "select username",
+                            "select search", "select password", "select search facebook", "select what's on your mind?",
+                            "select write a comment..."]
+        args = [['search box'], ['what are you interested in?'], ['username'], ['search'], ['password'],
+                ['search facebook'], ['what\'s on your mind?'], ["write a comment..."]]
+        self.validate_phrases(template_phrases, h.SELECT_ELEMENT, args)
+
     # def test_enter_text(self):
     #     template_phrases = ["enter text into form status {WAIT=3} I feel great today for some reason {WAIT=3}",
     #                         "write I feel great today and want to go on vacation",
@@ -148,7 +156,7 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.CLOSE_SETUP_PAGE)
 
     def test_play_video(self):
-        template_phrases = ["play video", "play", "start video", "start", "play movie", "start movie"]
+        template_phrases = ["play video", "start video", "start", "play movie", "start movie"]
         self.validate_phrases(template_phrases, h.PLAY_VIDEO)
 
     def test_pause_video(self):

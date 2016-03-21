@@ -2,6 +2,7 @@ __author__ = 'Shaun Howard'
 import json
 import web
 
+from helpers import log
 from text_processor.text_processor import TextProcessor
 from web_control_mapper.mapper import Mapper
 
@@ -11,9 +12,6 @@ err_msg = "Error: Command could not be processed.\n"
 
 # use this template to send the text request
 json_template = "{\"request\":\"open my friends list on facebook.\"}"
-
-TEST_MODE = False
-TEST_COMMAND = "Scroll down one page."
 
 
 class WebJargon():
@@ -25,17 +23,15 @@ class WebJargon():
         self.processor = TextProcessor()
 
     def GET(self):
-        return 'Provide Web Jargon with an English text web action request.'
+        return 'Please provide Web Jargon with an English text web action request.'
 
     def POST(self):
         try:
-            # recvd_action_request = web.data()
-            # json_action_request = json.loads(recvd_action_request)
-            # english_request = json_action_request["request"]
             english_request = web.data()
+            log(['received request: ', english_request])
             return extract_web_actions(english_request, self.processor, self.mapper)
         except ValueError:
-            print "Could not process English request."
+            log(["could not process English request..."])
         return err_msg
 
 
@@ -63,7 +59,4 @@ def extract_web_actions(text, processor, mapper):
     return json_action_response
 
 if __name__ == '__main__':
-    if not TEST_MODE:
-        web_app.run()
-    else:
-        print extract_web_actions(TEST_COMMAND)
+    web_app.run()

@@ -1,7 +1,5 @@
 __author__ = 'Shaun Howard'
 
-import re
-from text_processor.arg_parsers import WordsToNumbers
 ACTION = 'action'
 ACTIONS = 'actions'
 CMD = 'command'
@@ -25,6 +23,7 @@ BACKWARD = 'BACKWARD'
 REFRESH = 'REFRESH'
 CLICK = 'CLICK'
 OPEN_URL = 'OPEN_URL'
+SELECT_ELEMENT = 'SELECT_ELEMENT'
 ENTER_TEXT = 'ENTER_TEXT'
 SUBMIT_TEXT = 'SUBMIT_TEXT'
 ENTER_AND_SUBMIT = 'ENTER_AND_SUBMIT'
@@ -47,130 +46,142 @@ SEARCH_PDF = 'SEARCH_PDF'
 GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 
 
-NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
-              "ninth": 9, "tenth": 10, "eleventh": 11, "twelfth": 12, "thirteenth": 13, "fourteenth": 14,
-              "fifteenth": 15, "sixteenth": 16, "seventeenth": 17, "eighteenth": 18, "nineteenth": 19, "twentieth": 20}
+def log(text_list):
+    print ''.join(text_list)
 
 
-def tab_index(words):
-    result = WordsToNumbers().parse(words)
-    if result < 0:
-        result = get_index(words.split(" "))
-    return result
+def load_action_token_list(template_path):
+    # read actions file
+    with open(template_path, 'r') as f:
+        actions_string = f.read()
+
+    # determine each of the actions from string
+    actions = actions_string.split('\n')
+
+    # filter out comments from actions
+    filtered_actions = []
+    for action in actions:
+        action = action.strip()
+        if not action.startswith("#") and len(action) > 3:
+            filtered_actions.append(action)
+
+    # create a list of action tokens
+    action_token_list = []
+    for action in filtered_actions:
+        # split up action token and function call parts
+        toke_and_func = action.split(':')
+        action_token_list.append(toke_and_func[0].strip())
 
 
-def get_index(words):
-    result = -1
-    for word in words:
-        if word in NUM_TO_INT.keys():
-            result = NUM_TO_INT[word]
-            break
-    return result
+def get_action_keys_and_values(template_path):
+    # read actions file
+    with open(template_path, 'r') as f:
+        actions_string = f.read()
+
+    # determine each of the actions from string
+    actions = actions_string.split('\n')
+
+    # filter out comments from actions
+    filtered_actions = []
+    for action in actions:
+        action = action.strip()
+        if not action.startswith("#") and len(action) > 3:
+            filtered_actions.append(action)
+
+    action_map = dict()
+    # create a map from token to action list sequence
+    for action in filtered_actions:
+        # split up action token and function or list parts
+        toke_and_func = action.split(':')
+        action_key = toke_and_func[0].strip()
+        action_value = toke_and_func[1].strip()
+        if len(action_key) > 0 and len(action_value) > 0:
+            # strip [] and trailing whitespace from list
+            action_value = action_value.lstrip('[').rstrip(']').strip()
+            if len(action_value) > 0:
+                action_map[action_key] = action_value
+    return action_map
 
 
-def url(words):
-    parsed_arg = ''
-    words.replace('dot ', '.')
-    words.replace('dot', '.')
-    words.replace('w w w ', 'www')
-    words.replace('w w w', 'www')
-    match = re.match('.*(\.|dot) ?[a-z]{2,3}', words)
-    if match is not None and len(match.group()) > 0:
-        if len(match.group()) == len(words):
-            parsed_arg = match.group()
-    return parsed_arg
+def load_web_action_template(template_path, action_call=True):
+    """
+    Generate an action template for creating action sequences.
+    :param template_path: the path of the action call or command template file.
+    :return: the action template map, ready to use and fill in
+    """
+    action_keys_and_vals = get_action_keys_and_values(template_path)
+    action_map = dict()
+    for action_key in action_keys_and_vals.keys():
+        action_value = action_keys_and_vals[action_key]
+        # run action call template parser
+        if action_call:
+            # separate functions from arguments
+            l_paren_index = action_value.index(LPAREN)
+            action_args = action_value[l_paren_index:]
+            action_value = action_value[:l_paren_index]
 
+            # parse arguments into a list template
+            action_args_list = parse_arguments(action_args)
 
-PATTERN_DICT = {'ELEMENT_NAME': '[a-zA-Z\s]+$',
-                'NUM_PAGES': WordsToNumbers().parse, 'PERCENT': WordsToNumbers().parse,
-                'TAB_INDEX': tab_index, 'TAB_NAME': '[a-zA-Z\s]+$',
-                'URL': url, 'FORM_NAME': '', 'EXCERPT': '', 'BUTTON_NAME': '', 'PAGE_NUM': ''}
+            # create the action call template as a dictionary with command and arguments
+            if action_key not in action_map.keys():
+                action_map[action_key] = dict()
 
+            # store the action and the arguments to it
+            action_map[action_key][CMD_ARGS] = action_args_list
+            action_map[action_key][CMD] = action_key
+            action_map[action_key][ACTION] = action_value
+        else:
+            # run action command template parser
+            # split values on commas
+            utterances = action_value.split(",")
 
-def match_arg(arg_type, command_words, arg_sections):
-    arg_sections = [x.strip() for x in arg_sections]
-    parsed_arg = ''
-    if "|" in arg_type:
-        arg_types = arg_type.split("|")
-    else:
-        arg_types = [arg_type]
-    for arg_type in arg_types:
-        if len(command_words) > 0 and len(arg_sections) > 0 and arg_type in PATTERN_DICT.keys():
-            # extract the correct argument pattern and compile it
-            pattern = PATTERN_DICT[arg_type]
-            if type(pattern) is str:
-                pat = re.compile(pattern)
+            # clean up whitespace
+            utterances = [x.strip() for x in utterances if len(x.strip()) > 0]
 
-                # try to match to words first
-                for word in command_words:
-                    match = pat.match(word)
-                    if match is not None and len(match.group()) > 0:
-                        parsed_arg = match.group()
-                        break
+            # strip off quotes
+            utterances = [x[1:len(x)-1] for x in utterances]
+            # create the action command template as a dictionary with command and arguments
+            if action_key not in action_map.keys():
+                action_map[action_key] = []
+            for u in utterances:
+                # construct an utterance template
+                u_map = dict()
+                u_map[CMD] = u
+                u_map[PARTS] = []
+                u_map[CMD_ARGS] = dict()
 
-                # otherwise, try to match to argument phrase sections
-                for arg_section in arg_sections:
-                    match = pat.match(arg_section)
-                    if match is not None and len(match.group()) > 0:
-                        parsed_arg = match.group()
-                        break
-            else:
-                valid_match = False
-                for arg_section in arg_sections:
-                    match = pattern(arg_section)
-                    valid_match = (type(match) == int and match > 0) or (type(match) != int and match is not None)
-                    if valid_match:
-                        parsed_arg = match
-                        break
-                if valid_match:
-                    break
+                # split on rparen for arguments
+                s = u.split("(")
+                u_map[PARTS].append(s[0].strip().lower())
 
-    return parsed_arg
+                # extract necessary argument fields
+                if len(s) > 1:
+                    # already stored the first element
+                    s = s[1:]
+                    # pull out all arguments
+                    for st in s:
+                        strs = st.split(")")
 
+                        # extract default values
+                        arg = strs[0].strip()
+                        split_arg = arg.split("=")
 
-def extract_arg_sections(command_str, part_indices):
-    arg_indices = []
-    index_list = []
-    arg_sections = []
+                        # add the argument and default value to the dictionary
+                        if len(split_arg) > 1:
+                            u_map[CMD_ARGS][split_arg[0]] = split_arg[1]
+                        else:
+                            # or add argument and default value of nothing
+                            u_map[CMD_ARGS][split_arg[0]] = ''
 
-    if len(part_indices) > 2:
-        for part_index in part_indices:
-            index_list.append(part_index[0])
-            index_list.append(part_index[1])
+                        if len(strs) > 1 and len(strs[1]) > 0:
+                            u_map[PARTS].append(strs[1].strip().lower())
+                if '' in u_map[PARTS]:
+                    u_map[PARTS] = [x for x in u_map[PARTS] if len(x) > 0]
 
-        arg_start = -1
-        for i in range(len(index_list)):
-            # get arg start
-            if i > 0 and i % 2 == 0 and arg_start == -1:
-                arg_start = index_list[i]
-            else:
-                # get arg end
-                if arg_start >= 0:
-                    arg_end = index_list[i]
-                    arg_indices.append((arg_start, arg_end))
-                    arg_start = -1
-
-        for index_pair in arg_indices:
-            part_start = index_pair[0]
-            part_end = index_pair[1]
-            arg_sections.append(command_str[part_start:part_end])
-    elif len(part_indices) == 1 and part_indices[0][1] < len(command_str):
-        part_start = part_indices[0][1] + 1
-        part_end = len(command_str)
-        arg_sections.append(command_str[part_start:part_end])
-    elif len(part_indices) == 2:
-        # see if there is room for arguments at front of phrase
-        if part_indices[0][0] > 0:
-            arg_sections.append(command_str[0:part_indices[0][0]])
-
-        # see if there is room for args between first and second phrase
-        if part_indices[1][0] > part_indices[0][1]:
-            arg_sections.append(command_str[part_indices[0][1]:part_indices[1][0]])
-
-        # see if there is room for args at end of phrase
-        if part_indices[1][1] < len(command_str):
-            arg_sections.append(command_str[part_indices[1][1]])
-    return arg_sections
+                # add utterance map to action map
+                action_map[action_key].append(u_map)
+    return action_map
 
 
 def parse_arguments(arguments):
@@ -204,163 +215,98 @@ def parse_arguments(arguments):
     return args
 
 
-def load_action_token_list(template_path):
-    # read actions file
-    with open(template_path, 'r') as f:
-        actions_string = f.read()
-
-    # determine each of the actions from string
-    actions = actions_string.split('\n')
-
-    # filter out comments from actions
-    filtered_actions = []
-    for action in actions:
-        action = action.strip()
-        if not action.startswith("#") and len(action) > 3:
-            filtered_actions.append(action)
-
-    # create a list of action tokens
-    action_token_list = []
-    for action in filtered_actions:
-        # split up action token and function call parts
-        toke_and_func = action.split(':')
-        action_token_list.append(toke_and_func[0].strip())
-
-
-def load_web_action_template(template_path, action_call=True):
+def load_action_command_samples(file_path):
     """
-    Generate an action template for creating action sequences.
-    :param template_path: the path of the action call or command template file.
-    :return: the action template map, ready to use and fill in
+    Loads the action command samples file contents
+    into memory as an action map with the action
+    token as the key, the list of samples as the value.
+    :param file_path:
+    :return:
     """
-    # read actions file
-    with open(template_path, 'r') as f:
-        actions_string = f.read()
-
-    # determine each of the actions from string
-    actions = actions_string.split('\n')
-
-    # filter out comments from actions
-    filtered_actions = []
-    for action in actions:
-        action = action.strip()
-        if not action.startswith("#") and len(action) > 3:
-            filtered_actions.append(action)
-
-    # create a map from token to action function call
+    action_keys_and_values = get_action_keys_and_values(file_path)
     action_map = dict()
-    for action in filtered_actions:
-        # split up action token and function call parts
-        toke_and_func = action.split(':')
-        action_key = toke_and_func[0].strip()
-        action_value = toke_and_func[1].strip()
-
-        if len(action_key) > 0 and len(action_value) > 0:
-            # strip [] and trailing whitespace from function call
-            action_value = action_value.lstrip('[').rstrip(']').strip()
-            if len(action_value) > 0:
-                # run action call template parser
-                if action_call:
-                    # separate functions from arguments
-                    l_paren_index = action_value.index(LPAREN)
-                    action_args = action_value[l_paren_index:]
-                    action_value = action_value[:l_paren_index]
-
-                    # parse arguments into a list template
-                    action_args_list = parse_arguments(action_args)
-
-                    # create the action call template as a dictionary with command and arguments
-                    if action_key not in action_map.keys():
-                        action_map[action_key] = dict()
-
-                    # store the action and the arguments to it
-                    action_map[action_key][CMD_ARGS] = action_args_list
-                    action_map[action_key][CMD] = action_key
-                    action_map[action_key][ACTION] = action_value
-                else:
-                    # run action command template parser
-                    # split values on commas
-                    utterances = action_value.split(",")
-
-                    # clean up whitespace
-                    utterances = [x.strip() for x in utterances if len(x.strip()) > 0]
-
-                    # strip off quotes
-                    utterances = [x[1:len(x)-1] for x in utterances]
-                    # create the action command template as a dictionary with command and arguments
-                    if action_key not in action_map.keys():
-                        action_map[action_key] = []
-                    for u in utterances:
-                        # construct an utterance template
-                        u_map = dict()
-                        u_map[CMD] = u
-                        u_map[PARTS] = []
-                        u_map[CMD_ARGS] = dict()
-
-                        # split on rparen for arguments
-                        s = u.split("(")
-                        u_map[PARTS].append(s[0].strip().lower())
-
-                        # extract necessary argument fields
-                        if len(s) > 1:
-                            # already stored the first element
-                            s = s[1:]
-                            # pull out all arguments
-                            for st in s:
-                                strs = st.split(")")
-
-                                # extract default values
-                                arg = strs[0].strip()
-                                split_arg = arg.split("=")
-
-                                # add the argument and default value to the dictionary
-                                if len(split_arg) > 1:
-                                    u_map[CMD_ARGS][split_arg[0]] = split_arg[1]
-                                else:
-                                    # or add argument and default value of nothing
-                                    u_map[CMD_ARGS][split_arg[0]] = ''
-
-                                if len(strs) > 1 and len(strs[1]) > 0:
-                                    u_map[PARTS].append(strs[1].strip().lower())
-                        if '' in u_map[PARTS]:
-                            u_map[PARTS] = [x for x in u_map[PARTS] if len(x) > 0]
-
-                        # add utterance map to action map
-                        action_map[action_key].append(u_map)
+    for action_key in action_keys_and_values:
+        action_value = action_keys_and_values[action_key]
+        action_commands = action_value.split(", ")
+        if len(action_commands) > 0:
+            action_map[action_key] = action_commands
     return action_map
+
+
+def extract_arg_sections(command_str, part_indices):
+    """
+    Extracts the argument sections from the provided command string.
+    Uses the part indices to search the parts of the string that may contain arguments.
+    :param command_str: the string containing one command and its arguments
+    :param part_indices: the pairs of indices (start, end) that could contain arguments
+    :return: the argument section strings from the command
+    """
+    arg_indices = []
+    index_list = []
+    arg_sections = []
+
+    # parse multiple arguments out of the command string
+    if len(part_indices) > 2:
+        for part_index in part_indices:
+            index_list.append(part_index[0])
+            index_list.append(part_index[1])
+
+        arg_start = -1
+        for i in range(len(index_list)):
+            # get arg start
+            if i > 0 and i % 2 == 0 and arg_start == -1:
+                arg_start = index_list[i]
+            else:
+                # get arg end
+                if arg_start >= 0:
+                    arg_end = index_list[i]
+                    arg_indices.append((arg_start, arg_end))
+                    arg_start = -1
+
+        # add part pairs to
+        for index_pair in arg_indices:
+            part_start = index_pair[0]
+            part_end = index_pair[1]
+            arg_sections.append(command_str[part_start:part_end])
+    elif len(part_indices) == 1 and part_indices[0][1] < len(command_str):
+        # parse
+        part_start = part_indices[0][1] + 1
+        part_end = len(command_str)
+        arg_sections.append(command_str[part_start:part_end])
+    elif len(part_indices) == 2:
+        # see if there is room for arguments at front of phrase
+        if part_indices[0][0] > 0:
+            arg_sections.append(command_str[0:part_indices[0][0]])
+
+        # see if there is room for args between first and second phrase
+        if part_indices[1][0] > part_indices[0][1]:
+            arg_sections.append(command_str[part_indices[0][1]:part_indices[1][0]])
+
+        # see if there is room for args at end of phrase
+        if part_indices[1][1] < len(command_str):
+            arg_sections.append(command_str[part_indices[1][1]])
+    return arg_sections
 
 
 def normalize_string(text):
     return text.lower().strip()
 
 
-def load_action_command_samples(file_path):
-    # read actions file
-    with open(file_path, 'r') as f:
-        actions_string = f.read()
-
-    # determine each of the actions from string
-    actions = actions_string.split('\n')
-
-    # filter out comments from actions
-    filtered_actions = []
-    for action in actions:
-        action = action.strip()
-        if not action.startswith("#") and len(action) > 3:
-            filtered_actions.append(action)
-
-    # create a map from token to action function call
-    action_map = dict()
-    for action in filtered_actions:
-        # split up action token and function call parts
-        toke_and_func = action.split(':')
-        action_key = toke_and_func[0].strip()
-        action_commands = toke_and_func[1].strip()
-
-        if len(action_key) > 0 and len(action_commands) > 0:
-            # strip [] and trailing whitespace from function call
-            action_commands = action_commands.lstrip('[').rstrip(']').strip()
-            action_commands = action_commands.split(", ")
-            if len(action_commands) > 0:
-                action_map[action_key] = action_commands
-    return action_map
+def normalize_nested_dict(dict_of_dict):
+    """
+    Normalizes the contents of a nest dictionary,
+    i.e. take min and max of dict[x][y] and normalize between 0 and 1
+    :param dict_of_dict: nested dict {{}}
+    :return: new normalized nested dict
+    """
+    new_dict_of_dict = dict()
+    for key_1 in dict_of_dict.keys():
+        new_dict_of_dict[key_1] = dict()
+        for key_2 in dict_of_dict[key_1].keys():
+            new_dict_of_dict[key_1][key_2] = 0
+            max_val = max(dict_of_dict[key_1][key_2])
+            min_val = min(dict_of_dict[key_1][key_2])
+            for val in dict_of_dict[key_1][key_2]:
+                belief = (val - min_val) / (max_val - min_val)
+                new_dict_of_dict[key_1][key_2] = belief
+    return new_dict_of_dict

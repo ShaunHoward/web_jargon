@@ -29,8 +29,11 @@ CLICK:[click(ELEMENT_NAME|LINK_NAME)]
 OPEN_URL:[openURL(URL, IN_CURRENT_TAB=false)]
 
 # requirement 4.9
+# select, enter and submit must be used in sequence
+SELECT_ELEMENT:[selectElement(ELEMENT_NAME)]
+# enter depends on select
+ENTER_TEXT:[enterText(EXCERPT, WAIT=3)]
 # submit depends on enter
-ENTER_TEXT:[enterText(EXCERPT)]
 SUBMIT_TEXT:[submitText(BUTTON_NAME)]
 
 # requirement 4.10
