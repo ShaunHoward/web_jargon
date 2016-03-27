@@ -40,24 +40,24 @@ class TextProcessorTest(unittest.TestCase):
 
     def test_scroll_up(self):
         template_phrases = ["scroll up", "up scroll", "scroll up one page", "scroll up ten pages"]
-        args = [[], [], [1], [10]]
+        args = [[1], [1], [1], [10]]
         self.validate_phrases(template_phrases, h.SCROLL_UP, args)
 
     def test_scroll_down(self):
         template_phrases = ["scroll down", "down scroll", "scroll down one page", "scroll down four pages"]
-        args = [[], [], [1], [4]]
+        args = [[1], [1], [1], [4]]
         self.validate_phrases(template_phrases, h.SCROLL_DOWN, args)
 
     def test_zoom_in(self):
-        template_phrases = ["zoom in by ten percent", "zoom in 20 percent", "zoom 4 times", "zoom", "zoom larger",
+        template_phrases = ["zoom in by ten percent", "zoom in 20 percent", "zoom", "zoom larger",
                             "zoom in"]
-        args = [[10], [20], [], [], [], []]
+        args = [[10], [20], [25], [25], [25]]
         self.validate_phrases(template_phrases, h.ZOOM_IN, args)
 
     def test_zoom_out(self):
         template_phrases = ["zoom out by fifty percent", "zoom out by thirty five percent", "zoom away 30 percent",
-                            "zoom out three times", "zoom out 100 percent", "zoom smaller", "zoom out"]
-        args = [[50], [35], [30], [], [100], [], []]
+                            "zoom out 100 percent", "zoom smaller", "zoom out"]
+        args = [[50], [35], [30], [100], [25], [25]]
         self.validate_phrases(template_phrases, h.ZOOM_OUT, args)
 
     def test_open_new_tab(self):
@@ -105,8 +105,8 @@ class TextProcessorTest(unittest.TestCase):
         template_phrases = ["open www.google.com in the current tab", "open facebook.com", "open new google.com",
                             "open accuweather.com in this tab", "open pandora.com in this tab",
                             "open youtube.com in this tab", "open spotify.com in this tab"]
-        args = [['www.google.com'], ['facebook.com'], ['google.com'], ['accuweather.com'], ['pandora.com'], ['youtube.com'],
-                ['spotify.com']]
+        args = [['www.google.com', 'true'], ['facebook.com', 'false'], ['google.com', 'false'], ['accuweather.com', 'true'], ['pandora.com', 'true'], ['youtube.com', 'true'],
+                ['spotify.com', 'true']]
         self.validate_phrases(template_phrases, h.OPEN_URL, args)
 
     def test_select_element(self):
@@ -148,20 +148,21 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.CLOSE_CHEAT_SHEET)
 
     def test_open_setup_page(self):
-        template_phrases = ["display setup", "display setup page", "open setup", "open setup page", "show setup", "show setup page"]
+        template_phrases = ["display setup", "display setup page", "open setup", "open setup page", "show setup",
+                            "show setup page"]
         self.validate_phrases(template_phrases, h.OPEN_SETUP_PAGE)
 
     def test_close_setup_page(self):
         template_phrases = ["hide setup", "close setup", "exit setup"]
         self.validate_phrases(template_phrases, h.CLOSE_SETUP_PAGE)
 
-    def test_play_video(self):
+    def test_start_video(self):
         template_phrases = ["play video", "start video", "start", "play movie", "start movie"]
-        self.validate_phrases(template_phrases, h.PLAY_VIDEO)
+        self.validate_phrases(template_phrases, h.START_VIDEO)
 
-    def test_pause_video(self):
-        template_phrases = ["pause video", "pause", "pause movie", "stop video", "stop movie", "stop"]
-        self.validate_phrases(template_phrases, h.PAUSE_VIDEO)
+    def test_stop_video(self):
+        template_phrases = ["stop video", "stop movie"]
+        self.validate_phrases(template_phrases, h.STOP_VIDEO)
 
     def test_restart_video(self):
         template_phrases = ["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
@@ -177,18 +178,29 @@ class TextProcessorTest(unittest.TestCase):
                             "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off"]
         self.validate_phrases(template_phrases, h.CLOSE_FULLSCREEN)
 
-    # def test_play_music(self):
-    #     template_phrases = []
-    #     self.validate_phrases(template_phrases, "play music")
-    #
-    # def test_pause_music(self):
-    #     template_phrases = []
-    #     self.validate_phrases(template_phrases, "pause music")
-    #
-    # def test_next_song(self):
-    #     template_phrases = []
-    #     self.validate_phrases(template_phrases, "next song")
-    #
+    def test_start_music(self):
+        template_phrases = ["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)",
+                            "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music",
+                            "play my music", "play song", "play tune", "start music", "start pandora(IS_SPOTIFY)=false",
+                            "start spotify(IS_SPOTIFY=true)"]
+        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], ['false'], ['true']]
+        self.validate_phrases(template_phrases, h.START_MUSIC, args)
+
+    def test_stop_music(self):
+        template_phrases = ["stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)",
+                            "stop on spotify (IS_SPOTIFY=true)", "stop on pandora (IS_SPOTIFY=false)", "stop music",
+                            "stop my music", "stop song", "stop tune", "stop spotify (IS_SPOTIFY=true)",
+                            "stop pandora (IS_SPOTIFY=false)"]
+        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], ['true'], ['false']]
+        self.validate_phrases(template_phrases, h.STOP_MUSIC, args)
+
+    def test_next_song(self):
+        template_phrases = ["next on spotify (IS_SPOTIFY=true)", "next on pandora (IS_SPOTIFY=false)",
+                            "next song on spotify (IS_SPOTIFY=true)", "next song on pandora (IS_SPOTIFY=false)",
+                            "next song", "next"]
+        args = [['true'], ['false'], ['true'], ['false'], [], []]
+        self.validate_phrases(template_phrases, h.NEXT_SONG, args)
+
     # def test_search_music(self):
     #     template_phrases = []
     #     self.validate_phrases(template_phrases, "search music")

@@ -305,13 +305,14 @@ class TextProcessor():
                         arg_sections = h.extract_arg_sections(command_text, indices)
 
                         # do smart argument parsing use regex, parse trees, etc.
-                        args = dict()
+                        args = u_map[h.CMD_ARGS_DICT].copy()
                         num_args = 0
                         for arg_type in u_map[h.CMD_ARGS_DICT]:
                             # extract argument using argument type
                             parsed_arg = self.match_arg(arg_type, curr_command_words, arg_sections)
                             if (type(parsed_arg) == int and parsed_arg > 0)\
-                                or (type(parsed_arg) == list or type(parsed_arg) == str and len(parsed_arg) > 0):
+                                    or (type(parsed_arg) == list
+                                        or type(parsed_arg) == str and len(parsed_arg) > 0):
                                 args[arg_type] = parsed_arg
                                 num_args += 1
                         # this is an exact match
