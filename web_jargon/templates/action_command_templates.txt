@@ -25,16 +25,17 @@ REFRESH:["refresh the page", "refresh page", "page refresh", "refresh this page"
 
 # requirement 4.7
 # allow only part of element name (fuzzy string search using html web page from plugin)
-CLICK:["click (ELEMENT_NAME)", "click (ELEMENT_NAME) button", "click the (ELEMENT_NAME) button", "open link (LINK_NAME)", "open (LINK_NAME)", "enter (LINK_NAME)"]
+CLICK:["click (ELEMENT_NAME)", "click (ELEMENT_NAME) button", "click the (ELEMENT_NAME) button", "open link (LINK_NAME)", "click link (LINK_NAME)", "click (LINK_NAME) link", "enter (LINK_NAME)"]
 
 # requirement 4.8
-OPEN_URL:["open (URL) in the current tab (IN_CURRENT_TAB=true)", "open (URL) (IN_CURRENT_TAB=false)", "open new (URL) (IN_CURRENT_TAB=false)", "open (URL) in this tab (IN_CURRENT_TAB=true)", "open (URL) in new tab (IN_CURRENT_TAB=false)"]
+OPEN_URL:["open (URL) (IN_CURRENT_TAB=false)", "open (URL) in the current tab (IN_CURRENT_TAB=true)", "open url (URL) (IN_CURRENT_TAB=false)", "open new (URL) (IN_CURRENT_TAB=false)", "open (URL) in this tab (IN_CURRENT_TAB=true)", "open (URL) in new tab (IN_CURRENT_TAB=false)"]
 
 # requirement 4.9
+SELECT_ELEMENT:["select (ELEMENT_NAME)"]
+# enter depends on select
+ENTER_TEXT:["enter text short (EXCERPT) (WAIT=5)", "enter text long (EXCERPT) (WAIT=10)", "write (EXCERPT)(WAIT=5)"]
 # submit depends on enter
-ENTER_TEXT:["enter text into form (FORM_NAME) (BEFORE_WAIT=10) (EXCERPT) (AFTER_WAIT=10)", "write (EXCERPT)", "enter text (EXCERPT)"]
 SUBMIT_TEXT:["submit text using (BUTTON_NAME)", "submit", "submit text (BUTTON_NAME)", "submit (BUTTON_NAME)", "click (BUTTON_NAME) to submit"]
-ENTER_AND_SUBMIT:["enter text (EXCERPT) (AFTER_WAIT=2) and submit (BUTTON_NAME)", "enter text (EXCERPT) (AFTER_WAIT=2) submit (BUTTON_NAME)", "enter text into form (FORM_NAME) (BEFORE_WAIT=10) (EXCERPT) (AFTER_WAIT=10) submit"]
 
 # requirement 4.10
 OPEN_HELP:["help please", "please help", "open help", "open browsing assistance", "browsing assistance", "assistance", "assistant", "helper", "help window", "help me", "show hints", "open hints", "display hints", "list functions", "list commands", "list actions", "show actions", "show commands"]
@@ -47,7 +48,7 @@ OPEN_SETUP_PAGE:["display setup", "display setup page", "open setup", "open setu
 CLOSE_SETUP_PAGE:["hide setup", "close setup", "exit setup"]
 
 # requirement 4.12
-PLAY_VIDEO:["play video", "play", "start video", "start", "play movie", "start movie"]
+PLAY_VIDEO:["play video", "start video", "start", "play movie", "start movie"]
 PAUSE_VIDEO:["pause video", "pause", "pause movie", "stop video", "stop movie", "stop"]
 RESTART_VIDEO:["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
 OPEN_FULLSCREEN:["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen", "toggle full screen"]

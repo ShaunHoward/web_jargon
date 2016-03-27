@@ -1,6 +1,9 @@
 __author__ = 'shaun'
 import re
 
+# credit to https://code.activestate.com/recipes/550818-words-to.../1/.. (url was truncated, leads to file download)
+# the code has been modified for our purposes
+
 
 class WordsToNumbers():
     """A class that can translate strings of common English words that

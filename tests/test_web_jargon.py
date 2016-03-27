@@ -14,7 +14,7 @@ DIR = path.dirname(__file__)
 COMMAND_SAMPLES = DIR + '/data/action_command_samples.txt'
 
 
-class Text2WebText(unittest.TestCase):
+class WebJargonTest(unittest.TestCase):
     mapper = None
     processor = None
     action_commands = None
@@ -39,10 +39,9 @@ class Text2WebText(unittest.TestCase):
     def check_all_action_responses(self, action_key):
         if len(self.action_commands[action_key]) > 0:
             for command in self.action_commands[action_key]:
-                if action_key == h.CLICK:
-                    json_actions = wj.extract_web_actions(command, self.processor, self.mapper)
-                    print "checking: " + command
-                    self.validate_web_actions(json_actions, action_key)
+                json_actions = wj.extract_web_actions(command, self.processor, self.mapper)
+                print "checking: " + command
+                self.validate_web_actions(json_actions, action_key)
 
     # check all actions
     def test_all_actions(self):

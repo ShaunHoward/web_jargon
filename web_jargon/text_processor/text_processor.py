@@ -3,14 +3,17 @@ __author__ = 'shaun'
 from os import path
 from itertools import chain
 
+import re
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordPOSTagger
 import web_jargon.helpers as h
+from arg_parsers import WordsToNumbers
+
 
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
-              "ninth": 9, "tenth": 10, "eleventh": 11, "twelvefth": 12, "thirteenth": 13, "fourteenth": 14,
-              "fifteenth": 15}
+              "ninth": 9, "tenth": 10, "eleventh": 11, "twelfth": 12, "thirteenth": 13, "fourteenth": 14,
+              "fifteenth": 15, "sixteenth": 16, "seventeenth": 17, "eighteenth": 18, "nineteenth": 19, "twentieth": 20}
 
 SUCCESS = "The operation was successful."
 FAIL = "The operation was unsuccessful."
@@ -99,40 +102,64 @@ def fuzzy_action_interpreter(command_tags, command_words, curr_action_request):
     return curr_action_request
 
 
-def determine_action_context(words, tags):
-    return DEFAULT_ACTION_CONTEXT
-
-
-def valid_web_jargon(sent):
-    # TODO
-    return True
-
-
-def train_processor(training_data_dir):
+def load_training_data(training_data_dir):
     with open(training_data_dir, 'r') as training_file:
         training_data = training_file.read()
-    training_command_list = training_data.split('\n')
+    training_data_list = training_data.split('\n')
+    return training_data_list
 
 
-def normalize_nested_dict(dict_of_dict):
-    new_dict_of_dict = dict()
-    for key_1 in dict_of_dict.keys():
-        new_dict_of_dict[key_1] = dict()
-        for key_2 in dict_of_dict[key_1].keys():
-            new_dict_of_dict[key_1][key_2] = 0
-            max_val = max(dict_of_dict[key_1][key_2])
-            min_val = min(dict_of_dict[key_1][key_2])
-            for val in dict_of_dict[key_1][key_2]:
-                belief = (val - min_val) / (max_val - min_val)
-                new_dict_of_dict[key_1][key_2] = belief
-    return new_dict_of_dict
+def extract_match(str_to_search, matcher):
+    match = matcher.match(str_to_search)
+    parsed_arg = ''
+    if match is not None and len(match.group()) > 0:
+        parsed_arg = match.group()
+    return parsed_arg
 
 
 class TextProcessor():
+
     action_text_mappings = dict()
+    basic_name_pattern = "[a-zA-Z\s]+$"
+    valid_web_jargon_pattern = "^[\s\w\d\>\<\;\,\{\}\[\]\-\_\+\=\!\@\#\$\%\^\&\*\|\'\.\:\(\)\\\/\"\?]+$"
+    url_pattern = ".*(\.|dot) ?[a-z]{2,3}"
+    basic_name_matcher = None
+    web_jargon_matcher = None
+    words_to_numbers = None
+    url_matcher = None
+    PATTERN_DICT = dict()
 
     def __init__(self):
+        self.words_to_numbers = WordsToNumbers()
+        self.create_argument_pattern_dict()
+        self.basic_name_matcher = re.compile(self.basic_name_pattern)
+        self.web_jargon_matcher = re.compile(self.valid_web_jargon_pattern)
+        self.url_matcher = re.compile(self.url_pattern)
         self.action_text_mappings = h.load_web_action_template(DEFAULT_ACTIONS_PATH, False)
+        self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
+
+    def create_argument_pattern_dict(self):
+        self.PATTERN_DICT = {'ELEMENT_NAME': self.match_web_jargon,
+                             'NUM_PAGES': self.words_to_numbers.parse, 'PERCENT': self.words_to_numbers.parse,
+                             'TAB_INDEX': self.tab_index, 'TAB_NAME': self.basic_names,
+                             'URL': self.url, 'FORM_NAME': self.basic_names, 'EXCERPT': self.match_web_jargon,
+                             'BUTTON_NAME': self.basic_names,
+                             'PAGE_NUM': self.words_to_numbers.parse, 'LINK_NAME': self.match_web_jargon}
+
+    def basic_names(self, text):
+        return extract_match(text, self.basic_name_matcher)
+
+    def match_web_jargon(self, text):
+        return extract_match(text, self.web_jargon_matcher)
+
+    def valid_web_jargon(self, text):
+        """
+        Text is valid web jargon if it is good English of type str or unicode that is non-empty.
+        :param text: the web jargon request
+        :return: whether the input text is valid web jargon aka good English, no weird characters
+        """
+        return (type(text) is str or type(text) is unicode)\
+            and len(text) > 0 and len(self.web_jargon_matcher.match(text).group()) > 0
 
     def process_web_action_requests(self, text):
         """
@@ -141,19 +168,26 @@ class TextProcessor():
         :param text: the input command text
         :return: the controls list, which will be empty if in error
         """
-        # tokenize text into sentences
-        sentences = sent_tokenize(text)
-        words_of_sentences = [word_tokenize(sent) for sent in sentences]
-        # tags_of_words_of_sentences = [tag_words(words) for words in words_of_sentences]
-
-        # TODO: validate jargon
-        is_valid = [valid_web_jargon(sent) for sent in sentences]
         web_action_tokens = []
-        for i in range(len(is_valid)):
-            if is_valid[i]:
-                # process sentence for commands
-                web_action_tokens = web_action_tokens + self.extract_action_requests(text, words_of_sentences[i])
-                                                                                     # tags_of_words_of_sentences[i])
+        if self.valid_web_jargon(text):
+            # tokenize text into sentences
+            sentences = sent_tokenize(text)
+
+            # determine valid sentences
+            valid_sentences = [sent for sent in sentences if self.valid_web_jargon(sent)]
+
+            # extract words corresponding to valid sentences
+            words_of_sentences = [word_tokenize(sent) for sent in valid_sentences]
+
+            # extract action requests from the current command and add to web action token list
+            web_action_tokens = [x for words in words_of_sentences
+                                 for x in self.extract_action_requests(text, words)]
+        else:
+            if type(text) is str or unicode:
+                h.log(["invalid request received: ", text])
+            else:
+                h.log(["invalid request type, received: ", str(type(text)), " but expected str or unicode..."])
+
         return web_action_tokens
 
     def extract_action_requests(self, text, words, tags=None):
@@ -201,6 +235,7 @@ class TextProcessor():
         action_requests = []
         for i in range(len(commands)):
             command_words = commands[i]
+
             # command_tags = command_tags[i]
             command_tags = []
             curr_action_request = {h.CMD: "", h.CMD_ARGS: {}}
@@ -217,7 +252,7 @@ class TextProcessor():
             if len(curr_action_request) > 0:
                 action_requests.append(curr_action_request)
             else:
-                print "error in interpreting desired actions"
+                print "error in interpreting desired actions..."
 
         return action_requests
 
@@ -236,7 +271,7 @@ class TextProcessor():
         command_words = [x.lower() for x in command_words if x != '``' and x != '\'\'']
 
         # store lowercase, parens removed, stripped version of command text input
-        command_text = command_text.lower().strip()
+        command_text = command_text.lower().strip().lstrip("\"").rstrip("\"").strip()
         values = []
         # try to find match of an action key in the command
         # for key in self.action_text_mappings.keys():
@@ -303,8 +338,9 @@ class TextProcessor():
                         num_args = 0
                         for arg_type in u_map[h.CMD_ARGS]:
                             # extract argument using argument type
-                            parsed_arg = h.match_arg(arg_type, curr_command_words, arg_sections)
-                            if (type(parsed_arg) == int and parsed_arg > 0) or (type(parsed_arg) != int and len(parsed_arg) > 0):
+                            parsed_arg = self.match_arg(arg_type, curr_command_words, arg_sections)
+                            if (type(parsed_arg) == int and parsed_arg > 0)\
+                                or (type(parsed_arg) == list or type(parsed_arg) == str and len(parsed_arg) > 0):
                                 args[arg_type] = parsed_arg
                                 num_args += 1
                         # this is an exact match
@@ -356,6 +392,77 @@ class TextProcessor():
                 curr_action_request[h.CMD_ARGS] = matches[earliest_index][2]
 
         return curr_action_request
+
+    def tab_index(self, words):
+        """
+        Convert
+        :param words:
+        :return:
+        """
+        result = self.words_to_numbers.parse(words)
+        if result < 0:
+            result = self.get_index(words.split(" "))
+        return result
+
+    def get_index(self, words):
+        """
+        Returns a the number of an English number index (indicating element position) found in the provided list of words.
+        :param words: the list of words to find the English number index in
+        :return: the number version of the found index
+        """
+        result = -1
+        for word in words:
+            if word in NUM_TO_INT.keys():
+                result = NUM_TO_INT[word]
+                break
+        return result
+
+    def url(self, words):
+        words.replace('dot ', '.')
+        words.replace('dot', '.')
+        words.replace('w w w ', 'www')
+        words.replace('w w w', 'www')
+        return extract_match(words, self.url_matcher)
+
+    def match_arg(self, arg_type, command_words, arg_sections):
+        arg_sections = [x.strip() for x in arg_sections]
+        parsed_arg = ''
+        if "|" in arg_type:
+            arg_types = arg_type.split("|")
+        else:
+            arg_types = [arg_type]
+        for arg_type in arg_types:
+            if len(command_words) > 0 and len(arg_sections) > 0 and arg_type in self.PATTERN_DICT.keys():
+                # extract the correct argument pattern and compile it
+                pattern = self.PATTERN_DICT[arg_type]
+                if type(pattern) is str:
+                    pat = re.compile(pattern)
+
+                    # try to match to words first
+                    for word in command_words:
+                        match = pat.match(word)
+                        if match is not None and len(match.group()) > 0:
+                            parsed_arg = match.group()
+                            break
+
+                    # otherwise, try to match to argument phrase sections
+                    for arg_section in arg_sections:
+                        match = pat.match(arg_section)
+                        if match is not None and len(match.group()) > 0:
+                            parsed_arg = match.group()
+                            break
+                else:
+                    valid_match = False
+                    for arg_section in arg_sections:
+                        match = pattern(arg_section)
+                        valid_match = (type(match) == int and match > 0) or (type(match) != int and match is not None)
+                        if valid_match:
+                            parsed_arg = match
+                            break
+                    if valid_match:
+                        break
+
+        return parsed_arg
 
 # def create_bigram_belief_state(self, training_command_list):
 #     for command in training_command_list:
