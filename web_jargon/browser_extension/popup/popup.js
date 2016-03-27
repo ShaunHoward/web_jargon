@@ -5,17 +5,9 @@ var backgroundPage = chrome.extension.getBackgroundPage();
  */
 $("#textInput").submit(function( event ) {
   //backgroundPage._doCommand("click",["gaming"]);
-  var server = "http://localhost:8080/";
   var inputText = $("input:first").val();
   event.preventDefault();
-  $.post( server, inputText, function( data ) {
-    addLine(data);
-    var commands = JSON.parse(data)["actions"];
-    var msg = backgroundPage._doCommand(commands, params);
-  })
-  .fail(function() {
-    addLine("could not connect");
-  });
+  backgroundPage._sendText(inputText);
 });
 
 $("#listenButton").click(function( event ) {

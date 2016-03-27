@@ -105,6 +105,20 @@ function playMusic(){
   btn.click();
 }
 
+function pauseMusic(){
+  var frame = $("#app-player");
+  var contents = frame.contents();
+  var btn = contents.find("button[id='play-pause']");
+  btn.click();
+}
+
+function nextSong(){
+  var frame = $("#app-player");
+  var contents = frame.contents();
+  var btn = contents.find("button[id='next']");
+  btn.click();
+}
+
 function _zetZoom(z){
   $('body').css('zoom', z.toString());
   currentZoom = z;
@@ -122,6 +136,10 @@ function _scrollVertical(dest){
   }, 1000);
 }
 
-function _addBox(str){
-  $('html').append('<div style="position:absolute;color:white;background-color:black;right:30px;top:30px;width:100px;height:60px;">'+str+'</div>');
+function addMessage(str){
+  /*$('html').append('<div style="position:fixed;color:white;background-color:black;right:5px;top:5px;width:100px;height:60px;z-index:1000;">'+str+'</div>');*/
+  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:5px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
+  $("#WebJargonInfo").fadeOut(2000, function(){
+    $("#WebJargonInfo").remove();
+  });
 }
