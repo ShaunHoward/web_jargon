@@ -3,6 +3,11 @@ The background page controls extension-level, window-level, and high-level tab f
 Functions starting with underscore(_) are not callable by the api. They are helper-functions only.
 */
 
+var states = Object.freeze({READY: 1, BUSY: 2, ERROR: 3});
+var state = states.READY;
+
+var server = "http://localhost:8080/";
+
 var listening = false;
 var keepListening = true;
 
@@ -22,7 +27,9 @@ recognition.onresult = function(event) {
   for (var i = event.resultIndex; i < event.results.length; ++i) {
     if (event.results[i].isFinal) {
       final_transcript += event.results[i][0].transcript;
-      alert(event.results[i][0].transcript);
+      //alert(event.results[i][0].transcript);
+      var str = event.results[i][0].transcript;
+      _sendText(str);
     } else {
       interim_transcript += event.results[i][0].transcript;
     }
@@ -39,11 +46,41 @@ recognition.onstart = function(){
   listening = true;
 }
 
+function _sendText(str){
+  _setBusy();
+  $.post( server, str, function( data ) {
+    var commands = JSON.parse(data)["actions"];
+    for(c of commands){
+      var func = c["action"];
+      var params = c["arguments"]; 
+      alert(str);
+      //alert(data);
+      var msg = _doCommand(func, params);
+      _doCommand("addMessage",[func]);
+    }
+    _setReady();
+  })
+  .fail(function() {
+    _setError();
+    _doCommand("addMessage",["Could not connect to server"]);
+  });
 
-/**
-Opens a new tab with the input url
-*/
-function openUrl(u){
+}
+
+function openUrl(u, currentTab){
+  if(!currentTab){
+   openTab(u);
+   return;
+  }
+  chrome.tabs.query({index: tabId, currentWindow: true}, function (tabs) {
+    chrome.tabs.update(tabs[0].id, {url:  "http://www."+u+".com"});
+  });
+}
+
+function openTab(u){
+  if (u == undefined){
+    u = "google";
+  }
   chrome.tabs.create({ url: "http://www."+u+".com" });
 }
 
@@ -130,6 +167,15 @@ function _setIcon(file){
     path: file
   });
 }
-function _setIconReady(){_setIcon("popup/plugin_ready.png");}
-function _setIconBusy(){_setIcon("popup/plugin_busy.png");}
-function _setIconError(){_setIcon("popup/plugin_error.png");}
+function _setReady(){
+  _setIcon("popup/plugin_ready.png");
+  state = states.READY;
+}
+function _setBusy(){
+  _setIcon("popup/plugin_busy.png");
+  state = states.BUSY;
+}
+function _setError(){
+  _setIcon("popup/plugin_error.png");
+  state = states.ERROR;
+}
