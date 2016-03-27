@@ -70,13 +70,17 @@ function click(str){
   b[0].click();
 }
 
-function enterText(name, str){
-  var e = $("input[placeholder*='"+name+"']")
-  e.val(str);
-  lastEditedInput = e;
+function enterText(str){
+  lastEditedInput.val(str);
 }
 
-function submitForm(){
+function selectElement(name){
+  var e = $("input[placeholder*='"+name+"']");
+  lastEditedInput = e;
+  e.focus();
+}
+
+function submitText(){
   if(lastEditedInput != null){
     lastEditedInput.closest('form').submit();
   }
@@ -117,6 +121,10 @@ function nextSong(){
   var contents = frame.contents();
   var btn = contents.find("button[id='next']");
   btn.click();
+}
+
+function goToPage(num){
+  window.location.href = window.location.href+"#page="+num;
 }
 
 function _zetZoom(z){

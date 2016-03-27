@@ -7,9 +7,8 @@ import re
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordPOSTagger
-import web_jargon.helpers as h
+import helpers as h
 from arg_parsers import WordsToNumbers
-
 
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
               "ninth": 9, "tenth": 10, "eleventh": 11, "twelfth": 12, "thirteenth": 13, "fourteenth": 14,

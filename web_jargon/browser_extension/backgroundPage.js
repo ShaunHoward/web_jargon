@@ -53,8 +53,8 @@ function _sendText(str){
     for(c of commands){
       var func = c["action"];
       var params = c["arguments"]; 
-      alert(str);
-      //alert(data);
+      alert(data);
+      alert(params["PAGE_NUM"]);
       var msg = _doCommand(func, params);
       _doCommand("addMessage",[func]);
     }
@@ -128,6 +128,16 @@ function switchTab(tabId){
   }
 
   chrome.tabs.update(window.tabs[i].id, {active: true});
+}
+
+function displaySetup(){
+   if (chrome.runtime.openOptionsPage) {
+    // New way to open options pages, if supported (Chrome 42+).
+    chrome.runtime.openOptionsPage();
+  } else {
+    // Reasonable fallback.
+    window.open(chrome.runtime.getURL('options.html'));
+  }
 }
 
 /**
