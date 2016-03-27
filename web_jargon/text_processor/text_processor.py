@@ -95,9 +95,9 @@ def fuzzy_action_interpreter(command_tags, command_words, curr_action_request):
             # try to parse a number out of the numeral
             if 'JJ' in tag and command_words[j] in NUM_TO_INT.keys():
                 num_arg = NUM_TO_INT[command_words[j]]
-                curr_action_request[h.CMD_ARGS].append(num_arg)
+                curr_action_request[h.CMD_ARGS_DICT].append(num_arg)
             else:
-                curr_action_request[h.CMD_ARGS].append(command_words[j])
+                curr_action_request[h.CMD_ARGS_DICT].append(command_words[j])
     return curr_action_request
 
 
@@ -237,7 +237,7 @@ class TextProcessor():
 
             # command_tags = command_tags[i]
             command_tags = []
-            curr_action_request = {h.CMD: "", h.CMD_ARGS: {}}
+            curr_action_request = {h.CMD: "", h.CMD_ARGS_DICT: {}}
 
             # first try to use templates to determine desired actions
             curr_action_request = self.template_action_interpreter(text, command_tags, command_words,
@@ -271,35 +271,6 @@ class TextProcessor():
 
         # store lowercase, parens removed, stripped version of command text input
         command_text = command_text.lower().strip().lstrip("\"").rstrip("\"").strip()
-        values = []
-        # try to find match of an action key in the command
-        # for key in self.action_text_mappings.keys():
-        #     # split on underscore
-        #     s = key.split("_")
-        #     # only use lower case
-        #     s = [x.lower() for x in s]
-        #
-        #     indices = []
-        #     # try to find if the key is in the command to narrow search
-        #     for st in s:
-        #         if st in command_words:
-        #             indices.append(command_words.index(st))
-        #
-        #     # prev = -1
-        #     # c = 0
-        #     # # see if the words were encountered in the proper order
-        #     # for i in indices:
-        #     #     if i > prev:
-        #     #         prev = i
-        #     #         c += 1
-        #     #     else:
-        #     #         break
-        #     c = len(indices)
-        #     # we already know what command to use by this point, no need for nlp
-        #     if c == len(s) or c == len(command_words) and c > 0:
-        #         curr_action_request[h.CMD] = key
-        #         values = self.action_text_mappings[key]
-        #         break
 
         # found_action = False
         # store matches list
@@ -335,7 +306,7 @@ class TextProcessor():
                         # do smart argument parsing use regex, parse trees, etc.
                         args = dict()
                         num_args = 0
-                        for arg_type in u_map[h.CMD_ARGS]:
+                        for arg_type in u_map[h.CMD_ARGS_DICT]:
                             # extract argument using argument type
                             parsed_arg = self.match_arg(arg_type, curr_command_words, arg_sections)
                             if (type(parsed_arg) == int and parsed_arg > 0)\
@@ -388,7 +359,7 @@ class TextProcessor():
 
                 # set command and args from action text mappings
                 curr_action_request[h.CMD] = matches[earliest_index][0]
-                curr_action_request[h.CMD_ARGS] = matches[earliest_index][2]
+                curr_action_request[h.CMD_ARGS_DICT] = matches[earliest_index][2]
 
         return curr_action_request
 
@@ -462,33 +433,3 @@ class TextProcessor():
                         break
 
         return parsed_arg
-
-# def create_bigram_belief_state(self, training_command_list):
-#     for command in training_command_list:
-#         bigrams = self.determine_bigrams(command)
-#         for bigram in bigrams:
-#             norm_bigram_key = normalize_string(bigram[0])
-#             norm_bigram_value = normalize_string(bigram[1])
-#             if len(self.bigram_belief_state[norm_bigram_key]) == 0:
-#                 self.bigram_belief_state[norm_bigram_key] = dict()
-#                 self.bigram_belief_state[norm_bigram_key][norm_bigram_value] = 0
-#             self.bigram_belief_state[norm_bigram_key][norm_bigram_value] += 1
-#     self.bigram_belief_state = self.normalize_nested_dict(self.bigram_belief_state)
-#
-# def determine_bigrams(self, command):
-#     sent_tokenized_commands = sent_tokenize(command)
-#     word_tokenized_commands = word_tokenize(command)
-#     for i in range(0, len(word_tokenized_commands)):
-#         word = word_tokenized_commands[i]
-#         bigrams = []
-#         # do both left and right sides of word
-#         if 0 < i < len(word_tokenized_commands) - 1:
-#             bigrams = [(word, word_tokenized_commands[i - 1]),
-#                        (word, word_tokenized_commands[i + 1])]
-#         # only do right side of word
-#         elif i == 0:
-#             bigrams = [(word, word_tokenized_commands[i + 1])]
-#         # only do left side of word
-#         elif i == len(word_tokenized_commands) - 1:
-#             bigrams = [(word, word_tokenized_commands[i - 1])]
-#     return bigrams
