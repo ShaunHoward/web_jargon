@@ -26,6 +26,7 @@ class WebJargonTest(unittest.TestCase):
 
     def validate_web_actions(self, json_actions, action_key):
         json_actions = json.loads(json_actions)
+        print json_actions
         self.assertEqual(len(json_actions), 1)
         self.assertEqual(len(json_actions[h.ACTIONS]), 1)
         action = json_actions[h.ACTIONS][0]
@@ -33,8 +34,8 @@ class WebJargonTest(unittest.TestCase):
         print "desired action: " + action_key
         self.assertEqual(action[h.CMD], action_key)
         self.assertEqual(action[h.ACTION], self.mapper.action_call_map[action_key][h.ACTION])
-        for arg in self.mapper.action_call_map[action_key][h.CMD_ARGS]:
-            self.assertTrue(arg in action[h.CMD_ARGS].keys())
+        for arg in self.mapper.action_call_map[action_key][h.CMD_ARGS_DICT]:
+            self.assertTrue(arg in action[h.CMD_ARGS_DICT].keys())
 
     def check_all_action_responses(self, action_key):
         if len(self.action_commands[action_key]) > 0:

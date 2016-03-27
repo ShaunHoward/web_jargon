@@ -1,9 +1,12 @@
 __author__ = 'Shaun Howard'
 
+from collections import OrderedDict as dict
+
 ACTION = 'action'
 ACTIONS = 'actions'
 CMD = 'command'
-CMD_ARGS = 'arguments'
+CMD_ARGS_DICT = 'arguments'
+CMD_ARGS_LIST = 'arg_list'
 PARTS = 'parts'
 LPAREN = "("
 RPAREN = ")"
@@ -121,14 +124,14 @@ def load_web_action_template(template_path, action_call=True):
             action_value = action_value[:l_paren_index]
 
             # parse arguments into a list template
-            action_args_list = parse_arguments(action_args)
+            action_args_dict = parse_arguments(action_args)
 
             # create the action call template as a dictionary with command and arguments
             if action_key not in action_map.keys():
                 action_map[action_key] = dict()
 
             # store the action and the arguments to it
-            action_map[action_key][CMD_ARGS] = action_args_list
+            action_map[action_key][CMD_ARGS_DICT] = action_args_dict
             action_map[action_key][CMD] = action_key
             action_map[action_key][ACTION] = action_value
         else:
@@ -149,7 +152,7 @@ def load_web_action_template(template_path, action_call=True):
                 u_map = dict()
                 u_map[CMD] = u
                 u_map[PARTS] = []
-                u_map[CMD_ARGS] = dict()
+                u_map[CMD_ARGS_DICT] = dict()
 
                 # split on rparen for arguments
                 s = u.split("(")
@@ -169,10 +172,10 @@ def load_web_action_template(template_path, action_call=True):
 
                         # add the argument and default value to the dictionary
                         if len(split_arg) > 1:
-                            u_map[CMD_ARGS][split_arg[0]] = split_arg[1]
+                            u_map[CMD_ARGS_DICT][split_arg[0]] = split_arg[1]
                         else:
                             # or add argument and default value of nothing
-                            u_map[CMD_ARGS][split_arg[0]] = ''
+                            u_map[CMD_ARGS_DICT][split_arg[0]] = ''
 
                         if len(strs) > 1 and len(strs[1]) > 0:
                             u_map[PARTS].append(strs[1].strip().lower())
