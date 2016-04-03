@@ -1,6 +1,7 @@
 __author__ = 'shaun howard'
 import unittest
-from web_jargon.text_processor.text_processor import TextProcessor
+
+from text_processor import TextProcessor
 from web_jargon import helpers as h
 
 

@@ -1,13 +1,13 @@
 __author__ = 'shaun'
 
-from os import path
 from itertools import chain
 
+from os import path
 import re
 from nltk import sent_tokenize, word_tokenize
 from nltk.corpus import wordnet as wn
 from nltk.tag import StanfordPOSTagger
-import web_jargon.helpers as h
+import helpers as h
 from arg_parsers import WordsToNumbers
 
 
@@ -41,7 +41,7 @@ def tag_words(words_of_text):
     """
     Tags the provided words of the text with parts of speech.
     :param words_of_text: the text to tag the words of
-    :return: the tags of the words in a map (k=word, v=pos_tag)
+    :return: the tags of the words in a list
     """
     tags = []
     st = StanfordPOSTagger(TWORD_STANFORD_TAGGER_PATH, STANFORD_JAR_PATH)
@@ -117,6 +117,47 @@ def extract_match(str_to_search, matcher):
     return parsed_arg
 
 
+def break_into_multiple_actions(text, words, tags):
+    """
+    Uses the given tags to determine where to split the given words into
+    separate action requests. This facilitates the ability to interpret multiple
+    commands given at once.
+    :param text: the text of the command(s)
+    :param words: the words of the sentences spoken
+    :param tags: the tags of the words in the sentences spoken
+    :return: the commands and tags of the split up action requests
+    """
+    commands = []
+    command_tags = []
+    # break into multiple action requests on conjunctions
+    if 'CC' in tags:
+        conjunctions = []
+        for i in range(len(tags)):
+            if 'CC' in tags[i]:
+                conjunctions.append(i)
+
+        # split up commands by splitting sentence on conjunctions
+        commands = []
+        split_indices = [x for x in conjunctions]
+        for i in range(len(split_indices)):
+            split_index = split_indices[i]
+            if split_index == 0 or split_index == len(words):
+                continue
+            if i == 0:
+                command = words[:split_index-1]
+                tags_ = tags[:split_index-1]
+            elif i == len(split_indices) - 1:
+                command = words[split_index+1:]
+                tags_ = tags[split_index+1:]
+            if len(command) > 0 and len(tags_) > 0:
+                commands.append(command)
+                command_tags.append(tags_)
+    else:
+        commands.append(words)
+        command_tags.append(tags)
+    return commands, command_tags
+
+
 class TextProcessor():
 
     action_text_mappings = dict()
@@ -179,9 +220,16 @@ class TextProcessor():
             # extract words corresponding to valid sentences
             words_of_sentences = [word_tokenize(sent) for sent in valid_sentences]
 
+            # get the tags of words
+            tags_of_sentences = [tag_words(words) for words in words_of_sentences]
+
             # extract action requests from the current command and add to web action token list
-            web_action_tokens = [x for words in words_of_sentences
-                                 for x in self.extract_action_requests(text, words)]
+            web_action_tokens = []
+
+            for i in range(len(words_of_sentences)):
+                words = words_of_sentences[i]
+                tags = tags_of_sentences[i]
+                web_action_tokens.append(self.extract_action_requests(text, words, tags))
         else:
             if type(text) is str or unicode:
                 h.log(["invalid request received: ", text])
@@ -199,37 +247,12 @@ class TextProcessor():
         :param tags: the tags of the words in the sentence
         :return: the web actions tokens and arguments
         """
-        # search for conjunctions to split up commands
-        commands = [words]
-        # command_tags = tags
+        # commands = [words]
+        # normalize the text
+        text = text.strip()
 
-        # don't do this for now
-        # if 'CC' in tags:
-        #     conjunctions = []
-        #     for i in range(len(tags)):
-        #         if 'CC' in tags[i]:
-        #             conjunctions.append(i)
-        #
-        #     # split up commands by splitting sentence on conjunctions
-        #     commands = []
-        #     command_tags = []
-        #     split_indices = [x for x in conjunctions]
-        #     for i in range(len(split_indices)):
-        #         split_index = split_indices[i]
-        #         if split_index == 0 or split_index == len(words):
-        #             continue
-        #         if i == 0:
-        #             command = words[:split_index-1]
-        #             tags_ = tags[:split_index-1]
-        #         elif i == len(split_indices) - 1:
-        #             command = words[split_index+1:]
-        #             tags_ = tags[split_index+1:]
-        #         if len(command) > 0 and len(tags_) > 0:
-        #             commands.append(command)
-        #             command_tags.append(tags_)
-        # else:
-        #     commands.append(words)
-        #     command_tags.append(tags)
+        # search for conjunctions to split up commands
+        commands, command_tags = break_into_multiple_actions(text, words, tags)
 
         # interpret actions
         action_requests = []
@@ -241,8 +264,8 @@ class TextProcessor():
             curr_action_request = {h.CMD: "", h.CMD_ARGS_DICT: {}}
 
             # first try to use templates to determine desired actions
-            curr_action_request = self.template_action_interpreter(text, command_tags, command_words,
-                                                                   curr_action_request)
+            curr_action_request = self.template_action_interpreter(text, command_words)
+                                                                    #command_tags, curr_action_request)
 
             # next try to use the fuzzy nlp interpreter to determine desired actions
             if len(curr_action_request) == 0:
@@ -256,14 +279,12 @@ class TextProcessor():
 
         return action_requests
 
-    def template_action_interpreter(self, command_text, command_tags, command_words, curr_action_request):
+    def template_action_interpreter(self, command_text, command_words):
         """
         This method will not always work. multiple instances of the same string may be detected
         in matching and may throw off the interpreter.
         :param command_text
-        :param command_tags:
         :param command_words:
-        :param curr_action_request:
         :return:
         """
 
@@ -328,7 +349,6 @@ class TextProcessor():
         # select the earliest and/or longest command match for the current action request
         if len(matches) > 0:
             longest_phrase = 0
-            longest_index = 0
             most_args = 0
             earliest_pos = 0
             earliest_index = 0
@@ -345,7 +365,6 @@ class TextProcessor():
                 # look for longer phrase
                 if mlen > longest_phrase:
                     longest_phrase = mlen
-                    longest_index = ctr
                     # take longer phrase (still same starting location)
                     if start_pos == earliest_pos:
                         earliest_pos = start_pos
@@ -367,7 +386,7 @@ class TextProcessor():
 
     def tab_index(self, words):
         """
-        Convert
+        Convert the words to a number index
         :param words:
         :return:
         """
@@ -376,7 +395,8 @@ class TextProcessor():
             result = self.get_index(words.split(" "))
         return result
 
-    def get_index(self, words):
+    @staticmethod
+    def get_index(words):
         """
         Returns a the number of an English number index (indicating element position) found in the provided list of words.
         :param words: the list of words to find the English number index in
@@ -390,6 +410,7 @@ class TextProcessor():
         return result
 
     def url(self, words):
+        # try to fix words and parse out a URL
         words.replace('dot ', '.')
         words.replace('dot', '.')
         words.replace('w w w ', 'www')
@@ -397,6 +418,15 @@ class TextProcessor():
         return extract_match(words, self.url_matcher)
 
     def match_arg(self, arg_type, command_words, arg_sections):
+        """
+        Tries to find the given arg type in the list of argument sections,
+        using the provided command words as backup evidence in decision making.
+        :param arg_type: the type of argument to search for as addressed by the global pattern dictionary
+        in this class
+        :param command_words:
+        :param arg_sections:
+        :return:
+        """
         arg_sections = [x.strip() for x in arg_sections]
         parsed_arg = ''
         if "|" in arg_type:
