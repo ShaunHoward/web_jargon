@@ -5,7 +5,7 @@ import json
 from os import path
 from web_jargon import web_jargon as wj
 from mapper import Mapper
-from web_jargon.extension_backend.text_processor import TextProcessor
+from text_processor import TextProcessor
 from web_jargon import helpers as h
 
 

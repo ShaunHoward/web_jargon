@@ -21,7 +21,7 @@ SWITCH_TAB:["switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)
 # requirement 4.6
 FORWARD:["forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead"]
 BACKWARD:["backward", "go backward", "go backward a page", "go back a page", "go to the previous page", "previous page", "back a page", "backward a page", "one page backward", "page backward", "page back"]
-REFRESH:["refresh the page", "refresh page", "page refresh", "refresh this page"]
+REFRESH:["refresh", "refresh the page", "refresh page", "page refresh", "refresh this page"]
 
 # requirement 4.7
 # allow only part of element name (fuzzy string search using html web page from plugin)

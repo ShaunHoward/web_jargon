@@ -101,12 +101,11 @@ def extract_match(str_to_search, matcher):
     return parsed_arg
 
 
-def break_into_multiple_actions(text, words, tags):
+def break_into_multiple_actions(words, tags):
     """
     Uses the given tags to determine where to split the given words into
     separate action requests. This facilitates the ability to interpret multiple
     commands given at once.
-    :param text: the text of the command(s)
     :param words: the words of the sentences spoken
     :param tags: the tags of the words in the sentences spoken
     :return: the commands and tags of the split up action requests
@@ -121,32 +120,36 @@ def break_into_multiple_actions(text, words, tags):
                 conjunctions.append(i)
 
         # split up commands by splitting sentence on conjunctions
-        split_indices = [x for x in conjunctions] + [len(wo)]
+        split_indices = [x for x in conjunctions] + [len(words)]
         curr_words_ = words
         curr_tags_ = tags
-
-        for i in range(len(split_indices)):
-            curr_words = curr_words_[:i]
-            # remove these words from list
+        offset = 0
+        conj_removed = True
+        for i in split_indices:
+            i_ = i - offset
+            curr_words = curr_words_[:i_]
+            if i_ < len(curr_words_):
+                conjunction = curr_words_[i_]
+                conj_tag = curr_tags_[i_]
+                conj_removed = False
+            # remove the first half of the sentence from the list
             [curr_words_.remove(x) for x in curr_words]
-            curr_tags = curr_tags_[:i]
+            curr_tags = curr_tags_[:i_]
             [curr_tags_.remove(x) for x in curr_tags]
+            # remove the conjunction as well
+            if not conj_removed:
+                curr_words_.remove(conjunction)
+                # remove the conjunction tag as well
+                curr_tags_.remove(conj_tag)
+                conj_removed = True
+                # track an offset for future operations
+                offset += len(curr_words) + 1
+            else:
+                # track an offset for future operations
+                offset += len(curr_words)
+            # add these to the list
             commands.append(curr_words)
             command_tags.append(curr_tags)
-
-
-            split_index = split_indices[i]
-            if split_index == 0 or split_index == len(words):
-                continue
-            if i == 0:
-                command = words[:split_index]
-                tags_ = tags[:split_index]
-            elif i == len(split_indices) - 1:
-                command = words[split_index+1:]
-                tags_ = tags[split_index+1:]
-            if len(command) > 0 and len(tags_) > 0:
-                commands.append(command)
-                command_tags.append(tags_)
     else:
         commands.append(words)
         command_tags.append(tags)
@@ -259,25 +262,24 @@ class TextProcessor():
         :param tags: the tags of the words in the sentence
         :return: the web actions tokens and arguments
         """
-        # commands = [words]
-        # normalize the text
-        text = text.strip()
-
         # search for conjunctions to split up commands
-        commands, command_tags = break_into_multiple_actions(text, words, tags)
+        commands, command_tags = break_into_multiple_actions(words, tags)
 
         # interpret actions
         action_requests = []
+
         for i in range(len(commands)):
             command_words = commands[i]
-            command_tags = command_tags[i]
+            curr_command_tags = command_tags[i]
+            # only need command part of text
+            command_text = ' '.join(command_words)
             # first try to use templates to determine desired actions
-            curr_action_request = self.template_action_interpreter(text, command_words)
+            curr_action_request = self.template_action_interpreter(command_text, command_words)
                                                                     #command_tags, curr_action_request)
 
             # next try to use the fuzzy nlp interpreter to determine desired actions
             if len(curr_action_request) == 0:
-                curr_action_request = fuzzy_action_interpreter(command_tags, command_words, curr_action_request)
+                curr_action_request = fuzzy_action_interpreter(curr_command_tags, command_words, curr_action_request)
 
             # add actions if intent determine, otherwise print error message
             if len(curr_action_request) > 0:
@@ -313,6 +315,8 @@ class TextProcessor():
                     indices = []
                     curr_command_text = command_text
                     curr_command_words = [x for x in command_words]
+                    # track the number of words not found in the command words list
+                    num_left_out = 0
                     for part in u_map[h.PARTS]:
                         # check if part of the utterance is in the command
                         if part in curr_command_text:
@@ -326,6 +330,8 @@ class TextProcessor():
                             for p in part_split:
                                 if p in curr_command_words:
                                     curr_command_words.remove(p)
+                                else:
+                                    num_left_out += 1
 
                     # store match if parts are in command
                     if len(indices) == len(u_map[h.PARTS]):
@@ -335,6 +341,7 @@ class TextProcessor():
 
                         # do smart argument parsing use regex, parse trees, etc.
                         args = u_map[h.CMD_ARGS_DICT].copy()
+                        req_args = len(args)
                         num_args = 0
                         for arg_type in u_map[h.CMD_ARGS_DICT]:
                             # extract argument using argument type
@@ -345,13 +352,13 @@ class TextProcessor():
                                 args[arg_type] = parsed_arg
                                 num_args += 1
                         # this is an exact match
-                        if len(curr_command_words) == 0:
-                            matches = [(action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args)]
+                        if num_args == len(args) and len(curr_command_words) == 0 and num_left_out == 0:
+                            matches = [(action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args, req_args)]
                             has_exact_match = True
                             break
                         else:
                             # otherwise, keep appending matches
-                            matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args))
+                            matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args, req_args))
 
         curr_action_request = dict()
         # select the earliest and/or longest command match for the current action request
@@ -370,8 +377,10 @@ class TextProcessor():
                 # get the number of args matched from phrase
                 num_args = match[4]
 
+                req_args = match[5]
+
                 # look for longer phrase
-                if mlen > longest_phrase:
+                if mlen > longest_phrase and (req_args == num_args or most_args < num_args):
                     longest_phrase = mlen
                     # take longer phrase (still same starting location)
                     if start_pos == earliest_pos:
@@ -380,10 +389,9 @@ class TextProcessor():
 
                 # look for same length phrase with earlier command match
                 if start_pos < earliest_pos or (start_pos == earliest_pos and mlen == longest_phrase):
-                    if most_args < num_args:
-                        most_args = num_args
-                        earliest_pos = start_pos
-                        earliest_index = ctr
+                    most_args = num_args
+                    earliest_pos = start_pos
+                    earliest_index = ctr
                 ctr += 1
 
                 # set command and args from action text mappings

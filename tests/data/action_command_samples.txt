@@ -9,7 +9,7 @@ CLOSE_TAB:["close tab", "close this tab", "close my tab", "exit this tab", "leav
 SWITCH_TAB:["switch to tab three", "switch to tab google.com", "switch to Facebook", "change to CNN", "open tab Spotify", "open tab 10", "open the twelfth tab", "switch to the first tab", "change to Facebook tab", "change to tab four", "change to Pandora", "change tab to tab 4", "change tab to the weather"]
 FORWARD:["forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead"]
 BACKWARD:["backward", "go backward", "go backward a page", "go back a page", "go to the previous page", "previous page", "back a page", "backward a page", "one page backward", "page backward", "page back"]
-REFRESH:["refresh the page", "refresh page", "page refresh", "refresh this page"]
+REFRESH:["refresh", "refresh the page", "refresh page", "page refresh", "refresh this page"]
 CLICK:["open link facebook", "click google doc link", "click link github.com", "click search", "click facebook", "click submit", "click more", "click sent mail", "click the submit button", "click the post button", "click the home button", "enter facebook"]
 OPEN_URL:["open github.com", "open www.google.com in the current tab", "open facebook.com", "open new google.com", "open accuweather.com in this tab", "open pandora.com in this tab", "open youtube.com in this tab", "open spotify.com in this tab"]
 SELECT_ELEMENT:["select what are you interested in?", "select search box", "select username", "select search", "select password", "select search facebook", "select what's on your mind?", "select write a comment..."]
