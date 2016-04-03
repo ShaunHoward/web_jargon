@@ -117,19 +117,19 @@ class TextProcessorTest(unittest.TestCase):
                 ['search facebook'], ['what\'s on your mind?'], ["write a comment..."]]
         self.validate_phrases(template_phrases, h.SELECT_ELEMENT, args)
 
-    # def test_enter_text(self):
-    #     template_phrases = ["enter text into form status {WAIT=3} I feel great today for some reason {WAIT=3}",
-    #                         "write I feel great today and want to go on vacation",
-    #                         "enter the wheels on the car are worth $2500"]
-    #     self.validate_phrases(template_phrases, h.ENTER_TEXT)
-    #
-    # def test_submit_text(self):
-    #     template_phrases = ["submit text using post", "submit", "submit text post", "submit post", "click post to submit"]
-    #     self.validate_phrases(template_phrases, h.SUBMIT_TEXT)
-    #
-    # def test_enter_and_submit_text(self):
-    #     template_phrases = [""]
-    #     self.validate_phrases(template_phrases, "enter and submit text")
+    def test_enter_text(self):
+        template_phrases = ["enter text short I feel great today for some reason",
+                            "write I feel great today and want to go on vacation",
+                            "enter text long the wheels on the car are worth $2500"]
+        args = [['i feel great today for some reason', 5], ['i feel great today and want to go on vacation', 5],
+                ['the wheels on the car are worth $2500', 10]]
+        self.validate_phrases(template_phrases, h.ENTER_TEXT, args)
+
+    def test_submit_text(self):
+        template_phrases = ["submit text using post", "submit", "submit text post", "submit post",
+                            "click post to submit"]
+        args = [['post'], [], ['post'], ['post'], ['post']]
+        self.validate_phrases(template_phrases, h.SUBMIT_TEXT, args)
 
     def test_open_help(self):
         template_phrases = ["help please", "please help", "open help", "open browsing assistance", "browsing assistance", "assistance", "assistant", "helper", "help window", "help me", "show hints", "open hints", "display hints", "list functions", "list commands", "list actions", "show actions", "show commands"]
