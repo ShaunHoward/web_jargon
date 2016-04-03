@@ -30,26 +30,10 @@ CMD_START = 'VB|NN'
 CONTEXT = 'context'
 DEFAULT_ACTION_CONTEXT = "default"
 DIR = path.dirname(path.dirname(__file__))
-PARENT_DIR = path.dirname(DIR)
 DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
-STANFORD_JAR_PATH = PARENT_DIR + '/postagger/stanford-postagger.jar'
-BIDIR_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-bidirectional-distsim.tagger'
-TWORD_STANFORD_TAGGER_PATH = PARENT_DIR + '/postagger/models/english-left3words-distsim.tagger'
-
-
-def tag_words(words_of_text):
-    """
-    Tags the provided words of the text with parts of speech.
-    :param words_of_text: the text to tag the words of
-    :return: the tags of the words in a list
-    """
-    tags = []
-    st = StanfordPOSTagger(TWORD_STANFORD_TAGGER_PATH, STANFORD_JAR_PATH)
-    tag_tuple_list = st.tag(words_of_text)
-    for tag_tuple in tag_tuple_list:
-        tag = tag_tuple[1]
-        tags.append(tag)
-    return tags
+STANFORD_JAR_PATH = DIR + '/postagger/stanford-postagger.jar'
+BIDIR_STANFORD_TAGGER_PATH = DIR + '/postagger/models/english-bidirectional-distsim.tagger'
+TWORD_STANFORD_TAGGER_PATH = DIR + '/postagger/models/english-left3words-distsim.tagger'
 
 
 def similar_words(word, meaning):
@@ -137,15 +121,26 @@ def break_into_multiple_actions(text, words, tags):
                 conjunctions.append(i)
 
         # split up commands by splitting sentence on conjunctions
-        commands = []
-        split_indices = [x for x in conjunctions]
+        split_indices = [x for x in conjunctions] + [len(wo)]
+        curr_words_ = words
+        curr_tags_ = tags
+
         for i in range(len(split_indices)):
+            curr_words = curr_words_[:i]
+            # remove these words from list
+            [curr_words_.remove(x) for x in curr_words]
+            curr_tags = curr_tags_[:i]
+            [curr_tags_.remove(x) for x in curr_tags]
+            commands.append(curr_words)
+            command_tags.append(curr_tags)
+
+
             split_index = split_indices[i]
             if split_index == 0 or split_index == len(words):
                 continue
             if i == 0:
-                command = words[:split_index-1]
-                tags_ = tags[:split_index-1]
+                command = words[:split_index]
+                tags_ = tags[:split_index]
             elif i == len(split_indices) - 1:
                 command = words[split_index+1:]
                 tags_ = tags[split_index+1:]
@@ -171,6 +166,7 @@ class TextProcessor():
     PATTERN_DICT = dict()
 
     def __init__(self):
+
         self.words_to_numbers = WordsToNumbers()
         self.create_argument_pattern_dict()
         self.basic_name_matcher = re.compile(self.basic_name_pattern)
@@ -178,6 +174,20 @@ class TextProcessor():
         self.url_matcher = re.compile(self.url_pattern)
         self.action_text_mappings = h.load_web_action_template(DEFAULT_ACTIONS_PATH, False)
         self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
+        self.st = StanfordPOSTagger(TWORD_STANFORD_TAGGER_PATH, STANFORD_JAR_PATH)
+
+    def tag_words(self, words_of_text):
+        """
+        Tags the provided words of the text with parts of speech.
+        :param words_of_text: the text to tag the words of
+        :return: the tags of the words in a list
+        """
+        tags = []
+        tag_tuple_list = self.st.tag(words_of_text)
+        for tag_tuple in tag_tuple_list:
+            tag = tag_tuple[1]
+            tags.append(tag)
+        return tags
 
     def create_argument_pattern_dict(self):
         self.PATTERN_DICT = {'ELEMENT_NAME': self.match_web_jargon,
@@ -221,7 +231,7 @@ class TextProcessor():
             words_of_sentences = [word_tokenize(sent) for sent in valid_sentences]
 
             # get the tags of words
-            tags_of_sentences = [tag_words(words) for words in words_of_sentences]
+            tags_of_sentences = [self.tag_words(words) for words in words_of_sentences]
 
             # extract action requests from the current command and add to web action token list
             web_action_tokens = []
@@ -229,7 +239,9 @@ class TextProcessor():
             for i in range(len(words_of_sentences)):
                 words = words_of_sentences[i]
                 tags = tags_of_sentences[i]
-                web_action_tokens.append(self.extract_action_requests(text, words, tags))
+                curr_requests = self.extract_action_requests(text, words, tags)
+                for request in curr_requests:
+                    web_action_tokens.append(request)
         else:
             if type(text) is str or unicode:
                 h.log(["invalid request received: ", text])
@@ -258,11 +270,7 @@ class TextProcessor():
         action_requests = []
         for i in range(len(commands)):
             command_words = commands[i]
-
-            # command_tags = command_tags[i]
-            command_tags = []
-            curr_action_request = {h.CMD: "", h.CMD_ARGS_DICT: {}}
-
+            command_tags = command_tags[i]
             # first try to use templates to determine desired actions
             curr_action_request = self.template_action_interpreter(text, command_words)
                                                                     #command_tags, curr_action_request)
@@ -283,8 +291,8 @@ class TextProcessor():
         """
         This method will not always work. multiple instances of the same string may be detected
         in matching and may throw off the interpreter.
-        :param command_text
-        :param command_words:
+        :param command_text: the command text for the current action request
+        :param command_words: the command words for the current action request
         :return:
         """
 
@@ -423,24 +431,41 @@ class TextProcessor():
         using the provided command words as backup evidence in decision making.
         :param arg_type: the type of argument to search for as addressed by the global pattern dictionary
         in this class
-        :param command_words:
-        :param arg_sections:
-        :return:
+        :param command_words: the words of the command to match to
+        :param arg_sections: the already known argument sections in the command
+        :return: the parsed argument from the given command and data
         """
         arg_sections = [x.strip() for x in arg_sections]
         parsed_arg = ''
+        # may accept multiple argument types, so treat them independently
         if "|" in arg_type:
             arg_types = arg_type.split("|")
         else:
+            # otherwise, just have one argument type to look for
             arg_types = [arg_type]
+
+        # run search for pattern matches to argument types in the command text
         for arg_type in arg_types:
             if len(command_words) > 0 and len(arg_sections) > 0 and arg_type in self.PATTERN_DICT.keys():
-                # extract the correct argument pattern and compile it
+                # extract the proper pattern
                 pattern = self.PATTERN_DICT[arg_type]
-                if type(pattern) is str:
+                # The pattern may be a function call, strings mean regex patterns are given
+                if type(pattern) is not str:
+                    # match using a matching function that is callable
+                    valid_match = False
+                    for arg_section in arg_sections:
+                        match = pattern(arg_section)
+                        valid_match = (type(match) == int and match > 0) or (type(match) != int and match is not None)
+                        if valid_match:
+                            parsed_arg = match
+                            break
+                    if valid_match:
+                        break
+                else:
+                    # compile a regex pattern on the fly (not really used in practice but always an option)
                     pat = re.compile(pattern)
 
-                    # try to match to words first
+                    # try to match to words first using regex
                     for word in command_words:
                         match = pat.match(word)
                         if match is not None and len(match.group()) > 0:
@@ -453,15 +478,4 @@ class TextProcessor():
                         if match is not None and len(match.group()) > 0:
                             parsed_arg = match.group()
                             break
-                else:
-                    valid_match = False
-                    for arg_section in arg_sections:
-                        match = pattern(arg_section)
-                        valid_match = (type(match) == int and match > 0) or (type(match) != int and match is not None)
-                        if valid_match:
-                            parsed_arg = match
-                            break
-                    if valid_match:
-                        break
-
         return parsed_arg
