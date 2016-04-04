@@ -75,13 +75,11 @@ function _sendText(str){
   _setBusy();
   $.post( server, str, function( data ) {
     console.log(data);
-    var commands = JSON.parse(data)["actions"];
-    for(c of commands){
-      var func = c["action"];
-      var params = c["arg_list"]; 
-      var msg = _doCommand(func, params);
-      _doCommand("addMessage",[func]);
-    }
+    var cmd = JSON.parse(data)["action"];
+    var func = cmd["action"];
+    var params = cmd["arg_list"]; 
+    var msg = _doCommand(func, params);
+    _doCommand("addMessage",[func]);
     _setReady();
   })
   .fail(function() {
