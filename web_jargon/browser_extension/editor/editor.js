@@ -21,15 +21,21 @@ function appendToLinks(){
     $("a").append("yep");
 }
 
-function scrollDown(){
+function scrollDown(num){
+  if(num == undefined){
+    num = 1;
+  }
   var current = $(document).scrollTop();
-  var dest = current + $(window).height();
+  var dest = current + ($(window).height())*num;
   _scrollVertical(dest);
 }
 
-function scrollUp(){
+function scrollUp(num){
+  if(num == undefined){
+    num = 1;
+  }
   var current = $(document).scrollTop();
-  var dest = current - $(window).height();
+  var dest = current - ($(window).height())*num;
   _scrollVertical(dest);
 }
 
@@ -70,13 +76,17 @@ function click(str){
   b[0].click();
 }
 
-function enterText(name, str){
-  var e = $("input[placeholder*='"+name+"']")
-  e.val(str);
-  lastEditedInput = e;
+function enterText(str){
+  lastEditedInput.val(str);
 }
 
-function submitForm(){
+function selectElement(name){
+  var e = $("input[placeholder*='"+name+"']");
+  lastEditedInput = e;
+  e.focus();
+}
+
+function submitText(){
   if(lastEditedInput != null){
     lastEditedInput.closest('form').submit();
   }
@@ -90,11 +100,11 @@ function pauseVideo(){
   $("button[aria-label='Pause']").click();
 }
 
-function startFullscreen(){
+function openFullscreen(){
   $("button[title='Full screen']").click();
 }
 
-function stopFullscreen(){
+function closeFullscreen(){
   $("button[title='Exit full screen']").click();
 }
 
@@ -117,6 +127,16 @@ function nextSong(){
   var contents = frame.contents();
   var btn = contents.find("button[id='next']");
   btn.click();
+}
+
+function searchMusic(artist, album, song){
+  lastEditedInput = $(".form-control");
+  lastEditedInput.val(artist+" "+album+" "+song);
+  submitText();
+}
+
+function goToPage(num){
+  window.location.href = window.location.href+"#page="+num;
 }
 
 function _zetZoom(z){

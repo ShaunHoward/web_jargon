@@ -14,7 +14,8 @@
     "tabs",
     "activeTab",
     "https://ajax.googleapis.com/",
-    "http://localhost/*"
+    "http://localhost/*",
+    "storage"
   ],
 
   //files inserted automatically on page load
@@ -27,5 +28,17 @@
 
   "background": {
     "scripts": ["jquery-2.2.0.min.js","backgroundPage.js"]
+  },
+  
+  //"options_page": "options.html"
+
+  "options_ui": {
+    // Required.
+    "page": "options/options.html",
+    // Recommended.
+    "chrome_style": true
+    // Not recommended; only provided for backwards compatibility,
+    // and will be unsupported in a future version of Chrome (TBD).
+    //"open_in_tab": true
   }
 }

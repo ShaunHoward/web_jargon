@@ -4,7 +4,6 @@ var backgroundPage = chrome.extension.getBackgroundPage();
  * Interrupts extension button text input form to manually post to server
  */
 $("#textInput").submit(function( event ) {
-  //backgroundPage._doCommand("click",["gaming"]);
   var inputText = $("input:first").val();
   event.preventDefault();
   backgroundPage._sendText(inputText);
