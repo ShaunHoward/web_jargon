@@ -50,6 +50,10 @@ GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 DIR = path.dirname(path.dirname(__file__))
 DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 
+VIDEO_CONTEXT = {START_VIDEO, STOP_VIDEO, RESTART_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
+MUSIC_CONTEXT = {START_MUSIC, STOP_MUSIC, NEXT_SONG, SEARCH_MUSIC}
+DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
+
 
 def log(text_list):
     print ''.join(text_list)
