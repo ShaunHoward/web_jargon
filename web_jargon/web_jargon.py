@@ -40,7 +40,7 @@ def wrap_actions_in_json(web_actions):
     # jsonify a python dictionary of the current web action sequence response
     # TODO add session security key!
     json_dict = dict()
-    json_dict["actions"] = web_actions
+    json_dict["action"] = web_actions
     return json.dumps(json_dict)
 
 

@@ -3,7 +3,6 @@ __author__ = 'Shaun Howard'
 from collections import OrderedDict as dict
 
 ACTION = 'action'
-ACTIONS = 'actions'
 CMD = 'command'
 CMD_ARGS_DICT = 'arguments'
 CMD_ARGS_LIST = 'arg_list'
