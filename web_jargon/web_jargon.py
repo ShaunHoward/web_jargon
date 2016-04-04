@@ -1,10 +1,11 @@
 __author__ = 'Shaun Howard'
 import json
-import web
 
+import web
 from helpers import log
-from text_processor.text_processor import TextProcessor
-from web_control_mapper.mapper import Mapper
+from text_processor import TextProcessor
+from mapper import Mapper
+
 
 urls = ("/.*", "WebJargon")
 web_app = web.application(urls, globals())
@@ -36,6 +37,8 @@ class WebJargon():
 
 
 def wrap_actions_in_json(web_actions):
+    # jsonify a python dictionary of the current web action sequence response
+    # TODO add session security key!
     json_dict = dict()
     json_dict["actions"] = web_actions
     return json.dumps(json_dict)

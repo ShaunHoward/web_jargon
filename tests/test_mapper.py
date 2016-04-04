@@ -1,9 +1,11 @@
 __author__ = 'shaun howard'
 
-import os
 import unittest
+
+import os
 from web_jargon.text_processor import text_processor as tp
-from web_jargon.web_control_mapper import mapper as mp
+import mapper as mp
+
 
 # TODO read in these functions from dict or something
 SCROLL_UP = 'function scrollUp()'

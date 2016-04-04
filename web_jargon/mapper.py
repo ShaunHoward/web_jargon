@@ -1,7 +1,7 @@
 __author__ = 'shaun'
 from os import path
 
-import web_jargon.helpers as h
+import helpers as h
 
 
 CONTEXT = 'context'
@@ -11,6 +11,14 @@ DEFAULT_ACTIONS_PATH = DIR + '/templates/action_call_templates.txt'
 
 
 class Mapper():
+    """
+    The Mapper class maps action requests and arguments to action calls.
+    Action calls are function calls that can be invoked by adding parentheses
+    and the necessary function arguments. Many functions have default arguments
+    set in the action call templates or action command templates files.
+    For each action request sequence, a list of action call templates and parsed
+    arguments are returned to the browser plugin.
+    """
     action_call_map = dict()
 
     def __init__(self):

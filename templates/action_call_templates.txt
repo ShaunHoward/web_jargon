@@ -9,8 +9,8 @@ SCROLL_UP:[scrollUp(NUM_PAGES=1)]
 SCROLL_DOWN:[scrollDown(NUM_PAGES=1)]
 
 # requirement 4.4
-ZOOM_IN:[zoomIn(PERCENT=10)]
-ZOOM_OUT:[zoomOut(PERCENT=10)]
+ZOOM_IN:[zoomIn(PERCENT=25)]
+ZOOM_OUT:[zoomOut(PERCENT=25)]
 
 # requirement 4.5
 OPEN_TAB:[openTab(DOMAIN_NAME)]
@@ -47,15 +47,15 @@ OPEN_SETUP_PAGE:[displaySetup(SHOW=true)]
 CLOSE_SETUP_PAGE:[displaySetup(SHOW=false)]
 
 # requirement 4.12
-PLAY_VIDEO:[playVideo()]
-PAUSE_VIDEO:[pauseVideo()]
+START_VIDEO:[playVideo()]
+STOP_VIDEO:[pauseVideo()]
 RESTART_VIDEO:[restartVideo()]
-OPEN_FULLSCREEN:[toggleFullscreen(ON=true)]
-CLOSE_FULLSCREEN:[toggleFullscreen(ON=false)]
+OPEN_FULLSCREEN:[openFullscreen()]
+CLOSE_FULLSCREEN:[closeFullscreen()]
 
 # requirement 4.13
-PLAY_MUSIC:[playMusic(IS_SPOTIFY=false)]
-PAUSE_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
+START_MUSIC:[playMusic(IS_SPOTIFY=false)]
+STOP_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
 NEXT_SONG:[nextSong(IS_SPOTIFY=false)]
 SEARCH_MUSIC:[searchMusic(ARTIST, ALBUM, SONG)]
 

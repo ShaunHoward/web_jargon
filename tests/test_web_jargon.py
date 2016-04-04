@@ -1,12 +1,11 @@
 __author__ = 'shaun howard'
 import unittest
-
-from os import path
 import json
 
+from os import path
 from web_jargon import web_jargon as wj
-from web_jargon.web_control_mapper.mapper import Mapper
-from web_jargon.text_processor.text_processor import TextProcessor
+from mapper import Mapper
+from web_jargon.extension_backend.text_processor import TextProcessor
 from web_jargon import helpers as h
 
 
@@ -15,6 +14,10 @@ COMMAND_SAMPLES = DIR + '/data/action_command_samples.txt'
 
 
 class WebJargonTest(unittest.TestCase):
+    """
+    Tests the overall Web Jargon back end in a functional way.
+    Tests both the text processor and the mapper together in series.
+    """
     mapper = None
     processor = None
     action_commands = None
@@ -25,26 +28,38 @@ class WebJargonTest(unittest.TestCase):
         self.action_commands = h.load_action_command_samples(COMMAND_SAMPLES)
 
     def validate_web_actions(self, json_actions, action_key):
+        # load json actions
         json_actions = json.loads(json_actions)
         print json_actions
+        # assert one is returned
         self.assertEqual(len(json_actions), 1)
         self.assertEqual(len(json_actions[h.ACTIONS]), 1)
         action = json_actions[h.ACTIONS][0]
         print "returned action: " + action[h.CMD]
         print "desired action: " + action_key
+        # assert the correct action token was interpreted
         self.assertEqual(action[h.CMD], action_key)
+        # assert that the action returned matches the action it should be
         self.assertEqual(action[h.ACTION], self.mapper.action_call_map[action_key][h.ACTION])
+        # assert that the arguments return are in fact provided in the response dictionary
         for arg in self.mapper.action_call_map[action_key][h.CMD_ARGS_DICT]:
             self.assertTrue(arg in action[h.CMD_ARGS_DICT].keys())
 
     def check_all_action_responses(self, action_key):
+        """
+        Runs through all sample action commands with arguments for the provided action key/token and validates
+        that they return the correct action responses.
+        :param action_key: the action token to test all the command samples for
+        """
         if len(self.action_commands[action_key]) > 0:
+            # iterate through all possible action command samples
             for command in self.action_commands[action_key]:
+                # get the json action response and validate it
                 json_actions = wj.extract_web_actions(command, self.processor, self.mapper)
                 print "checking: " + command
                 self.validate_web_actions(json_actions, action_key)
 
-    # check all actions
+    # test and assert all action requests are serviced correctly
     def test_all_actions(self):
         for action_key in self.action_commands.keys():
             self.check_all_action_responses(action_key)

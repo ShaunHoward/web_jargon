@@ -6,12 +6,12 @@
 # requirement 4.3
 SCROLL_LEFT:["scroll left", "left scroll"]
 SCROLL_RIGHT:["scroll right", "right scroll"]
-SCROLL_UP:["scroll up (NUM_PAGES=1)", "up scroll"]
-SCROLL_DOWN:["scroll down (NUM_PAGES=1)", "down scroll"]
+SCROLL_UP:["scroll up (NUM_PAGES=1)", "up scroll (NUM_PAGES=1)"]
+SCROLL_DOWN:["scroll down (NUM_PAGES=1)", "down scroll (NUM_PAGES=1)"]
 
 # requirement 4.4
-ZOOM_IN:["zoom in by (PERCENT)", "zoom in (PERCENT)", "zoom (PERCENT)", "zoom larger", "zoom in"]
-ZOOM_OUT:["zoom out by (PERCENT)", "zoom out (PERCENT)", "zoom away (PERCENT)", "zoom smaller", "zoom out"]
+ZOOM_IN:["zoom in by (PERCENT)", "zoom in (PERCENT=25)", "zoom (PERCENT=25)", "zoom larger (PERCENT=25)"]
+ZOOM_OUT:["zoom out by (PERCENT)", "zoom out (PERCENT=25)", "zoom away (PERCENT=25)", "zoom smaller (PERCENT=25)", "zoom out (PERCENT=25)"]
 
 # requirement 4.5
 OPEN_TAB:["open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab", "create new tab"]
@@ -48,15 +48,15 @@ OPEN_SETUP_PAGE:["display setup", "display setup page", "open setup", "open setu
 CLOSE_SETUP_PAGE:["hide setup", "close setup", "exit setup"]
 
 # requirement 4.12
-PLAY_VIDEO:["play video", "start video", "start", "play movie", "start movie"]
-PAUSE_VIDEO:["pause video", "pause", "pause movie", "stop video", "stop movie", "stop"]
+START_VIDEO:["play video", "start video", "start", "play movie", "start movie"]
+STOP_VIDEO:["stop video", "stop movie"]
 RESTART_VIDEO:["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
 OPEN_FULLSCREEN:["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen", "toggle full screen"]
 CLOSE_FULLSCREEN:["escape", "quit", "quit fullscreen", "close fullscreen", "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off"]
 
 # requirement 4.13
-PLAY_MUSIC:["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)", "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music", "play my music", "play song", "play tune", "play"]
-PAUSE_MUSIC:["pause spotify (IS_SPOTIFY=true)", "pause pandora (IS_SPOTIFY=false)", "pause on spotify (IS_SPOTIFY=true)", "pause on pandora (IS_SPOTIFY=false)", "pause music", "pause my music", "pause song", "pause tune", "pause"]
+START_MUSIC:["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)", "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music", "play my music", "play song", "play tune", "play", "start music", "start pandora (IS_SPOTIFY=false)", "start spotify (IS_SPOTIFY=true)"]
+STOP_MUSIC:["stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)", "stop on spotify (IS_SPOTIFY=true)", "stop on pandora (IS_SPOTIFY=false)", "stop music", "stop my music", "stop song", "stop tune", "stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)"]
 NEXT_SONG:["next on spotify (IS_SPOTIFY=true)", "next on pandora (IS_SPOTIFY=false)", "next song on spotify (IS_SPOTIFY=true)", "next song on pandora (IS_SPOTIFY=false)", "next song", "next"]
 SEARCH_MUSIC:["search for (ARTIST, ALBUM, SONG)", "search for (ARTIST, ALBUM, SONG) in spotify (IS_SPOTIFY=true)", "search for (ARTIST, ALBUM, SONG) in pandora (IS_SPOTIFY=false)" ]
 

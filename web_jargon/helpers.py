@@ -36,13 +36,13 @@ OPEN_CHEAT_SHEET = 'OPEN_CHEAT_SHEET'
 CLOSE_CHEAT_SHEET = 'CLOSE_CHEAT_SHEET'
 OPEN_SETUP_PAGE = 'OPEN_SETUP_PAGE'
 CLOSE_SETUP_PAGE = 'CLOSE_SETUP_PAGE'
-PLAY_VIDEO = 'PLAY_VIDEO'
-PAUSE_VIDEO = 'PAUSE_VIDEO'
+START_VIDEO = 'START_VIDEO'
+STOP_VIDEO = 'STOP_VIDEO'
 RESTART_VIDEO = 'RESTART_VIDEO'
 OPEN_FULLSCREEN = 'OPEN_FULLSCREEN'
 CLOSE_FULLSCREEN = 'CLOSE_FULLSCREEN'
-PLAY_MUSIC = 'PLAY_MUSIC'
-PAUSE_MUSIC = 'PAUSE_MUSIC'
+START_MUSIC = 'START_MUSIC'
+STOP_MUSIC = 'STOP_MUSIC'
 NEXT_SONG = 'NEXT_SONG'
 SEARCH_MUSIC = 'SEARCH_MUSIC'
 SEARCH_PDF = 'SEARCH_PDF'
@@ -172,7 +172,13 @@ def load_web_action_template(template_path, action_call=True):
 
                         # add the argument and default value to the dictionary
                         if len(split_arg) > 1:
-                            u_map[CMD_ARGS_DICT][split_arg[0]] = split_arg[1]
+                            val = split_arg[1]
+                            # try to parse a number
+                            try:
+                                val = int(val)
+                            except:
+                                pass
+                            u_map[CMD_ARGS_DICT][split_arg[0]] = val
                         else:
                             # or add argument and default value of nothing
                             u_map[CMD_ARGS_DICT][split_arg[0]] = ''
