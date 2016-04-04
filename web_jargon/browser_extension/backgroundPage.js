@@ -6,7 +6,10 @@ Functions starting with underscore(_) are not callable by the api. They are help
 var states = Object.freeze({READY: 1, BUSY: 2, ERROR: 3});
 var state = states.READY;
 
-var server = "http://localhost:8080/";
+var startPhrases = ["start web jargon", "start listening"];
+var stopPhrases = ["stop web jargon", "stop listening"];
+
+var server = localStorage["serverURL"];//"http://localhost:8080/";
 
 var listening = false;
 var keepListening = true;
@@ -27,9 +30,8 @@ recognition.onresult = function(event) {
   for (var i = event.resultIndex; i < event.results.length; ++i) {
     if (event.results[i].isFinal) {
       final_transcript += event.results[i][0].transcript;
-      //alert(event.results[i][0].transcript);
       var str = event.results[i][0].transcript;
-      _sendText(str);
+      _processText(str);
     } else {
       interim_transcript += event.results[i][0].transcript;
     }
@@ -43,18 +45,40 @@ recognition.onend = function() {
   }
 }
 recognition.onstart = function(){
-  listening = true;
+}
+
+_startRecognition();
+
+function _processText(str){
+  str = str.trim();
+  console.log(str);
+  if(listening){
+    for(p in stopPhrases){
+      if(str.startsWith(stopPhrases[p])){
+        console.log("stopping");
+        listening = false;
+        return;
+      }
+    }
+    _sendText(str);
+  } else{
+    for(p in startPhrases){
+      if(str.startsWith(startPhrases[p])){
+        listening = true;
+        console.log("starting");
+      }
+    }
+  }
 }
 
 function _sendText(str){
   _setBusy();
   $.post( server, str, function( data ) {
+    console.log(data);
     var commands = JSON.parse(data)["actions"];
     for(c of commands){
       var func = c["action"];
-      var params = c["arguments"]; 
-      alert(data);
-      alert(params["PAGE_NUM"]);
+      var params = c["arg_list"]; 
       var msg = _doCommand(func, params);
       _doCommand("addMessage",[func]);
     }
@@ -72,7 +96,7 @@ function openUrl(u, currentTab){
    openTab(u);
    return;
   }
-  chrome.tabs.query({index: tabId, currentWindow: true}, function (tabs) {
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     chrome.tabs.update(tabs[0].id, {url:  "http://www."+u+".com"});
   });
 }
@@ -90,7 +114,12 @@ if input is number: Closes via index from left (0-start)
 if input is string: Closes tabs which contain input string
 */
 function closeTab(tabId){
-  if(typeof tabId != "string"){
+  if(tabId == undefined){
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      chrome.tabs.remove(tabs[0].id);
+    });
+  }
+  else if(typeof tabId != "string"){
     chrome.tabs.query({index: tabId, currentWindow: true}, function (tabs) {
       chrome.tabs.remove(tabs[0].id);
     });
@@ -112,6 +141,9 @@ if input is number: Chooses via index from left (0-start)
 if input is string: Chooses first tab which contains input string
 */
 function switchTab(tabId){
+  if(tabId == undefined){
+    return;
+  }
   if(typeof tabId != "string"){
     chrome.tabs.query({index: tabId, currentWindow: true}, function (tabs) {
       chrome.tabs.update(tabs[0].id, {active: true});
@@ -140,6 +172,10 @@ function displaySetup(){
   }
 }
 
+function displayHelp(){
+  chrome.tabs.create({ url: "help.html" });
+}
+
 /**
 Executes input command
 Checks background page functions first, then checks current tab functions
@@ -152,8 +188,8 @@ function _doCommand(cmd, params){
   //if function not found in backgound page, check content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
-      if(response.msg){
-        //nothing
+      if(response && response.msg){
+        return response.msg;
       }
   });
 });
@@ -163,13 +199,8 @@ function _getAudioPermission(){
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
 }
 
-function _toggleListening(){
-  if(listening){
-    keepListening = false;
-    recognition.stop();
-  } else{
-    recognition.start();
-  }
+function _startRecognition(){
+  recognition.start();
 }
 
 function _setIcon(file){
