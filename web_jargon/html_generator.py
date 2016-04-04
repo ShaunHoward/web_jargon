@@ -57,7 +57,7 @@ def end_html(html):
     # prettifies contents with beautiful soup 4
     html.append("</body></html>")
     html_str = ''.join(html)
-    bs4_html = bs4.BeautifulSoup(html_str).prettify()
+    bs4_html = bs4.BeautifulSoup(html_str, "html.parser").prettify()
     return bs4_html
 
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     file_path = os.path.join(os.getcwd(), "cheat_sheet.html")
     html = create_cheat_sheet_html_page()
     try:
-        print file_path
+        print "writing file to: " + file_path
         f = open(file_path, 'w')
         f.write(html)
         f.close()
