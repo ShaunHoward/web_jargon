@@ -16,19 +16,19 @@ class TextProcessorTest(unittest.TestCase):
         has_args = len(args) > 0
         curr_phrase = 0
         for phrase in phrases:
-            web_actions = self.tp.process_web_action_requests(phrase)
-            self.assertEqual(len(web_actions), 1)
-            self.assertTrue(web_actions[0][h.CMD] in self.tp.action_text_mappings.keys())
-            self.assertEqual(action, web_actions[0][h.CMD])
+            web_action = self.tp.process_web_action_request(phrase)
+            self.assertNotEqual(web_action, None)
+            self.assertTrue(web_action[h.CMD] in self.tp.action_text_mappings.keys())
+            self.assertEqual(action, web_action[h.CMD])
             print phrase.strip()
-            print web_actions[0]
+            print web_action
             num_args = 0
             if has_args:
                 for arg in args[curr_phrase]:
-                    if arg in web_actions[0]['arguments'].values():
+                    if arg in web_action['arguments'].values():
                         num_args += 1
                 self.assertEqual(len(args[curr_phrase]), num_args)
-            self.assertTrue(num_args == len(web_actions[0]['arguments'].values()))
+            self.assertTrue(num_args == len(web_action['arguments'].values()))
             curr_phrase += 1
 
     def test_scroll_left(self):

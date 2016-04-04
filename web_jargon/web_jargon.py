@@ -56,7 +56,7 @@ def extract_web_actions(text, processor, mapper):
     """
     # assert input is a string
     assert type(text) is str
-    web_commands = processor.process_web_action_requests(text)
+    web_commands = processor.process_web_action_request(text)
     web_actions = mapper.create_web_actions(web_commands)
     json_action_response = wrap_actions_in_json(web_actions)
     return json_action_response
