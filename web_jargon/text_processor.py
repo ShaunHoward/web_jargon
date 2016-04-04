@@ -58,7 +58,7 @@ class TextProcessor():
         self.basic_name_matcher = re.compile(self.basic_name_pattern)
         self.web_jargon_matcher = re.compile(self.valid_web_jargon_pattern)
         self.url_matcher = re.compile(self.url_pattern)
-        self.action_text_mappings = h.load_web_action_template(False)
+        self.action_text_mappings = h.load_web_action_template(h.DEFAULT_ACTIONS_PATH, False)
         self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
 
     def create_argument_pattern_dict(self):

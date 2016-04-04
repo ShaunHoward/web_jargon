@@ -26,7 +26,7 @@ STOP_VIDEO:["stop video", "stop movie"]
 RESTART_VIDEO:["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
 OPEN_FULLSCREEN:["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen", "toggle full screen"]
 CLOSE_FULLSCREEN:["escape", "quit", "quit fullscreen", "close fullscreen", "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off"]
-START_MUSIC:["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)", "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music", "play my music", "play song", "play tune", "start music", "start pandora(IS_SPOTIFY)=false", "start spotify(IS_SPOTIFY=true)"]
+START_MUSIC:["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)", "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music", "play my music", "play song", "play tune", "start music", "start pandora (IS_SPOTIFY=false)", "start spotify (IS_SPOTIFY=true)"]
 STOP_MUSIC:["stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)", "stop on spotify (IS_SPOTIFY=true)", "stop on pandora (IS_SPOTIFY=false)", "stop music", "stop my music", "stop song", "stop tune", "stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)"]
 NEXT_SONG:["next on spotify (IS_SPOTIFY=true)", "next on pandora (IS_SPOTIFY=false)", "next song on spotify (IS_SPOTIFY=true)", "next song on pandora (IS_SPOTIFY=false)", "next song", "next"]
 #SEARCH_MUSIC:

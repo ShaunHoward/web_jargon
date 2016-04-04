@@ -182,8 +182,8 @@ class TextProcessorTest(unittest.TestCase):
     def test_start_music(self):
         template_phrases = ["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)",
                             "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music",
-                            "play my music", "play song", "play tune", "start music", "start pandora(IS_SPOTIFY)=false",
-                            "start spotify(IS_SPOTIFY=true)"]
+                            "play my music", "play song", "play tune", "start music", "start pandora (IS_SPOTIFY=false)",
+                            "start spotify (IS_SPOTIFY=true)"]
         args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], ['false'], ['true']]
         self.validate_phrases(template_phrases, h.START_MUSIC, args)
 
