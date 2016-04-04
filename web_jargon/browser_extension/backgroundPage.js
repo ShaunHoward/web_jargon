@@ -6,12 +6,11 @@ Functions starting with underscore(_) are not callable by the api. They are help
 var states = Object.freeze({READY: 1, BUSY: 2, ERROR: 3});
 var state = states.READY;
 
-var startPhrases = ["start web jargon", "start listening"];
+var startPhrases = ["web jargon", "browser", "chrome"];
 var stopPhrases = ["stop web jargon", "stop listening"];
 
 var server = localStorage["serverURL"];//"http://localhost:8080/";
 
-var listening = false;
 var keepListening = true;
 
 var recognition = new webkitSpeechRecognition();
@@ -52,21 +51,13 @@ _startRecognition();
 function _processText(str){
   str = str.trim();
   console.log(str);
-  if(listening){
-    for(p in stopPhrases){
-      if(str.startsWith(stopPhrases[p])){
-        console.log("stopping");
-        listening = false;
-        return;
-      }
-    }
-    _sendText(str);
-  } else{
-    for(p in startPhrases){
-      if(str.startsWith(startPhrases[p])){
-        listening = true;
-        console.log("starting");
-      }
+  for(p in startPhrases){
+    var phrase = startPhrases[p];
+    var i = str.indexOf(phrase);
+    if(i >= 0){
+      var end = i+phrase.length;
+      _sendText(str.substring(end, str.length));
+      return;
     }
   }
 }
