@@ -24,24 +24,22 @@ class Mapper():
     def __init__(self):
         self.action_call_map = h.load_web_action_template(DEFAULT_ACTIONS_PATH)
 
-    def create_web_actions(self, action_requests):
+    def create_web_actions(self, action_request):
         """
-        Creates the web action function calls using the
+        Creates the web action function call using the
         action call templates.
-        :param action_requests: the list of commands to turn into web action sequences
-        :return: a list of web actions for the given web action requests
+        :param action_request: the command to turn into a web action sequence
+        :return: a web action for the given web action request
         """
-        web_actions = []
-        for action_request in action_requests:
+        web_actions = None
+        # get correct web action call template
+        action_call_template = self.action_call_map[action_request[h.CMD]].copy()
 
-            # get correct web action call template
-            action_call_template = self.action_call_map[action_request[h.CMD]]
+        # add arguments to action call
+        action_call_template[h.CMD_ARGS_DICT] = action_request[h.CMD_ARGS_DICT]
+        action_call_template[h.CMD_ARGS_LIST] =\
+            [action_request[h.CMD_ARGS_DICT][x] for x in action_request[h.CMD_ARGS_DICT].keys()]
 
-            # add arguments to action call
-            action_call_template[h.CMD_ARGS_DICT] = action_request[h.CMD_ARGS_DICT]
-            action_call_template[h.CMD_ARGS_LIST] =\
-                [action_request[h.CMD_ARGS_DICT][x] for x in action_request[h.CMD_ARGS_DICT].keys()]
-
-            # append to web action call list
-            web_actions.append(action_call_template)
+        # append to web action call list
+        web_actions = action_call_template
         return web_actions

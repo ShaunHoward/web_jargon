@@ -33,8 +33,8 @@ class WebJargonTest(unittest.TestCase):
         print json_actions
         # assert one is returned
         self.assertEqual(len(json_actions), 1)
-        self.assertEqual(len(json_actions[h.ACTIONS]), 1)
-        action = json_actions[h.ACTIONS][0]
+        self.assertEqual(len(json_actions[h.ACTIONS]), 4)
+        action = json_actions[h.ACTIONS]
         print "returned action: " + action[h.CMD]
         print "desired action: " + action_key
         # assert the correct action token was interpreted
