@@ -32,14 +32,15 @@ class Mapper():
         :return: a web action for the given web action request
         """
         web_actions = None
-        # get correct web action call template
-        action_call_template = self.action_call_map[action_request[h.CMD]].copy()
+        if action_request is not None:
+            # get correct web action call template
+            action_call_template = self.action_call_map[action_request[h.CMD]].copy()
 
-        # add arguments to action call
-        action_call_template[h.CMD_ARGS_DICT] = action_request[h.CMD_ARGS_DICT]
-        action_call_template[h.CMD_ARGS_LIST] =\
-            [action_request[h.CMD_ARGS_DICT][x] for x in action_request[h.CMD_ARGS_DICT].keys()]
+            # add arguments to action call
+            action_call_template[h.CMD_ARGS_DICT] = action_request[h.CMD_ARGS_DICT]
+            action_call_template[h.CMD_ARGS_LIST] =\
+                [action_request[h.CMD_ARGS_DICT][x] for x in action_request[h.CMD_ARGS_DICT].keys()]
 
-        # append to web action call list
-        web_actions = action_call_template
+            # append to web action call list
+            web_actions = action_call_template
         return web_actions

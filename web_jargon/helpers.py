@@ -51,6 +51,7 @@ GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 def log(text_list):
     print ''.join(text_list)
 
+#def create_cheat_sheet_html_page():
 
 def load_action_token_list(template_path):
     # read actions file
