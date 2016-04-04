@@ -217,15 +217,12 @@ def parse_arguments(arguments):
         for arg in arg_list:
             arg = arg.strip()
 
-            # handle "OR" parameters
-            or_args = arg.split("|")
-            for or_arg in or_args:
-                # handle default values
-                arg_vals = or_arg.split("=")
-                if len(arg_vals) == 2:
-                    args[arg_vals[0]] = arg_vals[1]
-                else:
-                    args[or_arg] = ""
+            # handle default values
+            arg_vals = arg.split("=")
+            if len(arg_vals) == 2:
+                args[arg_vals[0]] = arg_vals[1]
+            else:
+                args[arg_vals[0]] = ""
 
     return args
 
@@ -299,7 +296,8 @@ def extract_arg_sections(command_str, part_indices):
 
         # see if there is room for args at end of phrase
         if part_indices[1][1] < len(command_str):
-            arg_sections.append(command_str[part_indices[1][1]])
+            arg_sections.append(command_str[part_indices[1][1]:])
+    arg_sections = [x.strip() for x in arg_sections if x.strip()]
     return arg_sections
 
 

@@ -13,8 +13,8 @@ ZOOM_IN:[zoomIn(PERCENT=25)]
 ZOOM_OUT:[zoomOut(PERCENT=25)]
 
 # requirement 4.5
-OPEN_TAB:[openTab(DOMAIN_NAME)]
-CLOSE_TAB:[closeTab(TAB_INDEX|TAB_NAME)]
+OPEN_TAB:[openTab(DOMAIN_NAME="google.com")]
+CLOSE_TAB:[closeTab()]
 SWITCH_TAB:[switchTab(TAB_INDEX|TAB_NAME)]
 
 # requirement 4.6
