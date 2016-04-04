@@ -1,7 +1,7 @@
 __author__ = 'Shaun Howard'
 
+from os import path
 from collections import OrderedDict as dict
-
 ACTION = 'action'
 CMD = 'command'
 CMD_ARGS_DICT = 'arguments'
@@ -47,11 +47,13 @@ SEARCH_MUSIC = 'SEARCH_MUSIC'
 SEARCH_PDF = 'SEARCH_PDF'
 GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 
+DIR = path.dirname(path.dirname(__file__))
+DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
+
 
 def log(text_list):
     print ''.join(text_list)
 
-#def create_cheat_sheet_html_page():
 
 def load_action_token_list(template_path):
     # read actions file

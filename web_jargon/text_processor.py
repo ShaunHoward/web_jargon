@@ -21,9 +21,6 @@ GOOGLE = "google"
 YOUTUBE = "youtube"
 
 CONTEXT = 'context'
-DEFAULT_ACTION_CONTEXT = "default"
-DIR = path.dirname(path.dirname(__file__))
-DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 
 
 def load_training_data(training_data_dir):
@@ -61,7 +58,7 @@ class TextProcessor():
         self.basic_name_matcher = re.compile(self.basic_name_pattern)
         self.web_jargon_matcher = re.compile(self.valid_web_jargon_pattern)
         self.url_matcher = re.compile(self.url_pattern)
-        self.action_text_mappings = h.load_web_action_template(DEFAULT_ACTIONS_PATH, False)
+        self.action_text_mappings = h.load_web_action_template(False)
         self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
 
     def create_argument_pattern_dict(self):
