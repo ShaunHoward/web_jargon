@@ -130,13 +130,27 @@ function nextSong(){
 }
 
 function searchMusic(artist, album, song){
-  lastEditedInput = $(".form-control");
-  lastEditedInput.val(artist+" "+album+" "+song);
-  submitText();
+  var frame = $("#suggest");
+  var contents = frame.contents();
+  var input = contents.find("input[class='form-control focus']");
+  input.focus();
+  input.keypress();
+  input.val(artist);
+  input.keypress();
+  lastEditedInput = input;
+  /*input.trigger(
+      jQuery.Event( 'keydown', { keyCode: 69, which: 69 } )
+  );*/
+  //alert("done");
+  //submitText();
+  
+  //lastEditedInput.val(artist);//(artist+" "+album+" "+song);
+  //submitText();
 }
 
 function goToPage(num){
-  window.location.href = window.location.href+"#page="+num;
+  
+  window.location.href = window.location.href.split("#page")[0]+"#page="+num;
 }
 
 function _zetZoom(z){

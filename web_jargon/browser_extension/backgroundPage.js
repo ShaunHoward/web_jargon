@@ -6,12 +6,11 @@ Functions starting with underscore(_) are not callable by the api. They are help
 var states = Object.freeze({READY: 1, BUSY: 2, ERROR: 3});
 var state = states.READY;
 
-var startPhrases = ["start web jargon", "start listening"];
+var startPhrases = ["web jargon", "browser", "chrome"];
 var stopPhrases = ["stop web jargon", "stop listening"];
 
 var server = localStorage["serverURL"];//"http://localhost:8080/";
 
-var listening = false;
 var keepListening = true;
 
 var recognition = new webkitSpeechRecognition();
@@ -52,36 +51,28 @@ _startRecognition();
 function _processText(str){
   str = str.trim();
   console.log(str);
-  if(listening){
-    for(p in stopPhrases){
-      if(str.startsWith(stopPhrases[p])){
-        console.log("stopping");
-        listening = false;
-        return;
-      }
-    }
-    _sendText(str);
-  } else{
-    for(p in startPhrases){
-      if(str.startsWith(startPhrases[p])){
-        listening = true;
-        console.log("starting");
-      }
+  for(p in startPhrases){
+    var phrase = startPhrases[p];
+    var i = str.indexOf(phrase);
+    if(i >= 0){
+      var end = i+phrase.length;
+      _sendText(str.substring(end, str.length));
+      return;
     }
   }
 }
 
 function _sendText(str){
   _setBusy();
-  $.post( server, str, function( data ) {
+  var sendData = new Object();
+  sendData.input = str;
+  $.post( server, JSON.stringify(sendData), function( data ) {
     console.log(data);
-    var commands = JSON.parse(data)["actions"];
-    for(c of commands){
-      var func = c["action"];
-      var params = c["arg_list"]; 
-      var msg = _doCommand(func, params);
-      _doCommand("addMessage",[func]);
-    }
+    var cmd = JSON.parse(data)["action"];
+    var func = cmd["action"];
+    var params = cmd["arg_list"]; 
+    var msg = _doCommand(func, params);
+    _doCommand("addMessage",[func]);
     _setReady();
   })
   .fail(function() {
