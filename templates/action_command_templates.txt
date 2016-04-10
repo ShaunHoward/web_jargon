@@ -14,7 +14,7 @@ ZOOM_IN:["zoom in by (PERCENT)", "zoom in (PERCENT=25)", "zoom (PERCENT=25)", "z
 ZOOM_OUT:["zoom out by (PERCENT)", "zoom out (PERCENT=25)", "zoom away (PERCENT=25)", "zoom smaller (PERCENT=25)", "zoom out (PERCENT=25)"]
 
 # requirement 4.5
-OPEN_TAB:["open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab", "create new tab"]
+OPEN_TAB:["open a tab (DOMAIN_NAME=google.com)", "open a new tab (DOMAIN_NAME=google.com)", "new tab (DOMAIN_NAME=google.com)", "open new tab (DOMAIN_NAME=google.com)", "create tab (DOMAIN_NAME=google.com)", "create a new tab (DOMAIN_NAME=google.com)", "create new tab (DOMAIN_NAME=google.com)"]
 CLOSE_TAB:["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab", "exit the tab"]
 SWITCH_TAB:["switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME) tab", "change to (TAB_INDEX|TAB_NAME)", "open the (TAB_INDEX) tab"]
 
@@ -25,7 +25,7 @@ REFRESH:["refresh", "refresh the page", "refresh page", "page refresh", "refresh
 
 # requirement 4.7
 # allow only part of element name (fuzzy string search using html web page from plugin)
-CLICK:["click (ELEMENT_NAME)", "click (ELEMENT_NAME) button", "click the (ELEMENT_NAME) button", "open link (LINK_NAME)", "click link (LINK_NAME)", "click (LINK_NAME) link", "enter (LINK_NAME)"]
+CLICK:["click (ELEMENT_NAME|LINK_NAME)", "click (ELEMENT_NAME|LINK_NAME) button", "click the (ELEMENT_NAME|LINK_NAME) button", "open link (ELEMENT_NAME|LINK_NAME)", "click link (ELEMENT_NAME|LINK_NAME)", "click (ELEMENT_NAME|LINK_NAME) link", "enter (ELEMENT_NAME|LINK_NAME)"]
 
 # requirement 4.8
 OPEN_URL:["open (URL) (IN_CURRENT_TAB=false)", "open (URL) in the current tab (IN_CURRENT_TAB=true)", "open url (URL) (IN_CURRENT_TAB=false)", "open new (URL) (IN_CURRENT_TAB=false)", "open (URL) in this tab (IN_CURRENT_TAB=true)", "open (URL) in new tab (IN_CURRENT_TAB=false)"]

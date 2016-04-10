@@ -28,7 +28,8 @@ class TextProcessorTest(unittest.TestCase):
                     if arg in web_action['arguments'].values():
                         num_args += 1
                 self.assertEqual(len(args[curr_phrase]), num_args)
-            self.assertTrue(num_args == len(web_action['arguments'].values()))
+            num_nonempty_args = [x for x in web_action['arguments'].values() if x]
+            self.assertEqual(num_args, len(num_nonempty_args))
             curr_phrase += 1
 
     def test_scroll_left(self):
@@ -62,9 +63,10 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.ZOOM_OUT, args)
 
     def test_open_new_tab(self):
-        template_phrases = ["open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab",
+        template_phrases = ["open a tab facebook.com", "open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab",
                             "create new tab"]
-        self.validate_phrases(template_phrases, h.OPEN_TAB)
+        args = [['facebook.com']] + [['google.com'] for i in range(len(template_phrases))]
+        self.validate_phrases(template_phrases, h.OPEN_TAB, args)
 
     def test_close_tab(self):
         template_phrases = ["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab",
@@ -72,10 +74,9 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.CLOSE_TAB)
 
     def test_switch_tab(self):
-        template_phrases = ["switch to tab three", "switch to tab google", "switch to Facebook", "change to CNN","open tab Spotify", "open tab 10",
-                            "open the twelfth tab", "switch to the first tab",
-                            "change to Facebook tab",
-                            "change to tab four", "change to Pandora",
+        template_phrases = ["switch to tab three", "switch to tab google", "switch to Facebook", "change to CNN", "open tab Spotify", "open tab 10",
+                           "open the twelfth tab", "switch to the first tab",
+                           "change to Facebook tab", "change to tab four", "change to Pandora",
                             "change tab to tab 4", "change tab to the weather"]
         args = [[3], ["google"], ["facebook"], ["cnn"], ["spotify"], [10], [12], [1], ["facebook"], [4], ["pandora"], [4], ["the weather"]]
         self.validate_phrases(template_phrases, h.SWITCH_TAB, args)
@@ -182,8 +183,8 @@ class TextProcessorTest(unittest.TestCase):
     def test_start_music(self):
         template_phrases = ["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)",
                             "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music",
-                            "play my music", "play song", "play tune", "start music", "start pandora(IS_SPOTIFY)=false",
-                            "start spotify(IS_SPOTIFY=true)"]
+                            "play my music", "play song", "play tune", "start music", "start pandora (IS_SPOTIFY=false)",
+                            "start spotify (IS_SPOTIFY=true)"]
         args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], ['false'], ['true']]
         self.validate_phrases(template_phrases, h.START_MUSIC, args)
 

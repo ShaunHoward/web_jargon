@@ -21,9 +21,6 @@ GOOGLE = "google"
 YOUTUBE = "youtube"
 
 CONTEXT = 'context'
-DEFAULT_ACTION_CONTEXT = "default"
-DIR = path.dirname(path.dirname(__file__))
-DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 
 
 def load_training_data(training_data_dir):
@@ -44,7 +41,7 @@ def extract_match(str_to_search, matcher):
 class TextProcessor():
 
     action_text_mappings = dict()
-    basic_name_pattern = "[a-zA-Z\s]+$"
+    basic_name_pattern = "[a-zA-Z\s\.]+$"
     valid_web_jargon_pattern = "^[\s\w\d\>\<\;\,\{\}\[\]\-\_\+\=\!\@\#\$\%\^\&\*\|\'\.\:\(\)\\\/\"\?]+$"
     url_pattern = ".*(\.|dot) ?[a-z]{2,3}"
     punctuation = re.compile('[%s]' % re.escape(string.punctuation))
@@ -61,7 +58,7 @@ class TextProcessor():
         self.basic_name_matcher = re.compile(self.basic_name_pattern)
         self.web_jargon_matcher = re.compile(self.valid_web_jargon_pattern)
         self.url_matcher = re.compile(self.url_pattern)
-        self.action_text_mappings = h.load_web_action_template(DEFAULT_ACTIONS_PATH, False)
+        self.action_text_mappings = h.load_web_action_template(h.DEFAULT_ACTIONS_PATH, False)
         self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
 
     def create_argument_pattern_dict(self):
@@ -69,7 +66,7 @@ class TextProcessor():
                              'NUM_PAGES': self.words_to_numbers.parse, 'PERCENT': self.words_to_numbers.parse,
                              'TAB_INDEX': self.tab_index, 'TAB_NAME': self.basic_names,
                              'URL': self.url, 'FORM_NAME': self.basic_names, 'EXCERPT': self.match_web_jargon,
-                             'BUTTON_NAME': self.basic_names,
+                             'BUTTON_NAME': self.basic_names, 'DOMAIN_NAME': self.url,
                              'PAGE_NUM': self.words_to_numbers.parse, 'LINK_NAME': self.match_web_jargon}
 
     def basic_names(self, text):
@@ -165,10 +162,7 @@ class TextProcessor():
                     indices = []
                     curr_command_text = command_text
                     curr_command_words = [x for x in command_words]
-                    # track the number of words found in the command words list
-                    curr_weight = 0
-                    num_left_out = 0
-                    tot_parts = 0
+                    # track the words found in the command words list
                     for part in u_map[h.PARTS]:
                         # check if part of the utterance is in the command
                         if part in curr_command_text:
@@ -179,13 +173,9 @@ class TextProcessor():
                             curr_command_text = curr_command_text.replace(part, '')
                             # remove this part from the word list (if not in list, problem but neglect)
                             part_split = part.split(" ")
-                            tot_parts += len(part_split)
                             for p in part_split:
                                 if p in curr_command_words:
                                     curr_command_words.remove(p)
-                                    curr_weight += 1
-                                else:
-                                    num_left_out += 1
 
                     # store match if parts are in command
                     if len(indices) == len(u_map[h.PARTS]):
@@ -195,57 +185,41 @@ class TextProcessor():
 
                         # do smart argument parsing use regex, parse trees, etc.
                         args = u_map[h.CMD_ARGS_DICT].copy()
-                        req_args = len(args)
-                        num_args = 0
-                        tot_args = len(u_map[h.CMD_ARGS_DICT])
-                        for arg_type in u_map[h.CMD_ARGS_DICT]:
-                            # extract argument using argument type
-                            parsed_arg = self.match_arg(arg_type, curr_command_words, arg_sections)
-                            if (type(parsed_arg) == int and parsed_arg > 0)\
-                                    or (type(parsed_arg) == list
-                                        or type(parsed_arg) == str and len(parsed_arg) > 0):
-                                args[arg_type] = parsed_arg
-                                num_args += 1
-                        total_weight = curr_weight + num_args
-                        matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0]), num_args, total_weight))
+                        if len(arg_sections) > 0:
+                            for arg_type in u_map[h.CMD_ARGS_DICT]:
+                                # extract argument using argument type
+                                parsed_arg = self.match_arg(arg_type, curr_command_words, arg_sections)
+                                if (type(parsed_arg) == int and parsed_arg > 0)\
+                                        or (type(parsed_arg) == list
+                                            or type(parsed_arg) == str and len(parsed_arg) > 0):
+                                    args[arg_type] = parsed_arg
+                        matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0])))
 
         curr_action_request = dict()
         # select the earliest and/or longest command match for the current action request
         if len(matches) > 0:
             longest_phrase = 0
-            most_args = 0
             earliest_pos = 0
             earliest_index = 0
             ctr = 0
-            heaviest_weight = 0
             for match in matches:
                 # get length of parts string that matched command
                 mlen = len(match[1])
                 # get start pos of command match
                 start_pos = match[3]
 
-                # get the number of args matched from phrase
-                num_args = match[4]
+                # look for longer phrase
+                if mlen > longest_phrase:
+                    longest_phrase = mlen
+                    # take longer phrase (still same starting location)
+                    if start_pos == earliest_pos:
+                        earliest_pos = start_pos
+                        earliest_index = ctr
 
-                total_weight = match[5]
-
-                if total_weight > heaviest_weight:
+                # look for same length phrase with earlier command match
+                if start_pos < earliest_pos or (start_pos == earliest_pos and mlen == longest_phrase):
+                    earliest_pos = start_pos
                     earliest_index = ctr
-                    heaviest_weight = total_weight
-                # # look for longer phrase
-                # if mlen > longest_phrase:
-                #     longest_phrase = mlen
-                #     # take longer phrase (still same starting location)
-                #     if start_pos == earliest_pos:
-                #         earliest_pos = start_pos
-                #         earliest_index = ctr
-                #
-                # # look for same length phrase with earlier command match
-                # if start_pos < earliest_pos or (start_pos == earliest_pos and mlen == longest_phrase):
-                #     if most_args < num_args:
-                #         most_args = num_args
-                #         earliest_pos = start_pos
-                #         earliest_index = ctr
                 ctr += 1
 
                 # set command and args from action text mappings
@@ -287,11 +261,11 @@ class TextProcessor():
         words.replace('w w w', 'www')
         return extract_match(words, self.url_matcher)
 
-    def match_arg(self, arg_type, command_words, arg_sections):
+    def match_arg(self, orig_arg_type, command_words, arg_sections):
         """
         Tries to find the given arg type in the list of argument sections,
         using the provided command words as backup evidence in decision making.
-        :param arg_type: the type of argument to search for as addressed by the global pattern dictionary
+        :param orig_arg_type: the type of argument to search for as addressed by the global pattern dictionary
         in this class
         :param command_words: the words of the command to match to
         :param arg_sections: the already known argument sections in the command
@@ -300,11 +274,11 @@ class TextProcessor():
         arg_sections = [x.strip() for x in arg_sections]
         parsed_arg = ''
         # may accept multiple argument types, so treat them independently
-        if "|" in arg_type:
-            arg_types = arg_type.split("|")
+        if "|" in orig_arg_type:
+            arg_types = orig_arg_type.split("|")
         else:
             # otherwise, just have one argument type to look for
-            arg_types = [arg_type]
+            arg_types = [orig_arg_type]
 
         # run search for pattern matches to argument types in the command text
         for arg_type in arg_types:

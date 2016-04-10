@@ -1,7 +1,7 @@
 __author__ = 'Shaun Howard'
 
+from os import path
 from collections import OrderedDict as dict
-
 ACTION = 'action'
 CMD = 'command'
 CMD_ARGS_DICT = 'arguments'
@@ -47,11 +47,17 @@ SEARCH_MUSIC = 'SEARCH_MUSIC'
 SEARCH_PDF = 'SEARCH_PDF'
 GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 
+DIR = path.dirname(path.dirname(__file__))
+DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
+
+VIDEO_CONTEXT = {START_VIDEO, STOP_VIDEO, RESTART_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
+MUSIC_CONTEXT = {START_MUSIC, STOP_MUSIC, NEXT_SONG, SEARCH_MUSIC}
+DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
+
 
 def log(text_list):
     print ''.join(text_list)
 
-#def create_cheat_sheet_html_page():
 
 def load_action_token_list(template_path):
     # read actions file
@@ -211,15 +217,12 @@ def parse_arguments(arguments):
         for arg in arg_list:
             arg = arg.strip()
 
-            # handle "OR" parameters
-            or_args = arg.split("|")
-            for or_arg in or_args:
-                # handle default values
-                arg_vals = or_arg.split("=")
-                if len(arg_vals) == 2:
-                    args[arg_vals[0]] = arg_vals[1]
-                else:
-                    args[or_arg] = ""
+            # handle default values
+            arg_vals = arg.split("=")
+            if len(arg_vals) == 2:
+                args[arg_vals[0]] = arg_vals[1]
+            else:
+                args[arg_vals[0]] = ""
 
     return args
 
@@ -293,7 +296,8 @@ def extract_arg_sections(command_str, part_indices):
 
         # see if there is room for args at end of phrase
         if part_indices[1][1] < len(command_str):
-            arg_sections.append(command_str[part_indices[1][1]])
+            arg_sections.append(command_str[part_indices[1][1]:])
+    arg_sections = [x.strip() for x in arg_sections if x.strip()]
     return arg_sections
 
 
