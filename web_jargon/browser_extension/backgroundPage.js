@@ -64,7 +64,9 @@ function _processText(str){
 
 function _sendText(str){
   _setBusy();
-  $.post( server, str, function( data ) {
+  var sendData = new Object();
+  sendData.input = str;
+  $.post( server, JSON.stringify(sendData), function( data ) {
     console.log(data);
     var cmd = JSON.parse(data)["action"];
     var func = cmd["action"];
