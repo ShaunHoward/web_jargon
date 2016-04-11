@@ -167,7 +167,7 @@ class TextProcessorTest(unittest.TestCase):
                             "play my music", "play song", "play tune", "play", "start music", "start pandora",
                             "start spotify"]
 
-        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], ['false'], ['true']]
+        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], [], ['false'], ['true']]
         self.validate_phrases(template_phrases, h.START_MUSIC, args)
 
     def test_stop_music(self):
@@ -175,7 +175,7 @@ class TextProcessorTest(unittest.TestCase):
                             "stop my music", "stop song", "stop tune", "stop", "stop music", "stop pandora",
                             "stop spotify"]
 
-        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], ['false'], ['true']]
+        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], [], ['false'], ['true']]
         self.validate_phrases(template_phrases, h.STOP_MUSIC, args)
 
     def test_next_song(self):
@@ -195,7 +195,7 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.SEARCH_PDF, args)
 
     def test_go_to_page_pdf(self):
-        template_phrases = ["go to page number four hundred five", "go to page sixty seven", "go to two thousand seven hundred fifty three"]
+        template_phrases = ["go to page four hundred five", "go to page sixty seven", "go to two thousand seven hundred fifty three"]
         args = [['405'], ['67'], ['2753']]
         self.validate_phrases(template_phrases, h.GO_TO_PDF_PAGE, args)
 

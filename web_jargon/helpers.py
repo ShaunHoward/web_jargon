@@ -303,23 +303,3 @@ def extract_arg_sections(command_str, part_indices):
 
 def normalize_string(text):
     return text.lower().strip()
-
-
-def normalize_nested_dict(dict_of_dict):
-    """
-    Normalizes the contents of a nest dictionary,
-    i.e. take min and max of dict[x][y] and normalize between 0 and 1
-    :param dict_of_dict: nested dict {{}}
-    :return: new normalized nested dict
-    """
-    new_dict_of_dict = dict()
-    for key_1 in dict_of_dict.keys():
-        new_dict_of_dict[key_1] = dict()
-        for key_2 in dict_of_dict[key_1].keys():
-            new_dict_of_dict[key_1][key_2] = 0
-            max_val = max(dict_of_dict[key_1][key_2])
-            min_val = min(dict_of_dict[key_1][key_2])
-            for val in dict_of_dict[key_1][key_2]:
-                belief = (val - min_val) / (max_val - min_val)
-                new_dict_of_dict[key_1][key_2] = belief
-    return new_dict_of_dict

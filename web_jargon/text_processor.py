@@ -91,7 +91,7 @@ class TextProcessor():
         :param text: the input command text
         :return: the controls, which will be None if in error
         """
-        web_action_token = None
+        web_action_request = None
         if self.valid_web_jargon(text):
             # extract action request from the current command and add to web action token list
             words = text.split(" ")
@@ -99,14 +99,14 @@ class TextProcessor():
             words = [x for x in words if len(x) > 0]
             curr_request = self.extract_action_request(text, words)
             if curr_request is not None:
-                web_action_token = curr_request
+                web_action_request = curr_request
         else:
             if type(text) is str or unicode:
                 h.log(["invalid request received: ", text])
             else:
                 h.log(["invalid request type, received: ", str(type(text)), " but expected str or unicode..."])
 
-        return web_action_token
+        return web_action_request
 
     def extract_action_request(self, text, words):
         """
@@ -130,7 +130,7 @@ class TextProcessor():
         action_request = self.template_action_interpreter(command_text, words)
 
         # next try to use the fuzzy nlp interpreter to determine desired actions
-        if action_request is None:
+        if action_request is None or len(action_request) == 0 or h.CMD not in action_request.keys():
             print "error interpreting request"
 
         return action_request
