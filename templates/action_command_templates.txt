@@ -15,7 +15,7 @@ ZOOM_OUT:["zoom out by (PERCENT)", "zoom out (PERCENT=25)", "zoom away (PERCENT=
 
 # requirement 4.5
 OPEN_TAB:["open a tab (DOMAIN_NAME=google.com)", "open a new tab (DOMAIN_NAME=google.com)", "new tab (DOMAIN_NAME=google.com)", "open new tab (DOMAIN_NAME=google.com)", "create tab (DOMAIN_NAME=google.com)", "create a new tab (DOMAIN_NAME=google.com)", "create new tab (DOMAIN_NAME=google.com)"]
-CLOSE_TAB:["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab", "exit the tab"]
+CLOSE_TAB:["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab", "exit the tab", "exit tab"]
 SWITCH_TAB:["switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME) tab", "change to (TAB_INDEX|TAB_NAME)", "open the (TAB_INDEX) tab"]
 
 # requirement 4.6
@@ -32,34 +32,32 @@ OPEN_URL:["open (URL) (IN_CURRENT_TAB=false)", "open (URL) in the current tab (I
 
 # requirement 4.9
 SELECT_ELEMENT:["select (ELEMENT_NAME)"]
+
+# req 4.10
 # enter depends on select
-ENTER_TEXT:["enter text short (EXCERPT) (WAIT=5)", "enter text long (EXCERPT) (WAIT=10)", "write (EXCERPT)(WAIT=5)"]
+ENTER_TEXT:["enter text (EXCERPT)", "write (EXCERPT)"]
+
+# req 4.11
 # submit depends on enter
-SUBMIT_TEXT:["submit text using (BUTTON_NAME)", "submit", "submit text (BUTTON_NAME)", "submit (BUTTON_NAME)", "click (BUTTON_NAME) to submit"]
-
-# requirement 4.10
-OPEN_HELP:["help please", "please help", "open help", "open browsing assistance", "browsing assistance", "assistance", "assistant", "helper", "help window", "help me", "show hints", "open hints", "display hints", "list functions", "list commands", "list actions", "show actions", "show commands"]
-CLOSE_HELP:["close help", "I'm good", "thanks", "I am good"]
-OPEN_CHEAT_SHEET:["open cheat sheet", "let me cheat", "display cheats", "show cheats", "show me cheats", "open cheats", "open functions", "list all functions", "list all commands", "list all actions", "show all actions", "show all commands", "show all hints", "open all hints", "display all hints"]
-CLOSE_CHEAT_SHEET:["close cheat sheet", "close cheats", "hide cheats", "hide cheat sheet", "hide sheet"]
-
-# requirement 4.11
-OPEN_SETUP_PAGE:["display setup", "display setup page", "open setup", "open setup page", "show setup", "show setup page"]
-CLOSE_SETUP_PAGE:["hide setup", "close setup", "exit setup"]
+SUBMIT_TEXT:["submit", "submit text"]
 
 # requirement 4.12
+OPEN_HELP:["help please", "please help", "open help", "open browsing assistance", "browsing assistance", "assistance", "assistant", "helper", "help window", "help me", "show hints", "open hints", "display hints", "list functions", "list commands", "list actions", "show actions", "show commands"]
+CLOSE_HELP:["close help", "close help page", “hide commands", “hide help”, “hide hints”, “hide functions”, “close browsing assistance”]
+
+# requirement 4.14
 START_VIDEO:["play video", "start video", "start", "play movie", "start movie"]
 STOP_VIDEO:["stop video", "stop movie"]
-RESTART_VIDEO:["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
+NEXT_VIDEO:["next video", "go to next video", "next video in playlist"]
 OPEN_FULLSCREEN:["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen", "toggle full screen"]
 CLOSE_FULLSCREEN:["escape", "quit", "quit fullscreen", "close fullscreen", "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off"]
 
-# requirement 4.13
+# requirement 4.15
 START_MUSIC:["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)", "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music", "play my music", "play song", "play tune", "play", "start music", "start pandora (IS_SPOTIFY=false)", "start spotify (IS_SPOTIFY=true)"]
-STOP_MUSIC:["stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)", "stop on spotify (IS_SPOTIFY=true)", "stop on pandora (IS_SPOTIFY=false)", "stop music", "stop my music", "stop song", "stop tune", "stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)"]
+STOP_MUSIC:["stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)", "stop on spotify (IS_SPOTIFY=true)", "stop on pandora (IS_SPOTIFY=false)", "stop music", "stop my music", "stop song", "stop tune", "stop", "stop music", "stop pandora (IS_SPOTIFY=false)", "stop spotify (IS_SPOTIFY=true)"]
 NEXT_SONG:["next on spotify (IS_SPOTIFY=true)", "next on pandora (IS_SPOTIFY=false)", "next song on spotify (IS_SPOTIFY=true)", "next song on pandora (IS_SPOTIFY=false)", "next song", "next"]
-SEARCH_MUSIC:["search for (ARTIST, ALBUM, SONG)", "search for (ARTIST, ALBUM, SONG) in spotify (IS_SPOTIFY=true)", "search for (ARTIST, ALBUM, SONG) in pandora (IS_SPOTIFY=false)" ]
+SEARCH_MUSIC:["search for (ARTIST_INFO) (IS_SPOTIFY=false)", "search for (ARTIST_INFO) in spotify (IS_SPOTIFY=true)", "search for (ARTIST_INFO) in pandora (IS_SPOTIFY=false)"]
 
-# requirement 4.14
+# requirement 4.16
 SEARCH_PDF:["search for (EXCERPT)", "search (EXCERPT)"]
-GO_TO_PDF_PAGE:["go to page number (PAGE_NUM)", "go to page (PAGE_NUM)", "go to (PAGE_NUM)"
+GO_TO_PDF_PAGE:["go to page number (PAGE_NUM)", "go to page (PAGE_NUM)", "go to (PAGE_NUM)"]

@@ -120,17 +120,16 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.SELECT_ELEMENT, args)
 
     def test_enter_text(self):
-        template_phrases = ["enter text short I feel great today for some reason",
+        template_phrases = ["enter text I feel great today for some reason",
                             "write I feel great today and want to go on vacation",
-                            "enter text long the wheels on the car are worth $2500"]
-        args = [['i feel great today for some reason', 5], ['i feel great today and want to go on vacation', 5],
-                ['the wheels on the car are worth $2500', 10]]
+                            "enter text the wheels on the car are worth $2500"]
+        args = [['i feel great today for some reason'], ['i feel great today and want to go on vacation'],
+                ['the wheels on the car are worth $2500']]
         self.validate_phrases(template_phrases, h.ENTER_TEXT, args)
 
     def test_submit_text(self):
-        template_phrases = ["submit text using post", "submit", "submit text post", "submit post",
-                            "click post to submit"]
-        args = [['post'], [], ['post'], ['post'], ['post']]
+        template_phrases = ["submit text", "submit"]
+        args = [[], []]
         self.validate_phrases(template_phrases, h.SUBMIT_TEXT, args)
 
     def test_open_help(self):
@@ -138,25 +137,8 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.OPEN_HELP)
 
     def test_close_help(self):
-        template_phrases = ["close help", "I'm good", "thanks", "I am good"]
+        template_phrases = ["close help", "close help page", "hide commands", "hide help", "hide hints", "hide functions", "close browsing assistance"]
         self.validate_phrases(template_phrases, h.CLOSE_HELP)
-
-    def test_open_cheat_sheet(self):
-        template_phrases = ["open cheat sheet", "let me cheat", "display cheats", "show cheats", "show me cheats", "open cheats", "open functions", "list all functions", "list all commands", "list all actions", "show all actions", "show all commands", "show all hints", "open all hints", "display all hints"]
-        self.validate_phrases(template_phrases, h.OPEN_CHEAT_SHEET)
-
-    def test_close_sheat_sheet(self):
-        template_phrases = ["close cheat sheet", "close cheats", "hide cheats", "hide cheat sheet", "hide sheet"]
-        self.validate_phrases(template_phrases, h.CLOSE_CHEAT_SHEET)
-
-    def test_open_setup_page(self):
-        template_phrases = ["display setup", "display setup page", "open setup", "open setup page", "show setup",
-                            "show setup page"]
-        self.validate_phrases(template_phrases, h.OPEN_SETUP_PAGE)
-
-    def test_close_setup_page(self):
-        template_phrases = ["hide setup", "close setup", "exit setup"]
-        self.validate_phrases(template_phrases, h.CLOSE_SETUP_PAGE)
 
     def test_start_video(self):
         template_phrases = ["play video", "start video", "start", "play movie", "start movie"]
@@ -166,9 +148,9 @@ class TextProcessorTest(unittest.TestCase):
         template_phrases = ["stop video", "stop movie"]
         self.validate_phrases(template_phrases, h.STOP_VIDEO)
 
-    def test_restart_video(self):
-        template_phrases = ["restart video", "restart", "restart movie", "replay movie", "replay video", "replay"]
-        self.validate_phrases(template_phrases, h.RESTART_VIDEO)
+    def test_next_video(self):
+        template_phrases = ["next video", "go to next video", "next video in playlist"]
+        self.validate_phrases(template_phrases, h.NEXT_VIDEO)
 
     def test_open_fullscreen(self):
         template_phrases = ["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen",
@@ -181,39 +163,41 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.CLOSE_FULLSCREEN)
 
     def test_start_music(self):
-        template_phrases = ["play spotify (IS_SPOTIFY=true)", "play pandora (IS_SPOTIFY=false)",
-                            "play on spotify (IS_SPOTIFY=true)", "play on pandora (IS_SPOTIFY=false)", "play music",
-                            "play my music", "play song", "play tune", "start music", "start pandora (IS_SPOTIFY=false)",
-                            "start spotify (IS_SPOTIFY=true)"]
+        template_phrases = ["play spotify", "play pandora", "play on spotify", "play on pandora", "play music",
+                            "play my music", "play song", "play tune", "play", "start music", "start pandora",
+                            "start spotify"]
+
         args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], ['false'], ['true']]
         self.validate_phrases(template_phrases, h.START_MUSIC, args)
 
     def test_stop_music(self):
-        template_phrases = ["stop spotify (IS_SPOTIFY=true)", "stop pandora (IS_SPOTIFY=false)",
-                            "stop on spotify (IS_SPOTIFY=true)", "stop on pandora (IS_SPOTIFY=false)", "stop music",
-                            "stop my music", "stop song", "stop tune", "stop spotify (IS_SPOTIFY=true)",
-                            "stop pandora (IS_SPOTIFY=false)"]
-        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], ['true'], ['false']]
+        template_phrases = ["stop spotify", "stop pandora", "stop on spotify", "stop on pandora", "stop music",
+                            "stop my music", "stop song", "stop tune", "stop", "stop music", "stop pandora",
+                            "stop spotify"]
+
+        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], ['false'], ['true']]
         self.validate_phrases(template_phrases, h.STOP_MUSIC, args)
 
     def test_next_song(self):
-        template_phrases = ["next on spotify (IS_SPOTIFY=true)", "next on pandora (IS_SPOTIFY=false)",
-                            "next song on spotify (IS_SPOTIFY=true)", "next song on pandora (IS_SPOTIFY=false)",
+        template_phrases = ["next on spotify", "next on pandora", "next song on spotify", "next song on pandora",
                             "next song", "next"]
         args = [['true'], ['false'], ['true'], ['false'], [], []]
         self.validate_phrases(template_phrases, h.NEXT_SONG, args)
 
-    # def test_search_music(self):
-    #     template_phrases = []
-    #     self.validate_phrases(template_phrases, "search music")
-    #
-    # def test_search_pdf(self):
-    #     template_phrases = []
-    #     self.validate_phrases(template_phrases, "search pdf")
-    #
-    # def test_go_to_page_pdf(self):
-    #     template_phrases = []
-    #     self.validate_phrases(template_phrases, "go to page pdf")
+    def test_search_music(self):
+        template_phrases = ["search for Elvis Presley", "search for Led Zeppelin in spotify", "search for red hot chili peppers in pandora"]
+        args = [['false', 'Elvis Presley'], ['true', 'Led Zeppelin'], ['false', 'red hot chili peppers']]
+        self.validate_phrases(template_phrases, h.SEARCH_MUSIC, args)
+
+    def test_search_pdf(self):
+        template_phrases = ["search for the blue knight and dark horse", "search chapter 5 questions"]
+        args = [['blue knight and dark horse'], ['chapter 5 questions']]
+        self.validate_phrases(template_phrases, h.SEARCH_PDF, args)
+
+    def test_go_to_page_pdf(self):
+        template_phrases = ["go to page number four hundred five", "go to page sixty seven", "go to two thousand seven hundred fifty three"]
+        args = [['405'], ['67'], ['2753']]
+        self.validate_phrases(template_phrases, h.GO_TO_PDF_PAGE, args)
 
 if __name__ == '__main__':
     unittest.main()
