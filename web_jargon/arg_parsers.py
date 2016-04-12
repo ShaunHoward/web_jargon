@@ -74,13 +74,16 @@ class WordsToNumbers():
     def parse(self, words):
         """Parses words to the number they describe
         and strips off percent and/or page(s) if they contain it at the end.
-        Also Strips off tab from the front if words contain it."""
+        Also Strips off tab from the front if words contain it.
+        Also strips off number from the front."""
         if "percent" in words:
             words = words[:words.index("percent")].strip()
         elif "page" in words:
             words = words[:words.index("page")].strip()
         if "tab " in words:
             words = words[len("tab "):].strip()
+        if "number" in words:
+            words = words[len("number "):].strip()
 
         # to avoid case mismatch, everything is reduced to the lower
         # case

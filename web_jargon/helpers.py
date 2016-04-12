@@ -1,5 +1,6 @@
 __author__ = 'Shaun Howard'
 import json
+import random
 from os import path
 from collections import OrderedDict as dict
 ACTION = 'action'
@@ -58,6 +59,11 @@ MUSIC_CONTEXT = {PLAY_MUSIC, PAUSE_MUSIC, NEXT_SONG, SEARCH_MUSIC}
 DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
 DOMAINS = {"youtube": VIDEO_CONTEXT, "pandora": MUSIC_CONTEXT, "spotify": MUSIC_CONTEXT, ".pdf": DOC_CONTEXT}
 
+spot = "https://play.spotify.com/browse"
+pandora = "http://www.pandora.com/station/play/2880225754266056244"
+pdf = "http://www.thewritesource.com/apa/apa.pdf"
+youtube = "https://www.youtube.com/watch?v=wYUSPkssfIY"
+
 
 def determine_url_context(curr_url):
     context = set()
@@ -66,6 +72,19 @@ def determine_url_context(curr_url):
             if domain in curr_url:
                 context = DOMAINS[domain]
     return context
+
+
+def get_url_for_context(action_key):
+    url = "google.com"
+    if action_key in VIDEO_CONTEXT:
+        url = youtube
+    elif action_key in MUSIC_CONTEXT:
+        music = [spot, pandora]
+        i = random.randint(0, 1)
+        url = music[i]
+    elif action_key in DOC_CONTEXT:
+        url = pdf
+    return url
 
 
 def get_general_context_keys(action_text_mappings_keys):

@@ -45,15 +45,15 @@ OPEN_HELP:[displayHelp(SHOW=true)]
 CLOSE_HELP:[displayHelp(SHOW=false)]
 
 # requirement 4.14
-START_VIDEO:[playVideo()]
-STOP_VIDEO:[pauseVideo()]
+PLAY_VIDEO:[playVideo()]
+PAUSE_VIDEO:[pauseVideo()]
 NEXT_VIDEO:[nextVideo()]
 OPEN_FULLSCREEN:[openFullscreen()]
 CLOSE_FULLSCREEN:[closeFullscreen()]
 
 # requirement 4.15
-START_MUSIC:[playMusic(IS_SPOTIFY=false)]
-STOP_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
+PLAY_MUSIC:[playMusic(IS_SPOTIFY=false)]
+PAUSE_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
 NEXT_SONG:[nextSong(IS_SPOTIFY=false)]
 SEARCH_MUSIC:[searchMusic(ARTIST_INFO, IS_SPOTIFY=false)]
 

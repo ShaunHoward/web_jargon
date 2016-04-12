@@ -3,11 +3,7 @@ import unittest
 
 from text_processor import TextProcessor
 from web_jargon import helpers as h
-
-
-spot = "https://play.spotify.com/browse"
-pandora = "http://www.pandora.com/station/play/2880225754266056244"
-pdf = "http://www.thewritesource.com/apa/apa.pdf"
+from helpers import spot, pandora, youtube, pdf
 
 
 class TextProcessorTest(unittest.TestCase):
@@ -152,31 +148,31 @@ class TextProcessorTest(unittest.TestCase):
     # start video context
     def test_play_video(self):
         template_phrases = ["play", "play video", "play movie", "start", "start video", "start movie"]
-        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        urls = [youtube] * len(template_phrases)
         self.validate_phrases(template_phrases, h.PLAY_VIDEO, urls=urls)
 
     def test_pause_video(self):
         template_phrases = ["stop", "stop video", "stop movie", "stop youtube", "paws", "pause", "paws movie",
                             "paws video", "paws youtube", "pause youtube", "pause video", "pause movie"]
-        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        urls = [youtube] * len(template_phrases)
         self.validate_phrases(template_phrases, h.PAUSE_VIDEO, urls=urls)
 
     def test_next_video(self):
         template_phrases = ["next", "next video", "next movie", "next video in playlist", "next movie in playlist"]
-        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        urls = [youtube] * len(template_phrases)
         self.validate_phrases(template_phrases, h.NEXT_VIDEO, urls=urls)
 
     def test_open_fullscreen(self):
         template_phrases = ["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen",
                             "toggle full screen"]
-        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        urls = [youtube] * len(template_phrases)
         self.validate_phrases(template_phrases, h.OPEN_FULLSCREEN, urls=urls)
 
     def test_close_fullscreen(self):
         template_phrases = ["close", "exit", "escape", "quit", "quit fullscreen", "close fullscreen",
                             "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off",
                             "toggle full screen off"]
-        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        urls = [youtube] * len(template_phrases)
         self.validate_phrases(template_phrases, h.CLOSE_FULLSCREEN, urls=urls)
 
     # start music context

@@ -30,9 +30,9 @@ class WebJargon():
         try:
             # parse out json request with text command and current page URL
             request = web.data()
-            json_request = json.dumps(request)
+            request_dict = json.load(request)
             log_to_console(['received request: ', request])
-            return extract_web_actions(json_request, self.processor, self.mapper)
+            return extract_web_actions(request_dict, self.processor, self.mapper)
         except ValueError:
             log_to_console(["could not process Web Jargon request..."])
         return err_msg
@@ -46,29 +46,34 @@ def create_json_action_response(web_actions, sec_key):
     return json.dumps(json_dict)
 
 
-def extract_web_actions(json_request, processor, mapper):
+def extract_web_actions(request_dict, processor, mapper):
     """
     Interprets the provided text as a web control command if possible.
     A message may be returned to the user in json to describe the status
     of the operation.
-    :param json_request: the json request including txt command, sec key, and curr url
+    The json request must have a "command", a "sec_key" and a "url".
+    :param request_dict: the json request dict including txt command, sec key, and curr url
     :param processor: the processor instance to find the actions asked for
     :param mapper: the mapper instance for determining action list
     :return: the json text response of the web control service containing web actions to execute and other info
     """
 
-    json_action_response = json.dumps({"action": "", "sec_key": ""})
+    response_dict = {"action": "", "sec_key": ""}
+    json_action_response = None
     # make sure input is valid json
-    if is_json(json_request):
-        if "sec_key" in json_request:
-            sec_key = json_request["sec_key"]
-            json_action_response["sec_key"] = sec_key
-            if "command" in json_request and "url" in json_request:
-                action_request = json_request["command"]
-                curr_url = json_request["url"]
+    if type(request_dict) is dict:
+        if "sec_key" in request_dict.keys():
+            sec_key = request_dict["sec_key"]
+            response_dict["sec_key"] = sec_key
+            if "command" in request_dict.keys() and "url" in request_dict.keys():
+                action_request = request_dict["command"]
+                curr_url = request_dict["url"]
                 web_commands = processor.process_web_action_request(action_request, curr_url)
                 web_actions = mapper.create_web_actions(web_commands)
                 json_action_response = create_json_action_response(web_actions, sec_key)
+    if json_action_response is None:
+        json_action_response = json.dumps(response_dict)
+
     return json_action_response
 
 
