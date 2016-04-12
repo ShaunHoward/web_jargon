@@ -5,6 +5,11 @@ from text_processor import TextProcessor
 from web_jargon import helpers as h
 
 
+spot = "https://play.spotify.com/browse"
+pandora = "http://www.pandora.com/station/play/2880225754266056244"
+pdf = "http://www.thewritesource.com/apa/apa.pdf"
+
+
 class TextProcessorTest(unittest.TestCase):
 
     tp = None
@@ -12,11 +17,15 @@ class TextProcessorTest(unittest.TestCase):
     def setUp(self):
         self.tp = TextProcessor()
 
-    def validate_phrases(self, phrases, action, args=[]):
+    def validate_phrases(self, phrases, action, args=[], urls=[]):
         has_args = len(args) > 0
+        has_urls = len(urls) > 0
         curr_phrase = 0
+        curr_url = "google.com"
         for phrase in phrases:
-            web_action = self.tp.process_web_action_request(phrase)
+            if has_urls:
+                curr_url = urls[curr_phrase]
+            web_action = self.tp.process_web_action_request(phrase, curr_url)
             self.assertNotEqual(web_action, None)
             self.assertTrue(web_action[h.CMD] in self.tp.action_text_mappings.keys())
             self.assertEqual(action, web_action[h.CMD])
@@ -140,64 +149,76 @@ class TextProcessorTest(unittest.TestCase):
         template_phrases = ["close help", "close help page", "hide commands", "hide help", "hide hints", "hide functions", "close browsing assistance"]
         self.validate_phrases(template_phrases, h.CLOSE_HELP)
 
-    def test_start_video(self):
-        template_phrases = ["play video", "start video", "start", "play movie", "start movie"]
-        self.validate_phrases(template_phrases, h.START_VIDEO)
+    # start video context
+    def test_play_video(self):
+        template_phrases = ["play", "play video", "play movie", "start", "start video", "start movie"]
+        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        self.validate_phrases(template_phrases, h.PLAY_VIDEO, urls=urls)
 
-    def test_stop_video(self):
-        template_phrases = ["stop video", "stop movie"]
-        self.validate_phrases(template_phrases, h.STOP_VIDEO)
+    def test_pause_video(self):
+        template_phrases = ["stop", "stop video", "stop movie", "stop youtube", "paws", "pause", "paws movie",
+                            "paws video", "paws youtube", "pause youtube", "pause video", "pause movie"]
+        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        self.validate_phrases(template_phrases, h.PAUSE_VIDEO, urls=urls)
 
     def test_next_video(self):
-        template_phrases = ["next video", "go to next video", "next video in playlist"]
-        self.validate_phrases(template_phrases, h.NEXT_VIDEO)
+        template_phrases = ["next", "next video", "next movie", "next video in playlist", "next movie in playlist"]
+        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        self.validate_phrases(template_phrases, h.NEXT_VIDEO, urls=urls)
 
     def test_open_fullscreen(self):
         template_phrases = ["fullscreen", "full screen", "open fullscreen", "open full screen", "toggle fullscreen",
                             "toggle full screen"]
-        self.validate_phrases(template_phrases, h.OPEN_FULLSCREEN)
+        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        self.validate_phrases(template_phrases, h.OPEN_FULLSCREEN, urls=urls)
 
     def test_close_fullscreen(self):
-        template_phrases = ["escape", "quit", "quit fullscreen", "close fullscreen", "close full screen",
-                            "exit fullscreen", "exit full screen", "toggle fullscreen off", "toggle full screen off"]
-        self.validate_phrases(template_phrases, h.CLOSE_FULLSCREEN)
+        template_phrases = ["close", "exit", "escape", "quit", "quit fullscreen", "close fullscreen",
+                            "close full screen", "exit fullscreen", "exit full screen", "toggle fullscreen off",
+                            "toggle full screen off"]
+        urls = ["https://www.youtube.com/watch?v=wYUSPkssfIY"] * len(template_phrases)
+        self.validate_phrases(template_phrases, h.CLOSE_FULLSCREEN, urls=urls)
 
-    def test_start_music(self):
-        template_phrases = ["play spotify", "play pandora", "play on spotify", "play on pandora", "play music",
-                            "play my music", "play song", "play tune", "play", "start music", "start pandora",
-                            "start spotify"]
+    # start music context
+    def test_play_music(self):
+        template_phrases = ["play", "start", "play music", "play my music", "play song", "play tune", "start music",
+                            "start song", "start tune"]
+        args = [['true'], ['false'], ['true'], ['false'], ['false'], ['false'], ['true'], ['false'], ['true']]
+        urls = [spot, pandora, spot, pandora, pandora, pandora, spot, pandora, spot]
+        self.validate_phrases(template_phrases, h.PLAY_MUSIC, args, urls=urls)
 
-        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], [], ['false'], ['true']]
-        self.validate_phrases(template_phrases, h.START_MUSIC, args)
+    def test_pause_music(self):
+        template_phrases = ["pause", "pause music", "paws music", "paws", "paws song", "stop", "stop music",
+                            "stop my music", "stop song", "stop tune"]
 
-    def test_stop_music(self):
-        template_phrases = ["stop spotify", "stop pandora", "stop on spotify", "stop on pandora", "stop music",
-                            "stop my music", "stop song", "stop tune", "stop", "stop music", "stop pandora",
-                            "stop spotify"]
-
-        args = [['true'], ['false'], ['true'], ['false'], [], [], [], [], [], [], ['false'], ['true']]
-        self.validate_phrases(template_phrases, h.STOP_MUSIC, args)
+        args = [['true'], ['false'], ['true'], ['false'], ['false'], ['false'], ['false'], ['true'], ['false'], ['true']]
+        urls = [spot, pandora, spot, pandora, pandora, pandora, pandora,  spot, pandora, spot]
+        self.validate_phrases(template_phrases, h.PAUSE_MUSIC, args, urls=urls)
 
     def test_next_song(self):
-        template_phrases = ["next on spotify", "next on pandora", "next song on spotify", "next song on pandora",
-                            "next song", "next"]
-        args = [['true'], ['false'], ['true'], ['false'], [], []]
-        self.validate_phrases(template_phrases, h.NEXT_SONG, args)
+        template_phrases = ["next", "next song", "next tune", "next on playlist", "next in playlist"]
+        args = [['true'], ['false'], ['true'], ['false'], ['false'], ['true']]
+        urls = [spot, pandora, spot, pandora, pandora, spot]
+        self.validate_phrases(template_phrases, h.NEXT_SONG, args, urls=urls)
 
     def test_search_music(self):
-        template_phrases = ["search for Elvis Presley", "search for Led Zeppelin in spotify", "search for red hot chili peppers in pandora"]
-        args = [['false', 'Elvis Presley'], ['true', 'Led Zeppelin'], ['false', 'red hot chili peppers']]
-        self.validate_phrases(template_phrases, h.SEARCH_MUSIC, args)
+        template_phrases = ["search for Elvis Presley", "search Led Zeppelin", "search for red hot chili peppers"]
+        args = [['false', 'elvis presley'], ['true', 'led zeppelin'], ['false', 'red hot chili peppers']]
+        urls = [pandora, spot, pandora]
+        self.validate_phrases(template_phrases, h.SEARCH_MUSIC, args, urls=urls)
 
+    # start doc context
     def test_search_pdf(self):
         template_phrases = ["search for the blue knight and dark horse", "search chapter 5 questions"]
-        args = [['blue knight and dark horse'], ['chapter 5 questions']]
-        self.validate_phrases(template_phrases, h.SEARCH_PDF, args)
+        args = [['the blue knight and dark horse'], ['chapter 5 questions']]
+        urls = [pdf] * 2
+        self.validate_phrases(template_phrases, h.SEARCH_PDF, args, urls=urls)
 
     def test_go_to_page_pdf(self):
         template_phrases = ["go to page four hundred five", "go to page sixty seven", "go to two thousand seven hundred fifty three"]
-        args = [['405'], ['67'], ['2753']]
-        self.validate_phrases(template_phrases, h.GO_TO_PDF_PAGE, args)
+        args = [[405], [67], [2753]]
+        urls = [pdf] * 3
+        self.validate_phrases(template_phrases, h.GO_TO_PDF_PAGE, args, urls=urls)
 
 if __name__ == '__main__':
     unittest.main()
