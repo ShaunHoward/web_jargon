@@ -23,7 +23,7 @@ BACKWARD:[backwardPage()]
 REFRESH:[refresh()]
 
 # requirement 4.7
-CLICK:[click(ELEMENT_NAME)]
+CLICK:[click(DOMAIN_NAME|ELEMENT_NAME)]
 
 # requirement 4.8
 OPEN_URL:[openURL(URL, IN_CURRENT_TAB=false)]

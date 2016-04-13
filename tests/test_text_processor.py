@@ -103,9 +103,13 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.REFRESH)
 
     def test_click_element(self):
-        template_phrases = ["click search", "click submit", "click more", "click sent mail", "click the submit button",
-                            "click the post button", "click the home button"]
-        args = [['search'], ['submit'], ['more'], ['sent mail'], ['submit'], ['post'], ['home']]
+        template_phrases = ["open link facebook", "click google doc link", "click link github.com",
+                            "open link w w w dot google dot com", "click github dot com", "click search",
+                            "click the home button", "click submit", "click more", "click sent mail", "click the submit button",
+                            "click the post button", "click the home button", "enter facebook"]
+
+        args = [['facebook'], ['google doc'], ['github.com'], ['www.google.com'], ['github.com'], ['search'], ['home'],
+                ['submit'], ['more'], ['sent mail'], ['submit'], ['post'], ['home'], ['facebook']]
         self.validate_phrases(template_phrases, h.CLICK, args)
 
     def test_open_url(self):

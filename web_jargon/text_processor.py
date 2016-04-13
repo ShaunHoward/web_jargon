@@ -267,13 +267,14 @@ class TextProcessor():
 
     def url(self, words):
         # try to fix words and parse out a URL
-        words.replace('dot', '.')
-        words.replace('dot ', '.')
-        words.replace(' dot ', '.')
-        words.replace(' dot', '.')
-        words.replace('w w w ', 'www')
-        words.replace('w w w', 'www')
-        words.replace(' w w w', 'www')
+        words = words.replace(' dot ', '.')
+        words = words.replace('dot ', '.')
+        words = words.replace(' dot', '.')
+        words = words.replace('dot', '.')
+        words = words.replace(' w w w ', 'www')
+        words = words.replace('w w w ', 'www')
+        words = words.replace(' w w w', 'www')
+        words = words.replace('w w w', 'www')
         return extract_match(words, self.url_matcher)
 
     def match_arg(self, orig_arg_type, command_words, arg_sections):
