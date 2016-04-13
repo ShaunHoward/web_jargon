@@ -42,7 +42,7 @@ class TextProcessor():
     action_text_mappings = dict()
     basic_name_pattern = "[a-zA-Z\s\.]+$"
     valid_web_jargon_pattern = "^[\s\w\d\>\<\;\,\{\}\[\]\-\_\+\=\!\@\#\$\%\^\&\*\|\'\.\:\(\)\\\/\"\?]+$"
-    url_pattern = ".*(\.|dot) ?[a-z]{2,3}"
+    url_pattern = ".* ?(\.|dot){0,1} ?[a-z]{2,3}"
     punctuation = re.compile('[%s]' % re.escape(string.punctuation))
     basic_name_matcher = None
     web_jargon_matcher = None
@@ -65,8 +65,7 @@ class TextProcessor():
                              'PERCENT': self.words_to_numbers.parse, 'TAB_INDEX': self.tab_index,
                              'TAB_NAME': self.basic_names, 'URL': self.url, 'FORM_NAME': self.basic_names,
                              'EXCERPT': self.match_web_jargon, 'BUTTON_NAME': self.basic_names, 'DOMAIN_NAME': self.url,
-                             'PAGE_NUM': self.words_to_numbers.parse, 'LINK_NAME': self.match_web_jargon,
-                             'ARTIST_INFO': self.match_web_jargon}
+                             'PAGE_NUM': self.words_to_numbers.parse, 'ARTIST_INFO': self.match_web_jargon}
 
     def basic_names(self, text):
         return extract_match(text, self.basic_name_matcher)
@@ -255,7 +254,7 @@ class TextProcessor():
     @staticmethod
     def get_index(words):
         """
-        Returns a the number of an English number index (indicating element position) found in the provided list of words.
+        Returns the number of an English number index (indicating element position) found in the provided list of words.
         :param words: the list of words to find the English number index in
         :return: the number version of the found index
         """
@@ -268,10 +267,13 @@ class TextProcessor():
 
     def url(self, words):
         # try to fix words and parse out a URL
-        words.replace('dot ', '.')
         words.replace('dot', '.')
+        words.replace('dot ', '.')
+        words.replace(' dot ', '.')
+        words.replace(' dot', '.')
         words.replace('w w w ', 'www')
         words.replace('w w w', 'www')
+        words.replace(' w w w', 'www')
         return extract_match(words, self.url_matcher)
 
     def match_arg(self, orig_arg_type, command_words, arg_sections):

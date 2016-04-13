@@ -25,7 +25,7 @@ REFRESH:["refresh", "refresh the page", "refresh page", "page refresh", "refresh
 
 # requirement 4.7
 # allow only part of element name (fuzzy string search using html web page from plugin)
-CLICK:["click (ELEMENT_NAME|LINK_NAME)", "click (ELEMENT_NAME|LINK_NAME) button", "click the (ELEMENT_NAME|LINK_NAME) button", "open link (ELEMENT_NAME|LINK_NAME)", "click link (ELEMENT_NAME|LINK_NAME)", "click (ELEMENT_NAME|LINK_NAME) link", "enter (ELEMENT_NAME|LINK_NAME)"]
+CLICK:["click (ELEMENT_NAME)", "click (ELEMENT_NAME) button", "click the (ELEMENT_NAME) button", "open link (ELEMENT_NAME)", "click link (ELEMENT_NAME)", "click (ELEMENT_NAME) link", "enter (ELEMENT_NAME)"]
 
 # requirement 4.8
 OPEN_URL:["open (URL) (IN_CURRENT_TAB=false)", "open (URL) in the current tab (IN_CURRENT_TAB=true)", "open url (URL) (IN_CURRENT_TAB=false)", "open new (URL) (IN_CURRENT_TAB=false)", "open (URL) in this tab (IN_CURRENT_TAB=true)", "open (URL) in new tab (IN_CURRENT_TAB=false)"]
