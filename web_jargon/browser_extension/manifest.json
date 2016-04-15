@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
 
-  "name": "Jargon Web API",
+  "name": "Web Jargon",
   "description": "Control the web via text commands",
   "version": "1.0",
 
