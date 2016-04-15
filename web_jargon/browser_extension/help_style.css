@@ -1,0 +1,25 @@
+tr:nth-child(even){background-color: #f2f2f2}
+tr:nth-child(odd){background-color: #d8d8d8}
+tr:hover {background-color: #ddd;}
+th {
+    text-align: center;
+    padding: 6px;
+}
+td {
+    padding: 6px;
+}
+table {
+    #border: 1px solid black;
+    border-collapse: collapse;
+}
+body {
+    background-color: rgb(193, 224, 254);
+}
+h1 {
+    color: navy;
+    margin-left: 20px;
+}
+h2 {
+    color: navy;
+    margin-left: 20px;
+}

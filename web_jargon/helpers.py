@@ -113,7 +113,7 @@ def get_possible_action_text_mapping_keys(command_context, action_dict):
         elif command_context == "D":
             context_keys_ = DOC_CONTEXT
         for x in context_keys_:
-            context_keys.append(x)
+            context_keys.insert(0, x)
     return context_keys
 
 

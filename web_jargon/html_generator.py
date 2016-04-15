@@ -64,17 +64,7 @@ def create_table(html, kvdict, ww=False, heading=None):
 
 def start_html():
     # creates the beginning part of html list
-    return ["""<!DOCTYPE html><html><head><style>
-            th {
-                text-align: center;
-            }
-            td {
-                padding: 4px 4px 4px 4px;
-            }
-            table {
-                border: 1px solid black;
-            }
-            </style></head><body>"""]
+    return ["""<!DOCTYPE html><html><head><link rel="stylesheet" type="text/css" href="help_style.css"></head><body>"""]
 
 
 def end_html(html):
