@@ -24,7 +24,7 @@ class Mapper():
     def __init__(self):
         self.action_call_map = h.load_web_action_template(DEFAULT_ACTIONS_PATH)
 
-    def create_web_actions(self, action_request):
+    def create_web_action(self, action_request):
         """
         Creates the web action function call using the
         action call templates.

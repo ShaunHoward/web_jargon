@@ -31,6 +31,7 @@ def load_training_data(training_data_dir):
 
 
 def extract_match(str_to_search, matcher):
+    # extract a match via the compiled regex matcher from the string to search
     match = matcher.match(str_to_search)
     parsed_arg = ''
     if match is not None and len(match.group()) > 0:
@@ -39,20 +40,27 @@ def extract_match(str_to_search, matcher):
 
 
 class TextProcessor():
-
-    action_text_mappings = dict()
+    """
+    Class for processing text commands received from the Web Jargon Chrome Extension and
+    transforming those commands into action templates to send to the web text action mapper.
+    """
+    # store patterns for matching
     basic_name_pattern = "[a-zA-Z\s\.]+$"
     valid_web_jargon_pattern = "^[\s\w\d\>\<\;\,\{\}\[\]\-\_\+\=\!\@\#\$\%\^\&\*\|\'\.\:\(\)\\\/\"\?]+$"
     url_pattern = ".* ?(\.|dot){0,1} ?[a-z]{2,3}"
-    punctuation = re.compile('[%s]' % re.escape(string.punctuation))
+
+    # store pre-compiled matchers for fast matching
     basic_name_matcher = None
     web_jargon_matcher = None
     words_to_numbers = None
     url_matcher = None
+
+    # initialize action-text mapping dict and patter_dict
+    action_text_mappings = dict()
     PATTERN_DICT = dict()
 
     def __init__(self):
-
+        # initialize all parsing objects, functions and regex matchers
         self.words_to_numbers = WordsToNumbers()
         self.create_argument_pattern_dict()
         self.basic_name_matcher = re.compile(self.basic_name_pattern)
@@ -62,6 +70,7 @@ class TextProcessor():
         self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
 
     def create_argument_pattern_dict(self):
+        # creates a dictionary from command argument token type to the callable match function to parse that argument
         self.PATTERN_DICT = {'ELEMENT_NAME': self.match_web_jargon, 'NUM_PAGES': self.words_to_numbers.parse,
                              'PERCENT': self.words_to_numbers.parse, 'TAB_INDEX': self.tab_index,
                              'TAB_NAME': self.basic_names, 'URL': self.url, 'FORM_NAME': self.basic_names,
@@ -69,9 +78,11 @@ class TextProcessor():
                              'PAGE_NUM': self.words_to_numbers.parse, 'ARTIST_INFO': self.match_web_jargon}
 
     def basic_names(self, text):
+        # matches to the basic names pattern in this class
         return extract_match(text, self.basic_name_matcher)
 
     def match_web_jargon(self, text):
+        # matches to the general web jargon pattern in this class
         return extract_match(text, self.web_jargon_matcher)
 
     def valid_web_jargon(self, text):
@@ -95,7 +106,6 @@ class TextProcessor():
         if self.valid_web_jargon(text) and type(curr_url) is str and len(curr_url) > 0:
             # extract action request from the current command and add to web action token list
             words = text.split(" ")
-            # words = [self.punctuation.sub('', x.strip()) for x in words]
             words = [x for x in words if len(x) > 0]
             curr_request = self.extract_action_request(text, words, curr_url)
             if curr_request is not None:
