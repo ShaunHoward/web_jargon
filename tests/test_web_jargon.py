@@ -32,7 +32,7 @@ class WebJargonTest(unittest.TestCase):
         json_actions = json.loads(json_actions)
         print json_actions
         # assert one is returned
-        self.assertEqual(len(json_actions), 1)
+        self.assertEqual(len(json_actions), 2)
         self.assertEqual(len(json_actions[h.ACTION]), 4)
         action = json_actions[h.ACTION]
         print "returned action: " + action[h.CMD]
@@ -51,11 +51,14 @@ class WebJargonTest(unittest.TestCase):
         that they return the correct action responses.
         :param action_key: the action token to test all the command samples for
         """
+        possible_url = h.get_url_for_context(action_key)
         if len(self.action_commands[action_key]) > 0:
             # iterate through all possible action command samples
             for command in self.action_commands[action_key]:
+                request_dict = {"command": command, "sec_key": "ADFW#R$#$%$452354345345e23@#FSDFASFw3r",
+                                "url": possible_url}
                 # get the json action response and validate it
-                json_actions = wj.extract_web_actions(command, self.processor, self.mapper)
+                json_actions = wj.extract_web_actions(request_dict, self.processor, self.mapper)
                 print "checking: " + command
                 self.validate_web_actions(json_actions, action_key)
 

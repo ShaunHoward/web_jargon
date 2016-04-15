@@ -73,12 +73,12 @@ def determine_action_context(action_token):
     return context
 
 
-def create_cheat_sheet_html_page(template_path=h.DEFAULT_ACTIONS_PATH):
+def create_help_html_page(template_path=h.DEFAULT_ACTIONS_PATH):
     # begin html document list
     html = start_html()
 
     # add header info
-    html.append("<h1>Web Jargon Cheat Sheet</h1>")
+    html.append("<h1>Web Jargon Help Page</h1>")
 
     # list wake words
     wws = ["Web Jargon", "web jargon", "browser", "Chrome", "chrome"]
@@ -110,12 +110,14 @@ def create_cheat_sheet_html_page(template_path=h.DEFAULT_ACTIONS_PATH):
 if __name__ == '__main__':
     import os
     # create and write the cheat sheet to html page
-    file_path = os.path.join(os.getcwd(), "cheat_sheet.html")
-    html = create_cheat_sheet_html_page()
+    file_path = os.path.join(os.getcwd(), "help_page.html")
+    html = create_help_html_page()
     try:
         print "writing file to: " + file_path
         f = open(file_path, 'w')
-        f.write(html)
+        html = unicode(html)
+        ascii_html = html.encode('ascii', 'ignore')
+        f.write(ascii_html)
         f.close()
     except IOError:
         print "had issue writing file to file: " + file_path

@@ -1,5 +1,6 @@
 __author__ = 'Shaun Howard'
-
+import json
+import random
 from os import path
 from collections import OrderedDict as dict
 ACTION = 'action'
@@ -35,13 +36,13 @@ OPEN_CHEAT_SHEET = 'OPEN_CHEAT_SHEET'
 CLOSE_CHEAT_SHEET = 'CLOSE_CHEAT_SHEET'
 OPEN_SETUP_PAGE = 'OPEN_SETUP_PAGE'
 CLOSE_SETUP_PAGE = 'CLOSE_SETUP_PAGE'
-START_VIDEO = 'START_VIDEO'
-STOP_VIDEO = 'STOP_VIDEO'
-RESTART_VIDEO = 'RESTART_VIDEO'
+PLAY_VIDEO = 'PLAY_VIDEO'
+PAUSE_VIDEO = 'PAUSE_VIDEO'
+NEXT_VIDEO = 'NEXT_VIDEO'
 OPEN_FULLSCREEN = 'OPEN_FULLSCREEN'
 CLOSE_FULLSCREEN = 'CLOSE_FULLSCREEN'
-START_MUSIC = 'START_MUSIC'
-STOP_MUSIC = 'STOP_MUSIC'
+PLAY_MUSIC = 'PLAY_MUSIC'
+PAUSE_MUSIC = 'PAUSE_MUSIC'
 NEXT_SONG = 'NEXT_SONG'
 SEARCH_MUSIC = 'SEARCH_MUSIC'
 SEARCH_PDF = 'SEARCH_PDF'
@@ -50,12 +51,57 @@ GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 DIR = path.dirname(path.dirname(__file__))
 DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 
-VIDEO_CONTEXT = {START_VIDEO, STOP_VIDEO, RESTART_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
-MUSIC_CONTEXT = {START_MUSIC, STOP_MUSIC, NEXT_SONG, SEARCH_MUSIC}
+MUSIC_DOMAINS = ["pandora", "spotify"]
+DOC_EXTS = [".pdf"]
+
+VIDEO_CONTEXT = {PLAY_VIDEO, PAUSE_VIDEO, NEXT_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
+MUSIC_CONTEXT = {PLAY_MUSIC, PAUSE_MUSIC, NEXT_SONG, SEARCH_MUSIC}
 DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
+DOMAINS = {"youtube": VIDEO_CONTEXT, "pandora": MUSIC_CONTEXT, "spotify": MUSIC_CONTEXT, ".pdf": DOC_CONTEXT}
+
+spot = "https://play.spotify.com/browse"
+pandora = "http://www.pandora.com/station/play/2880225754266056244"
+pdf = "http://www.thewritesource.com/apa/apa.pdf"
+youtube = "https://www.youtube.com/watch?v=wYUSPkssfIY"
 
 
-def log(text_list):
+def determine_url_context(curr_url):
+    context = set()
+    if type(curr_url) is str:
+        for domain in DOMAINS.keys():
+            if domain in curr_url:
+                context = DOMAINS[domain]
+    return context
+
+
+def get_url_for_context(action_key):
+    url = "google.com"
+    if action_key in VIDEO_CONTEXT:
+        url = youtube
+    elif action_key in MUSIC_CONTEXT:
+        music = [spot, pandora]
+        i = random.randint(0, 1)
+        url = music[i]
+    elif action_key in DOC_CONTEXT:
+        url = pdf
+    return url
+
+
+def get_general_context_keys(action_text_mappings_keys):
+    return [x for x in action_text_mappings_keys if x not in VIDEO_CONTEXT
+            and x not in MUSIC_CONTEXT
+            and x not in DOC_CONTEXT]
+
+
+def get_possible_action_text_mapping_keys(command_context, action_text_mappings_keys):
+    context_keys = get_general_context_keys(action_text_mappings_keys)
+    if type(command_context) is set or type(command_context) is list:
+        for x in command_context:
+            context_keys.append(x)
+    return context_keys
+
+
+def log_to_console(text_list):
     print ''.join(text_list)
 
 
@@ -275,13 +321,13 @@ def extract_arg_sections(command_str, part_indices):
                     arg_indices.append((arg_start, arg_end))
                     arg_start = -1
 
-        # add part pairs to
+        # add part section to arg sections list
         for index_pair in arg_indices:
             part_start = index_pair[0]
             part_end = index_pair[1]
             arg_sections.append(command_str[part_start:part_end])
     elif len(part_indices) == 1 and part_indices[0][1] < len(command_str):
-        # parse
+        # add part section to list
         part_start = part_indices[0][1] + 1
         part_end = len(command_str)
         arg_sections.append(command_str[part_start:part_end])
@@ -305,21 +351,9 @@ def normalize_string(text):
     return text.lower().strip()
 
 
-def normalize_nested_dict(dict_of_dict):
-    """
-    Normalizes the contents of a nest dictionary,
-    i.e. take min and max of dict[x][y] and normalize between 0 and 1
-    :param dict_of_dict: nested dict {{}}
-    :return: new normalized nested dict
-    """
-    new_dict_of_dict = dict()
-    for key_1 in dict_of_dict.keys():
-        new_dict_of_dict[key_1] = dict()
-        for key_2 in dict_of_dict[key_1].keys():
-            new_dict_of_dict[key_1][key_2] = 0
-            max_val = max(dict_of_dict[key_1][key_2])
-            min_val = min(dict_of_dict[key_1][key_2])
-            for val in dict_of_dict[key_1][key_2]:
-                belief = (val - min_val) / (max_val - min_val)
-                new_dict_of_dict[key_1][key_2] = belief
-    return new_dict_of_dict
+def is_json(my_json):
+    try:
+        json_obj = json.loads(my_json)
+    except ValueError, e:
+        return False
+    return True

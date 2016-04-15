@@ -1,6 +1,5 @@
 __author__ = 'shaun'
 
-from os import path
 import re
 import helpers as h
 from arg_parsers import WordsToNumbers
@@ -14,13 +13,13 @@ SUCCESS = "The operation was successful."
 FAIL = "The operation was unsuccessful."
 
 # context names
+CONTEXT = 'context'
 DEFAULT = "default"
 FACEBOOK = "facebook"
+IS_SPOTIFY = "IS_SPOTIFY"
 SPOTIFY = "spotify"
 GOOGLE = "google"
 YOUTUBE = "youtube"
-
-CONTEXT = 'context'
 
 
 def load_training_data(training_data_dir):
@@ -43,7 +42,7 @@ class TextProcessor():
     action_text_mappings = dict()
     basic_name_pattern = "[a-zA-Z\s\.]+$"
     valid_web_jargon_pattern = "^[\s\w\d\>\<\;\,\{\}\[\]\-\_\+\=\!\@\#\$\%\^\&\*\|\'\.\:\(\)\\\/\"\?]+$"
-    url_pattern = ".*(\.|dot) ?[a-z]{2,3}"
+    url_pattern = ".* ?(\.|dot){0,1} ?[a-z]{2,3}"
     punctuation = re.compile('[%s]' % re.escape(string.punctuation))
     basic_name_matcher = None
     web_jargon_matcher = None
@@ -62,12 +61,11 @@ class TextProcessor():
         self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
 
     def create_argument_pattern_dict(self):
-        self.PATTERN_DICT = {'ELEMENT_NAME': self.match_web_jargon,
-                             'NUM_PAGES': self.words_to_numbers.parse, 'PERCENT': self.words_to_numbers.parse,
-                             'TAB_INDEX': self.tab_index, 'TAB_NAME': self.basic_names,
-                             'URL': self.url, 'FORM_NAME': self.basic_names, 'EXCERPT': self.match_web_jargon,
-                             'BUTTON_NAME': self.basic_names, 'DOMAIN_NAME': self.url,
-                             'PAGE_NUM': self.words_to_numbers.parse, 'LINK_NAME': self.match_web_jargon}
+        self.PATTERN_DICT = {'ELEMENT_NAME': self.match_web_jargon, 'NUM_PAGES': self.words_to_numbers.parse,
+                             'PERCENT': self.words_to_numbers.parse, 'TAB_INDEX': self.tab_index,
+                             'TAB_NAME': self.basic_names, 'URL': self.url, 'FORM_NAME': self.basic_names,
+                             'EXCERPT': self.match_web_jargon, 'BUTTON_NAME': self.basic_names, 'DOMAIN_NAME': self.url,
+                             'PAGE_NUM': self.words_to_numbers.parse, 'ARTIST_INFO': self.match_web_jargon}
 
     def basic_names(self, text):
         return extract_match(text, self.basic_name_matcher)
@@ -84,36 +82,35 @@ class TextProcessor():
         return (type(text) is str or type(text) is unicode)\
             and len(text) > 0 and len(self.web_jargon_matcher.match(text).group()) > 0
 
-    def process_web_action_request(self, text):
+    def process_web_action_request(self, text, curr_url):
         """
         Parses the provided text into web text actions that will be converted into
         web actions by the web text to action mapper. The order will be maintained.
         :param text: the input command text
-        :return: the controls, which will be None if in error
+        :param curr_url: the url of the current web page
+        :return: the action request response, which will be empty or None if in error
         """
-        web_action_token = None
-        if self.valid_web_jargon(text):
+        web_action_request = None
+        if self.valid_web_jargon(text) and type(curr_url) is str and len(curr_url) > 0:
             # extract action request from the current command and add to web action token list
             words = text.split(" ")
             # words = [self.punctuation.sub('', x.strip()) for x in words]
             words = [x for x in words if len(x) > 0]
-            curr_request = self.extract_action_request(text, words)
+            curr_request = self.extract_action_request(text, words, curr_url)
             if curr_request is not None:
-                web_action_token = curr_request
+                web_action_request = curr_request
         else:
-            if type(text) is str or unicode:
-                h.log(["invalid request received: ", text])
-            else:
-                h.log(["invalid request type, received: ", str(type(text)), " but expected str or unicode..."])
+            h.log_to_console(["request error: ", text])
 
-        return web_action_token
+        return web_action_request
 
-    def extract_action_request(self, text, words):
+    def extract_action_request(self, text, words, url):
         """
         Figure out the web actions that exist in the provided sentence using
         the given words as well as action command templates.
         :param text: the text said by the user
         :param words: the words of the sentence
+        :param url: the url of the current web page
         :return: the web action token and arguments
         """
         curr_text = text
@@ -126,22 +123,23 @@ class TextProcessor():
             command_text += curr_text[:end_index]
             curr_text = curr_text[end_index:]
 
-        # first try to use templates to determine desired actions
-        action_request = self.template_action_interpreter(command_text, words)
+        # try to use templates to determine desired actions
+        action_request = self.template_action_interpreter(command_text, words, url)
 
-        # next try to use the fuzzy nlp interpreter to determine desired actions
-        if action_request is None:
+        # check if request is received
+        if action_request is None or len(action_request) == 0 or h.CMD not in action_request.keys():
             print "error interpreting request"
 
         return action_request
 
-    def template_action_interpreter(self, command_text, command_words):
+    def template_action_interpreter(self, command_text, command_words, command_url):
         """
         This method will not always work. multiple instances of the same string may be detected
         in matching and may throw off the interpreter.
         :param command_text: the command text for the current action request
         :param command_words: the command words for the current action request
-        :return:
+        :param command_url: the url of the command given used for context determination
+        :return: the current action request response
         """
 
         # store lowercase of all strings and filter out quotes
@@ -151,12 +149,19 @@ class TextProcessor():
         command_text = command_text.lower().strip().lstrip("\"").lstrip('``').lstrip('\'\'')\
             .rstrip('\'\'').rstrip("\"").rstrip('``').strip()
 
-        # found_action = False
+        # clean up command url and get command context
+        command_url = command_url.strip()
+        command_context = h.determine_url_context(command_url)
+
+        # get possible action mappings
+        possible_action_text_mapping_keys = h.get_possible_action_text_mapping_keys(command_context,
+                                                                                    self.action_text_mappings.keys())
+
         # store matches list
         matches = []
         has_exact_match = False
         # try to find match for command in templates
-        for action_key in self.action_text_mappings.keys():
+        for action_key in possible_action_text_mapping_keys:
             if not has_exact_match:
                 for u_map in self.action_text_mappings[action_key]:
                     indices = []
@@ -222,9 +227,16 @@ class TextProcessor():
                     earliest_index = ctr
                 ctr += 1
 
-                # set command and args from action text mappings
+            # set command and args from action text mappings
             curr_action_request[h.CMD] = matches[earliest_index][0]
             curr_action_request[h.CMD_ARGS_DICT] = matches[earliest_index][2]
+
+            # handle music context boolean setting for music actions
+            if command_context == h.MUSIC_CONTEXT:
+                if "spotify" in command_url:
+                    curr_action_request[h.CMD_ARGS_DICT][IS_SPOTIFY] = 'true'
+                else:
+                    curr_action_request[h.CMD_ARGS_DICT][IS_SPOTIFY] = 'false'
 
         return curr_action_request
 
@@ -242,7 +254,7 @@ class TextProcessor():
     @staticmethod
     def get_index(words):
         """
-        Returns a the number of an English number index (indicating element position) found in the provided list of words.
+        Returns the number of an English number index (indicating element position) found in the provided list of words.
         :param words: the list of words to find the English number index in
         :return: the number version of the found index
         """
@@ -255,10 +267,14 @@ class TextProcessor():
 
     def url(self, words):
         # try to fix words and parse out a URL
-        words.replace('dot ', '.')
-        words.replace('dot', '.')
-        words.replace('w w w ', 'www')
-        words.replace('w w w', 'www')
+        words = words.replace(' dot ', '.')
+        words = words.replace('dot ', '.')
+        words = words.replace(' dot', '.')
+        words = words.replace('dot', '.')
+        words = words.replace(' w w w ', 'www')
+        words = words.replace('w w w ', 'www')
+        words = words.replace(' w w w', 'www')
+        words = words.replace('w w w', 'www')
         return extract_match(words, self.url_matcher)
 
     def match_arg(self, orig_arg_type, command_words, arg_sections):

@@ -2,12 +2,12 @@
 
 **Web Jargon** is the Google Chrome Browser Extension designed for browsing when a keyboard and mouse are too much to handle. Our plugin and API system use speech recognition and natural language processing in order to control your web browsing experience by voice. Web Jargon has an English web jargon request system designed so that you only have to say a wake word and an action to take pertaining to a certain website element to control, then the API will intelligently discern and extract the correct action(s) to take for you. Web Jargon is currently **in progress** as Shaun Howard and Elliot Essman's BS senior project at Case Western Reserve University for EECS 395 Spring 2016.
 
-##### Web Jargon has or will have the following features: 
+##### Web Jargon has the following features:
 
 * Voice-Controlled Browsing via Google Web Speech API<br />
 * Text-Controlled Browsing via Plugin Drop-down<br />
 * Scroll Up, Down, Left, Right<br />
-* Open and Close Tabs<br />
+* Open, Close and Switch Tabs<br />
 * Open Clickable Links by Name<br />
 * Open Specified URL<br />
 * Enter and Submit Text in Forms<br />

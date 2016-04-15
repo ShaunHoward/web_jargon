@@ -23,42 +23,40 @@ BACKWARD:[backwardPage()]
 REFRESH:[refresh()]
 
 # requirement 4.7
-CLICK:[click(ELEMENT_NAME|LINK_NAME)]
+CLICK:[click(DOMAIN_NAME|ELEMENT_NAME)]
 
 # requirement 4.8
 OPEN_URL:[openURL(URL, IN_CURRENT_TAB=false)]
 
 # requirement 4.9
-# select, enter and submit must be used in sequence
+# select, enter and submit are usually used in sequence
 SELECT_ELEMENT:[selectElement(ELEMENT_NAME)]
+
+# req 4.10
 # enter depends on select
-ENTER_TEXT:[enterText(EXCERPT, WAIT=3)]
+ENTER_TEXT:[enterText(EXCERPT)]
+
+# req 4.11
 # submit depends on enter
 SUBMIT_TEXT:[submitText(BUTTON_NAME)]
 
-# requirement 4.10
+# requirement 4.12
 OPEN_HELP:[displayHelp(SHOW=true)]
 CLOSE_HELP:[displayHelp(SHOW=false)]
-OPEN_CHEAT_SHEET:[displayCheatSheet(SHOW=true)]
-CLOSE_CHEAT_SHEET:[displayCheatSheet(SHOW=false)]
 
-# requirement 4.11
-OPEN_SETUP_PAGE:[displaySetup(SHOW=true)]
-CLOSE_SETUP_PAGE:[displaySetup(SHOW=false)]
-
-# requirement 4.12
-START_VIDEO:[playVideo()]
-STOP_VIDEO:[pauseVideo()]
-RESTART_VIDEO:[restartVideo()]
+# requirement 4.14
+PLAY_VIDEO:[playVideo()]
+PAUSE_VIDEO:[pauseVideo()]
+NEXT_VIDEO:[nextVideo()]
 OPEN_FULLSCREEN:[openFullscreen()]
 CLOSE_FULLSCREEN:[closeFullscreen()]
 
-# requirement 4.13
-START_MUSIC:[playMusic(IS_SPOTIFY=false)]
-STOP_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
+# requirement 4.15
+PLAY_MUSIC:[playMusic(IS_SPOTIFY=false)]
+PAUSE_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
 NEXT_SONG:[nextSong(IS_SPOTIFY=false)]
-SEARCH_MUSIC:[searchMusic(ARTIST, ALBUM, SONG)]
+SEARCH_MUSIC:[searchMusic(ARTIST_INFO, IS_SPOTIFY=false)]
 
-# requirement 4.14
+# requirement 4.16
 SEARCH_PDF:[searchPDF(EXCERPT)]
 GO_TO_PDF_PAGE:[goToPage(PAGE_NUM)]
