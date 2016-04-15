@@ -27,7 +27,10 @@
   ],
 
   "background": {
-    "scripts": ["jquery-2.2.0.min.js","backgroundPage.js"]
+    "scripts": ["jquery-2.2.0.min.js",
+                "backgroundPage.js", 
+                "3rd-party/sha256.js"
+               ]
   },
   
   //"options_page": "options.html"

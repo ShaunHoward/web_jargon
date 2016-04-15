@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener(
     if (typeof window[request.func] == 'function') {
       window[request.func].apply(null, request.params);
     } else{
-      sendResponse({msg: "not found"}); 
+      //sendResponse({msg: "not found"}); 
     }   
   });
 
@@ -170,8 +170,7 @@ function _scrollVertical(dest){
   }, 1000);
 }
 
-function addMessage(str){
-  /*$('html').append('<div style="position:fixed;color:white;background-color:black;right:5px;top:5px;width:100px;height:60px;z-index:1000;">'+str+'</div>');*/
+function _addMessage(str){
   $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:5px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
   $("#WebJargonInfo").fadeOut(2000, function(){
     $("#WebJargonInfo").remove();
