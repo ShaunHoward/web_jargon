@@ -99,8 +99,20 @@ def get_general_context_keys(action_text_mappings_keys):
 def get_possible_action_text_mapping_keys(command_context, action_dict):
     # returns the action keys available from the given action dictionary within the command context
     context_keys = get_general_context_keys(action_dict)
+    # add contents of set or list to context keys
     if type(command_context) is set or type(command_context) is list:
         for x in command_context:
+            context_keys.append(x)
+    elif type(command_context) is str:
+        # or resolve context string to a pre-defined context set
+        context_keys_ = []
+        if command_context == "V":
+            context_keys_ = VIDEO_CONTEXT
+        elif command_context == "M":
+            context_keys_ = MUSIC_CONTEXT
+        elif command_context == "D":
+            context_keys_ = DOC_CONTEXT
+        for x in context_keys_:
             context_keys.append(x)
     return context_keys
 
@@ -108,7 +120,7 @@ def get_possible_action_text_mapping_keys(command_context, action_dict):
 def filter_results(action_dict, curr_context):
     # filters out only the actions for the current context
     keys = get_possible_action_text_mapping_keys(curr_context, action_dict)
-    new_dict = dict
+    new_dict = dict()
     for key in keys:
         new_dict[key] = action_dict[key]
     return new_dict
