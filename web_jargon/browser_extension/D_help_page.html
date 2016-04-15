@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <link href="help_style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>
+   Web Jargon Help Page
+  </h1>
+  <h2>
+   You are currently browsing in the document context.
+  </h2>
+  <table border="1">
+   <h1>
+    Wake Words
+   </h1>
+   <tr>
+    <td>
+     Web Jargon
+    </td>
+   </tr>
+   <tr>
+    <td>
+     web jargon
+    </td>
+   </tr>
+   <tr>
+    <td>
+     browser
+    </td>
+   </tr>
+   <tr>
+    <td>
+     Chrome
+    </td>
+   </tr>
+   <tr>
+    <td>
+     chrome
+    </td>
+   </tr>
+  </table>
+  <h1>
+   Action Request Usage Contexts:
+  </h1>
+  <table border="1">
+   <tr>
+    <th>
+     Context
+    </th>
+    <th>
+     Application
+    </th>
+   </tr>
+   <tr>
+    <td>
+     General (G)
+    </td>
+    <td>
+     Almost all web pages (click, search, scroll, forward, backward, zoom in/out, etc.)
+    </td>
+   </tr>
+   <tr>
+    <td>
+     Music (M)
+    </td>
+    <td>
+     Spotify, Pandora (play, pause, next song, search artists/songs)
+    </td>
+   </tr>
+   <tr>
+    <td>
+     Video (V)
+    </td>
+    <td>
+     YouTube (play, pause, toggle fullscreen)
+    </td>
+   </tr>
+   <tr>
+    <td>
+     Document (D)
+    </td>
+    <td>
+     Adobe Acrobat (search for text, go to page, zoom in/out)
+    </td>
+   </tr>
+  </table>
+  <h1>
+   Available Action Commands and Templates
+  </h1>
+  <table border="1">
+   <tr>
+    <th>
+     Context: Action
+    </th>
+    <th>
+     Command
+    </th>
+    <tr>
+     <td>
+      D: GO_TO_PDF_PAGE
+     </td>
+     <td>
+      go to page number (PAGE_NUM)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go to page (PAGE_NUM)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go to (PAGE_NUM)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      D: SEARCH_PDF
+     </td>
+     <td>
+      search for (EXCERPT)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      search (EXCERPT)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: SCROLL_LEFT
+     </td>
+     <td>
+      scroll left
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      left scroll
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: SCROLL_RIGHT
+     </td>
+     <td>
+      scroll right
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      right scroll
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: SCROLL_UP
+     </td>
+     <td>
+      scroll up (NUM_PAGES=1)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      up scroll (NUM_PAGES=1)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: SCROLL_DOWN
+     </td>
+     <td>
+      scroll down (NUM_PAGES=1)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      down scroll (NUM_PAGES=1)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: ZOOM_IN
+     </td>
+     <td>
+      zoom in by (PERCENT)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      zoom in (PERCENT=25)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      zoom (PERCENT=25)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      zoom larger (PERCENT=25)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: ZOOM_OUT
+     </td>
+     <td>
+      zoom out by (PERCENT)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      zoom out (PERCENT=25)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      zoom away (PERCENT=25)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      zoom smaller (PERCENT=25)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      zoom out (PERCENT=25)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: OPEN_TAB
+     </td>
+     <td>
+      open a tab (DOMAIN_NAME=google.com)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open a new tab (DOMAIN_NAME=google.com)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      new tab (DOMAIN_NAME=google.com)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open new tab (DOMAIN_NAME=google.com)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      create tab (DOMAIN_NAME=google.com)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      create a new tab (DOMAIN_NAME=google.com)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      create new tab (DOMAIN_NAME=google.com)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: CLOSE_TAB
+     </td>
+     <td>
+      close tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      close this tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      close my tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      exit this tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      leave this tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      exit the tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      exit tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: SWITCH_TAB
+     </td>
+     <td>
+      switch to tab (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open tab (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      change to tab (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      switch tab to (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      change tab to (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      switch to (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      change to (TAB_INDEX|TAB_NAME) tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      change to (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open the (TAB_INDEX) tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: FORWARD
+     </td>
+     <td>
+      forward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go forward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go forward a page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go to the next page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      next page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      ahead a page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      forward a page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      one page forward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      page forward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      page ahead
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: BACKWARD
+     </td>
+     <td>
+      backward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go backward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go backward a page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go back a page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go to the previous page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      previous page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      back a page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      backward a page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      one page backward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      page backward
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      page back
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: REFRESH
+     </td>
+     <td>
+      refresh
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      refresh the page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      refresh page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      page refresh
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      refresh this page
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: CLICK
+     </td>
+     <td>
+      click (DOMAIN_NAME|ELEMENT_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      click (DOMAIN_NAME|ELEMENT_NAME) button
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      click the (DOMAIN_NAME|ELEMENT_NAME) button
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open link (DOMAIN_NAME|ELEMENT_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      click link (DOMAIN_NAME|ELEMENT_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      click (DOMAIN_NAME|ELEMENT_NAME) link
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      enter (DOMAIN_NAME|ELEMENT_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: OPEN_URL
+     </td>
+     <td>
+      open (URL) (IN_CURRENT_TAB=false)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open (URL) in the current tab (IN_CURRENT_TAB=true)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open url (URL) (IN_CURRENT_TAB=false)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open new (URL) (IN_CURRENT_TAB=false)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open (URL) in this tab (IN_CURRENT_TAB=true)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open (URL) in new tab (IN_CURRENT_TAB=false)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: SELECT_ELEMENT
+     </td>
+     <td>
+      select (ELEMENT_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: ENTER_TEXT
+     </td>
+     <td>
+      enter text (EXCERPT)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      write (EXCERPT)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: SUBMIT_TEXT
+     </td>
+     <td>
+      submit
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      submit text
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: OPEN_HELP
+     </td>
+     <td>
+      help please
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      please help
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open help
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open browsing assistance
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      browsing assistance
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      assistance
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      assistant
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      helper
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      help window
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      help me
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      show hints
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      open hints
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      display hints
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      list functions
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      list commands
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      list actions
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      show actions
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      show commands
+     </td>
+    </tr>
+    <tr>
+     <td>
+      G: CLOSE_HELP
+     </td>
+     <td>
+      close help
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      close help page
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      hide commands
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      hide help
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      hide hints
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      hide functions
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      close browsing assistance
+     </td>
+    </tr>
+   </tr>
+  </table>
+ </body>
+</html>
