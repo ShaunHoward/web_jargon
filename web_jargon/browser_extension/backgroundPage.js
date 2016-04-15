@@ -2,9 +2,13 @@
 The background page controls extension-level, window-level, and high-level tab functions
 Functions starting with underscore(_) are not callable by the api. They are helper-functions only.
 */
-
 var states = Object.freeze({READY: 1, BUSY: 2, ERROR: 3});
 var state = states.READY;
+
+var audio_success = new Audio();
+audio_success.src = "audio/success.mp3";
+var audio_fail = new Audio();
+audio_fail.src = "audio/fail.wav";
 
 var startPhrases = ["web jargon", "browser", "chrome"];
 var stopPhrases = ["stop web jargon", "stop listening"];
@@ -12,6 +16,7 @@ var stopPhrases = ["stop web jargon", "stop listening"];
 var server = localStorage["serverURL"];//"http://localhost:8080/";
 
 var keepListening = true;
+var asked = false;
 
 var recognition = new webkitSpeechRecognition();
 recognition.continuous = true;
@@ -19,7 +24,8 @@ recognition.interimResults = true;
 
 recognition.onerror = function(event) {
   //check if microphone is available
-  if(event.error == 'not-allowed'){
+  if(event.error == 'not-allowed' && asked == false){
+   asked = true;
     _getAudioPermission();
   }
 }
@@ -63,23 +69,33 @@ function _processText(str){
 }
 
 function _sendText(str){
-  _setBusy();
-  var sendData = new Object();
-  sendData.input = str;
-  $.post( server, JSON.stringify(sendData), function( data ) {
-    console.log(data);
-    var cmd = JSON.parse(data)["action"];
-    var func = cmd["action"];
-    var params = cmd["arg_list"]; 
-    var msg = _doCommand(func, params);
-    _doCommand("addMessage",[func]);
-    _setReady();
-  })
-  .fail(function() {
-    _setError();
-    _doCommand("addMessage",["Could not connect to server"]);
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+    var url = tabs[0].url;
+    _setBusy();
+    var sendData = new Object();
+    sendData.input = str;
+    sendData.url = url;
+    sendData.sec_key = sha256_digest("any message");
+    $.post( server, JSON.stringify(sendData), function( data ) {
+      console.log(data);
+      var cmd = JSON.parse(data)["action"];
+      var func = cmd["action"];
+      var params = cmd["arg_list"]; 
+      var msg = _doCommand(func, params);
+      _showResult(str, func, params);
+    })
+    .fail(function() {
+      _setError();
+      _doCommand("_addMessage",["Could not connect to server"]);
+      audio_fail.play();
+    });
   });
+}
 
+function _showResult(inputStr, func, params){
+  _doCommand("_addMessage",[func]);
+  _setReady();
+  audio_success.play(); 
 }
 
 function openUrl(u, currentTab){
@@ -164,7 +180,7 @@ function displaySetup(){
 }
 
 function displayHelp(){
-  chrome.tabs.create({ url: "help.html" });
+  chrome.tabs.create({ url: "cheat_sheet.html" });
 }
 
 /**
@@ -179,8 +195,8 @@ function _doCommand(cmd, params){
   //if function not found in backgound page, check content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
-      if(response && response.msg){
-        return response.msg;
+      if(response){
+        return response;
       }
   });
 });

@@ -1,13 +1,14 @@
+var backgroundPage = chrome.extension.getBackgroundPage();
+
 navigator.webkitGetUserMedia({
       audio: true,
     }, function(stream) {
+      //granted
       stream.stop();
-      alert("granted");
-      //permission granted
+      backgroundPage._startRecognition();
+      close();
       }, function() {
-      //permission rejected
+      //denied
+      backgroundPage._denyAudioPermission();
+      close();
   });
-
-var backgroundPage = chrome.extension.getBackgroundPage();
-backgroundPage._startListening();
-close();
