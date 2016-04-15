@@ -18,6 +18,8 @@ var server = localStorage["serverURL"];//"http://localhost:8080/";
 var keepListening = true;
 var asked = false;
 
+var key = (Math.random()*1e20).toString(36);
+
 var recognition = new webkitSpeechRecognition();
 recognition.continuous = true;
 recognition.interimResults = true;
@@ -75,7 +77,7 @@ function _sendText(str){
     var sendData = new Object();
     sendData.input = str;
     sendData.url = url;
-    sendData.sec_key = sha256_digest("any message");
+    sendData.sec_key = key;
     $.post( server, JSON.stringify(sendData), function( data ) {
       console.log(data);
       var cmd = JSON.parse(data)["action"];
@@ -112,7 +114,7 @@ function openTab(u){
   if (u == undefined){
     u = "google";
   }
-  chrome.tabs.create({ url: "http://www."+u+".com" });
+  chrome.tabs.create({ url: u});
 }
 
 /**
