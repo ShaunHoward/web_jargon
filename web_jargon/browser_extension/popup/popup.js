@@ -9,13 +9,8 @@ $("#textInput").submit(function( event ) {
   backgroundPage._sendText(inputText);
 });
 
-$("#listenButton").click(function( event ) {
-  //event.preventDefault();
-  if (!('webkitSpeechRecognition' in window)) {
-    upgrade();
-  } else{
-    backgroundPage._toggleListening();
-  }
+$("#settings").click(function( event ) {
+  chrome.runtime.openOptionsPage(); 
 });
 
 function addLine(str){
