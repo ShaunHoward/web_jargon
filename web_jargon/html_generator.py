@@ -3,6 +3,8 @@ __author__ = 'shaun'
 import helpers as h
 import bs4
 
+CONTEXTS = ["G", "V", "M", "D"]
+
 
 def create_table(html, kvdict, ww=False, heading=None):
     # html is a list of html
@@ -73,7 +75,22 @@ def determine_action_context(action_token):
     return context
 
 
-def create_help_html_page(template_path=h.DEFAULT_ACTIONS_PATH):
+def add_context_info(html, context):
+    # adds contextual info to the html help page
+    html.append("<p>You are currently browsing in the ")
+    if context is "V":
+        html.append("video")
+    elif context is "M":
+        html.append("music")
+    elif context is "D":
+        html.append("document")
+    else:
+        html.append("general")
+    html.append(" context.</p>")
+    return html
+
+
+def create_help_html_page(curr_context, template_path=h.DEFAULT_ACTIONS_PATH):
     # begin html document list
     html = start_html()
 
@@ -94,11 +111,14 @@ def create_help_html_page(template_path=h.DEFAULT_ACTIONS_PATH):
             <tr><td>Video (V)</td><td>YouTube (play, pause, toggle fullscreen)</td></tr>
             <tr><td>Document (D)</td><td>Adobe Acrobat (search for text, go to page, zoom in/out)</td></tr></table>""")
 
+    # add current context info to help page
+    html = add_context_info(html, curr_context)
+
     # load action keys and possible commands
     action_keys_and_vals = h.load_web_action_template(template_path, False)
 
     # add template header
-    html.append("<h1>Action Command Templates</h1>")
+    html.append("<h1>Available Action Commands and Templates</h1>")
 
     # create html tables of action values
     html = create_table(html, action_keys_and_vals)
@@ -109,15 +129,17 @@ def create_help_html_page(template_path=h.DEFAULT_ACTIONS_PATH):
 
 if __name__ == '__main__':
     import os
-    # create and write the cheat sheet to html page
-    file_path = os.path.join(os.getcwd(), "help_page.html")
-    html = create_help_html_page()
-    try:
-        print "writing file to: " + file_path
-        f = open(file_path, 'w')
-        html = unicode(html)
-        ascii_html = html.encode('ascii', 'ignore')
-        f.write(ascii_html)
-        f.close()
-    except IOError:
-        print "had issue writing file to file: " + file_path
+    # create help pages for all contexts
+    for context in CONTEXTS:
+        # create and write the help page to html page
+        file_path = os.path.join(os.getcwd(), '_'.join([str(context), "help_page.html"]))
+        html = create_help_html_page(context)
+        try:
+            print "writing file to: " + file_path
+            f = open(file_path, 'w')
+            html = unicode(html)
+            ascii_html = html.encode('ascii', 'ignore')
+            f.write(ascii_html)
+            f.close()
+        except IOError:
+            print "had issue writing file to file: " + file_path

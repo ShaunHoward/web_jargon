@@ -23,6 +23,7 @@ YOUTUBE = "youtube"
 
 
 def load_training_data(training_data_dir):
+    # load the training data
     with open(training_data_dir, 'r') as training_file:
         training_data = training_file.read()
     training_data_list = training_data.split('\n')

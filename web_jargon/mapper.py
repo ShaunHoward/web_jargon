@@ -37,15 +37,17 @@ class Mapper():
             action_call_template = self.action_call_map[action_request[h.CMD]].copy()
 
             # add arguments to action call
-            # action_call_template[h.CMD_ARGS_DICT] = action_request[h.CMD_ARGS_DICT]
             action_call_template[h.CMD_ARGS_LIST] = []
             for arg_type in action_call_template[h.CMD_ARGS_DICT].keys():
+                # try to match expected arguments in input text
                 if arg_type in action_request[h.CMD_ARGS_DICT].keys():
                     value = action_request[h.CMD_ARGS_DICT][arg_type]
+                    # set value if an actual arg value was given with the expected type
                     if value is not None:
                         action_call_template[h.CMD_ARGS_DICT][arg_type] = value
                         action_call_template[h.CMD_ARGS_LIST].append(value)
                 else:
+                    # use the default value for this argument type from the action call template
                     action_call_template[h.CMD_ARGS_LIST].append(action_call_template[h.CMD_ARGS_DICT][arg_type])
             # append to web action call list
             web_actions = action_call_template

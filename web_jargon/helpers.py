@@ -3,6 +3,8 @@ import json
 import random
 from os import path
 from collections import OrderedDict as dict
+
+# useful constants
 ACTION = 'action'
 CMD = 'command'
 CMD_ARGS_DICT = 'arguments'
@@ -51,9 +53,7 @@ GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 DIR = path.dirname(path.dirname(__file__))
 DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 
-MUSIC_DOMAINS = ["pandora", "spotify"]
-DOC_EXTS = [".pdf"]
-
+# context lists to outline functions available only in the given context
 VIDEO_CONTEXT = {PLAY_VIDEO, PAUSE_VIDEO, NEXT_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
 MUSIC_CONTEXT = {PLAY_MUSIC, PAUSE_MUSIC, NEXT_SONG, SEARCH_MUSIC}
 DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
@@ -66,6 +66,7 @@ youtube = "https://www.youtube.com/watch?v=wYUSPkssfIY"
 
 
 def determine_url_context(curr_url):
+    # determines the context of the provided url
     context = set()
     if type(curr_url) is str:
         for domain in DOMAINS.keys():
@@ -75,6 +76,7 @@ def determine_url_context(curr_url):
 
 
 def get_url_for_context(action_key):
+    # returns a url for testing the given action key in the proper context
     url = "google.com"
     if action_key in VIDEO_CONTEXT:
         url = youtube
@@ -88,20 +90,32 @@ def get_url_for_context(action_key):
 
 
 def get_general_context_keys(action_text_mappings_keys):
+    # returns the action keys for the general context
     return [x for x in action_text_mappings_keys if x not in VIDEO_CONTEXT
             and x not in MUSIC_CONTEXT
             and x not in DOC_CONTEXT]
 
 
-def get_possible_action_text_mapping_keys(command_context, action_text_mappings_keys):
-    context_keys = get_general_context_keys(action_text_mappings_keys)
+def get_possible_action_text_mapping_keys(command_context, action_dict):
+    # returns the action keys available from the given action dictionary within the command context
+    context_keys = get_general_context_keys(action_dict)
     if type(command_context) is set or type(command_context) is list:
         for x in command_context:
             context_keys.append(x)
     return context_keys
 
 
+def filter_results(action_dict, curr_context):
+    # filters out only the actions for the current context
+    keys = get_possible_action_text_mapping_keys(curr_context, action_dict)
+    new_dict = dict
+    for key in keys:
+        new_dict[key] = action_dict[key]
+    return new_dict
+
+
 def log_to_console(text_list):
+    # prints the given text list as a concatenated string
     print ''.join(text_list)
 
 
@@ -348,10 +362,12 @@ def extract_arg_sections(command_str, part_indices):
 
 
 def normalize_string(text):
+    # converts text to lowercase and strips whitespace from ends.
     return text.lower().strip()
 
 
 def is_json(my_json):
+    # determines if given object is actually json
     try:
         json_obj = json.loads(my_json)
     except ValueError, e:
