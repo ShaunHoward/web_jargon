@@ -73,9 +73,9 @@ function _sendText(str){
     var url = tabs[0].url;
     _setBusy();
     var sendData = new Object();
-    sendData.input = str;
+    sendData.command = str;
     sendData.url = url;
-    sendData.sec_key = sha256_digest("any message");
+    sendData.session_id = sha256_digest("any message");
     $.post( server, JSON.stringify(sendData), function( data ) {
       console.log(data);
       var cmd = JSON.parse(data)["action"];
@@ -180,7 +180,7 @@ function displaySetup(){
 }
 
 function displayHelp(){
-  chrome.tabs.create({ url: "cheat_sheet.html" });
+  chrome.tabs.create({ url: "G_help_page.html" });
 }
 
 /**

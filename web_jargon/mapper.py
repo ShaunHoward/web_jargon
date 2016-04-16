@@ -32,7 +32,7 @@ class Mapper():
         :return: a web action for the given web action request
         """
         web_actions = None
-        if action_request is not None:
+        if action_request is not None and type(action_request) is dict and h.CMD in action_request.keys():
             # get correct web action call template
             action_call_template = self.action_call_map[action_request[h.CMD]].copy()
 

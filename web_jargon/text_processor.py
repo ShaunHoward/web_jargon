@@ -103,7 +103,7 @@ class TextProcessor():
         :return: the action request response, which will be empty or None if in error
         """
         web_action_request = None
-        if self.valid_web_jargon(text) and type(curr_url) is str and len(curr_url) > 0:
+        if self.valid_web_jargon(text) and (type(curr_url) is unicode or type(curr_url) is str) and len(curr_url) > 0:
             # extract action request from the current command and add to web action token list
             words = text.split(" ")
             words = [x for x in words if len(x) > 0]

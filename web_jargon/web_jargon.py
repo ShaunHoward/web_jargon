@@ -11,9 +11,6 @@ urls = ("/.*", "WebJargon")
 web_app = web.application(urls, globals())
 err_msg = "Error: Command could not be processed.\n"
 
-# use this template to send the text request
-json_template = "{\"request\":\"open my friends list on facebook.\"}"
-
 
 class WebJargon():
     # store mapper and processor instances for fast usage via server cache
@@ -31,10 +28,12 @@ class WebJargon():
         try:
             # parse out json request with text command and current page URL
             request = web.data()
-            request_dict = json.load(request)
+            request_dict = json.loads(request)
             log_to_console(['received request: ', request])
             # extract the web actions from the given command and return a browser action response
-            return extract_web_actions(request_dict, self.processor, self.mapper)
+            resp = extract_web_actions(request_dict, self.processor, self.mapper)
+            log_to_console(['sending response: ', resp])
+            return resp
         except ValueError:
             log_to_console(["could not process Web Jargon request..."])
         return err_msg
