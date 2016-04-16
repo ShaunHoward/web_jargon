@@ -63,12 +63,14 @@ function forwardPage(){
   parent.history.forward();
 }
 
-function zoomIn(){
-  _zetZoom(currentZoom + zoomLevel);
+function zoomIn(amount){
+  var dec_amount = amount / 100;
+  _zetZoom(currentZoom + dec_amount);
 }
 
-function zoomOut(){
-  _zetZoom(currentZoom - zoomLevel);
+function zoomOut(amount)
+  var dec_amount = amount / 100;
+  _zetZoom(currentZoom - dec_amount);
 }
 
 function click(str){
@@ -129,13 +131,13 @@ function nextSong(){
   btn.click();
 }
 
-function searchMusic(artist, album, song){
+function searchMusic(artist_info){
   var frame = $("#suggest");
   var contents = frame.contents();
   var input = contents.find("input[class='form-control focus']");
   input.focus();
   input.keypress();
-  input.val(artist);
+  input.val(artist_info);
   input.keypress();
   lastEditedInput = input;
   /*input.trigger(
