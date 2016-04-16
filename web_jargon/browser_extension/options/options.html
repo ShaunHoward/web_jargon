@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head><title>WebJargon Extension Options</title>
+<style>
+  #save{
+    position: relative;
+    float: right;
+    bottom: 20px;
+  }
+</style>
 </head>
 <body>
 
 Server url:
 <input type="text" id="serverURL"></br>
+For a local server: http://localhost:8080/</br></br>
+Audio response:
+<input type="checkbox" id="audioResponse"></br>
+Text response:
+<input type="checkbox" id="textResponse"></br>
 
+</br>
 <div id="msg"></div>
 <button id="save">Save</button>
 
