@@ -126,13 +126,13 @@ function _onSuccess(inputStr, func, params){
   }
 }
 
-function openUrl(u, currentTab){
+function openURL(u, currentTab){
   if(!currentTab){
    openTab(u);
    return;
   }
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-    chrome.tabs.update(tabs[0].id, {url: u});
+    chrome.tabs.update(tabs[0].id, {url: "www."+u+".com")});
   });
 }
 
@@ -140,7 +140,7 @@ function openTab(u){
   if (u == undefined){
     u = "www.google.com";
   }
-  chrome.tabs.create({url: u});
+  chrome.tabs.create({url: "www."+u+".com")});
 }
 
 /**
@@ -267,6 +267,29 @@ function _loadOptions(){
   server = localStorage["serverURL"];
   audioResponse = localStorage["audioResponse"] == "false" ? false : true;
   textResponse = localStorage["textResponse"] == "false" ? false : true;
+}
+
+function _getURL(name){
+  var fullURL = "http://www."+name+".com";
+  alert(_websiteExists(fullURL));
+  return _websiteExists(fullURL) ? fullURL : "http://www.google.com/#q="+name;
+}
+
+function _websiteExists(url){
+  var request;
+  if(window.XMLHttpRequest){
+    request = new XMLHttpRequest();
+  }
+  else{
+    request = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  request.open('HEAD', url, false);
+  request.send(); // there will be a 'pause' here until the response to come.
+  // the object request will be actually modified
+  if (request.status === 404) {
+    return false;
+  }
+  return true;
 }
 
 function _startRecognition(){
