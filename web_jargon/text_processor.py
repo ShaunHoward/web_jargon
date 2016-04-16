@@ -91,8 +91,7 @@ class TextProcessor():
         :param text: the web jargon request
         :return: whether the input text is valid web jargon aka good English, no weird characters
         """
-        return (type(text) is str or type(text) is unicode)\
-            and len(text) > 0 and len(self.web_jargon_matcher.match(text).group()) > 0
+        return h.is_text_type(text) and len(text) > 0 and len(self.web_jargon_matcher.match(text).group()) > 0
 
     def process_web_action_request(self, text, curr_url):
         """
@@ -103,7 +102,7 @@ class TextProcessor():
         :return: the action request response, which will be empty or None if in error
         """
         web_action_request = None
-        if self.valid_web_jargon(text) and (type(curr_url) is unicode or type(curr_url) is str) and len(curr_url) > 0:
+        if self.valid_web_jargon(text) and h.is_text_type(curr_url) and len(curr_url) > 0:
             # extract action request from the current command and add to web action token list
             words = text.split(" ")
             words = [x for x in words if len(x) > 0]
@@ -207,7 +206,7 @@ class TextProcessor():
                                 parsed_arg = self.match_arg(arg_type, curr_command_words, arg_sections)
                                 if (type(parsed_arg) == int and parsed_arg > 0)\
                                         or (type(parsed_arg) == list
-                                            or type(parsed_arg) == str and len(parsed_arg) > 0):
+                                            or h.is_text_type(parsed_arg) and len(parsed_arg) > 0):
                                     args[arg_type] = parsed_arg
                         matches.append((action_key, " ".join(u_map[h.PARTS]), args, min(indices[:][0])))
 
@@ -313,7 +312,7 @@ class TextProcessor():
                 # extract the proper pattern
                 pattern = self.PATTERN_DICT[arg_type]
                 # The pattern may be a function call, strings mean regex patterns are given
-                if type(pattern) is not str:
+                if not h.is_text_type(pattern):
                     # match using a matching function that is callable
                     valid_match = False
                     for arg_section in arg_sections:

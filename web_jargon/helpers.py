@@ -68,7 +68,7 @@ youtube = "https://www.youtube.com/watch?v=wYUSPkssfIY"
 def determine_url_context(curr_url):
     # determines the context of the provided url
     context = set()
-    if type(curr_url) is str:
+    if is_text_type(curr_url):
         for domain in DOMAINS.keys():
             if domain in curr_url:
                 context = DOMAINS[domain]
@@ -103,7 +103,7 @@ def get_possible_action_text_mapping_keys(command_context, action_dict):
     if type(command_context) is set or type(command_context) is list:
         for x in command_context:
             context_keys.append(x)
-    elif type(command_context) is str:
+    elif is_text_type(command_context):
         # or resolve context string to a pre-defined context set
         context_keys_ = []
         if command_context == "V":
@@ -385,3 +385,6 @@ def is_json(my_json):
     except ValueError, e:
         return False
     return True
+
+def is_text_type(string):
+    return type(string) is str or type(string) is unicode

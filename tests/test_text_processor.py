@@ -79,11 +79,11 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.CLOSE_TAB)
 
     def test_switch_tab(self):
-        template_phrases = ["switch to tab three", "switch to tab google", "switch to Facebook", "change to CNN", "open tab Spotify", "open tab 10",
+        template_phrases = ["switch to tab Facebook", "switch to tab three", "switch to tab google", "switch to Facebook", "change to CNN", "open tab Spotify", "open tab 10",
                            "open the twelfth tab", "switch to the first tab",
                            "change to Facebook tab", "change to tab four", "change to Pandora",
                             "change tab to tab 4", "change tab to the weather"]
-        args = [[3], ["google"], ["facebook"], ["cnn"], ["spotify"], [10], [12], [1], ["facebook"], [4], ["pandora"], [4], ["the weather"]]
+        args = [["facebook"], [3], ["google"], ["facebook"], ["cnn"], ["spotify"], [10], [12], [1], ["facebook"], [4], ["pandora"], [4], ["the weather"]]
         self.validate_phrases(template_phrases, h.SWITCH_TAB, args)
 
     def test_forward_page(self):
