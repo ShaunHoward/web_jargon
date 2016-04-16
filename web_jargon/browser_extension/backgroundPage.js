@@ -134,12 +134,12 @@ function closeTab(tabId){
   } else if (typeof(tabId) == "string") {
     //tab id is a string
     chrome.tabs.query({currentWindow: true}, function (tabs) {
-        regex = new RegExp(tabId);
-        for (t in tabs){
-          if(tabs[t].title.match(regex)){
-            chrome.tabs.remove(tabs[t].id);
-          }
+      for (t in tabs){
+        lower_title = tabs[t].title.toLowerCase();
+        if(lower_title.indexOf(tabId) > -1){
+          chrome.tabs.remove(tabs[t].id);
         }
+      }
     });
   }
   return;
@@ -163,13 +163,13 @@ function switchTab(tabId){
     });
   } else if (typeof(tabId) == "string") {
       //tab id is a string
-      str_to_match = tabId.toLowerCase();
       chrome.tabs.query({currentWindow: true}, function (tabs) {
-            for (t in tabs){
-              if(tabs[t].title.indexOf(str_to_match) > -1){
-                chrome.tabs.update(tabs[t].id, {active: true});
-              }
-            }
+        for (t in tabs){
+          lower_title = tabs[t].title.toLowerCase();
+          if(lower_title.indexOf(tabId) > -1){
+            chrome.tabs.update(tabs[t].id, {active: true});
+          }
+        }
       });
   }
   return;
