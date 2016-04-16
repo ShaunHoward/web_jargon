@@ -132,7 +132,7 @@ function openURL(u, currentTab){
    return;
   }
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-    chrome.tabs.update(tabs[0].id, {url: "www."+u+".com")});
+    chrome.tabs.update(tabs[0].id, {url: "www."+u+".com"});
   });
 }
 
@@ -140,7 +140,7 @@ function openTab(u){
   if (u == undefined){
     u = "www.google.com";
   }
-  chrome.tabs.create({url: "www."+u+".com")});
+  chrome.tabs.create({url: "www."+u+".com"});
 }
 
 /**

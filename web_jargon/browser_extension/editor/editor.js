@@ -5,6 +5,13 @@ var zoomLevel = .25;
 var currentZoom = parseInt($('body').css('zoom'));//TODO css is not updated after a zoom
 var lastEditedInput = null;
 
+//from https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
+$.expr[":"].containsci = $.expr.createPseudo(function(arg) {
+    return function( elem ) {
+        return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+    };
+});
+
 /**
  * Called from the background page.
  */
@@ -72,7 +79,7 @@ function zoomOut(){
 }
 
 function click(str){
-  var b = $("a:contains("+str+")").first();
+  var b = $("a:containsci("+str+")").first();
   b[0].click();
 }
 
