@@ -70,7 +70,11 @@ function _processText(str){
 
 function _sendText(str){
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-    var url = tabs[0].url;
+    if (tabs != undefined) {
+        var url = tabs[0].url;
+    } else {
+        var url = "www.google.com";
+    }
     _setBusy();
     var sendData = new Object();
     sendData.command = str;
@@ -104,15 +108,15 @@ function openUrl(u, currentTab){
    return;
   }
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-    chrome.tabs.update(tabs[0].id, {url:  "http://www."+u+".com"});
+    chrome.tabs.update(tabs[0].id, {url: u});
   });
 }
 
 function openTab(u){
   if (u == undefined){
-    u = "google";
+    u = "www.google.com";
   }
-  chrome.tabs.create({ url: "http://www."+u+".com" });
+  chrome.tabs.create({url: u});
 }
 
 /**
@@ -121,25 +125,24 @@ if input is number: Closes via index from left (0-start)
 if input is string: Closes tabs which contain input string
 */
 function closeTab(tabId){
+  // do not execute action if tab id is undefined
   if(tabId == undefined){
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-      chrome.tabs.remove(tabs[0].id);
+    return;
+  }
+  if (typeof(tabId) == "number") {
+    _closeTabAtIndex(tabId);
+  } else if (typeof(tabId) == "string") {
+    //tab id is a string
+    chrome.tabs.query({currentWindow: true}, function (tabs) {
+        regex = new RegExp(tabId);
+        for (t in tabs){
+          if(tabs[t].title.match(regex)){
+            chrome.tabs.remove(tabs[t].id);
+          }
+        }
     });
   }
-  else if(typeof tabId != "string"){
-    chrome.tabs.query({index: tabId, currentWindow: true}, function (tabs) {
-      chrome.tabs.remove(tabs[0].id);
-    });
-  } else{
-  //tab id is a string
-  chrome.tabs.query({currentWindow: true}, function (tabs) {
-    for (t in tabs){
-      if(tabs[t].title.match(new RegExp(tabId))){
-        chrome.tabs.remove(tabs[t].id);
-      }
-    }
-  });
-  }
+  return;
 }
 
 /**
@@ -148,29 +151,32 @@ if input is number: Chooses via index from left (0-start)
 if input is string: Chooses first tab which contains input string
 */
 function switchTab(tabId){
+  // do not execute action if tab id is undefined
   if(tabId == undefined){
     return;
   }
-  if(typeof tabId != "string"){
-    chrome.tabs.query({index: tabId, currentWindow: true}, function (tabs) {
-      chrome.tabs.update(tabs[0].id, {active: true});
+  if (typeof(tabId) == "number") {
+    chrome.tabs.query({currentWindow: true}, function (tabs) {
+        if (0 < tabId && tabId < tabs.length){
+           chrome.tabs.update(tabs[tabId-1].id, {active: true});
+        }
     });
-  } else{
-  //tab id is a string
-  chrome.tabs.query({currentWindow: true}, function (tabs) {
-    for (t in tabs){
-      if(tabs[t].title.match(new RegExp(tabId))){
-        chrome.tabs.update(tabs[t].id, {active: true});
-      }
-    }
-  });
+  } else if (typeof(tabId) == "string") {
+      //tab id is a string
+      regex = new RegExp(tabId);
+      chrome.tabs.query({currentWindow: true}, function (tabs) {
+            for (t in tabs){
+              if(tabs[t].title.match(regex)){
+                chrome.tabs.update(tabs[t].id, {active: true});
+              }
+            }
+      });
   }
-
-  chrome.tabs.update(window.tabs[i].id, {active: true});
+  return;
 }
 
 function displaySetup(){
-   if (chrome.runtime.openOptionsPage) {
+  if (chrome.runtime.openOptionsPage) {
     // New way to open options pages, if supported (Chrome 42+).
     chrome.runtime.openOptionsPage();
   } else {
@@ -179,8 +185,25 @@ function displaySetup(){
   }
 }
 
-function displayHelp(){
-  chrome.tabs.create({ url: "G_help_page.html" });
+function displayHelp(show){
+  var show = Boolean(show);
+  if (show == true) {
+      chrome.tabs.create({ url: "/html_help_pages/G_help_page.html" });
+  } else {
+     closeTab("help_page");
+  }
+}
+
+function _closeFirstTab() {
+    _closeTabAtIndex(0);
+}
+
+function _closeTabAtIndex(tabIndex) {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      if (0 < tabIndex and tabIndex < tabs.length) {
+        chrome.tabs.remove(tabs[tabIndex-1].id);
+      }
+    });
 }
 
 /**
@@ -192,7 +215,7 @@ function _doCommand(cmd, params){
     window[cmd].apply(null, params);
     return;
   }
-  //if function not found in backgound page, check content script
+  //if function not found in background page, check content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
       if(response){
