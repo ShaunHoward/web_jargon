@@ -147,7 +147,8 @@ def run_help_page_creator():
     # create help pages for all contexts
     for context in CONTEXTS:
         # create and write the help page to html page
-        file_path = os.path.join(os.getcwd() + "/browser_extension/", '_'.join([str(context), "help_page.html"]))
+        file_path = os.path.join(os.getcwd() + "/browser_extension/html_help_pages/",
+                                 '_'.join([str(context), "help_page.html"]))
         html = create_help_html_page(context, action_dict)
         try:
             print "writing file to: " + file_path
