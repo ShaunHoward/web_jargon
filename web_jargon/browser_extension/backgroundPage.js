@@ -18,8 +18,6 @@ var server = localStorage["serverURL"];//"http://localhost:8080/";
 var keepListening = true;
 var asked = false;
 
-var key = (Math.random()*1e20).toString(36);
-
 var recognition = new webkitSpeechRecognition();
 recognition.continuous = true;
 recognition.interimResults = true;
@@ -73,9 +71,10 @@ function _processText(str){
 function _sendText(str){
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     var url = tabs[0].url;
+    var key = (Math.random()*1e20).toString(36);
     _setBusy();
     var sendData = new Object();
-    sendData.input = str;
+    sendData.command = str;
     sendData.url = url;
     sendData.sec_key = key;
     $.post( server, JSON.stringify(sendData), function( data ) {
@@ -182,7 +181,7 @@ function displaySetup(){
 }
 
 function displayHelp(){
-  chrome.tabs.create({ url: "cheat_sheet.html" });
+  chrome.tabs.create({ url: "G_help_page.html" });
 }
 
 /**

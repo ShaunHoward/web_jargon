@@ -24,7 +24,7 @@ class Mapper():
     def __init__(self):
         self.action_call_map = h.load_web_action_template(DEFAULT_ACTIONS_PATH)
 
-    def create_web_actions(self, action_request):
+    def create_web_action(self, action_request):
         """
         Creates the web action function call using the
         action call templates.
@@ -32,20 +32,22 @@ class Mapper():
         :return: a web action for the given web action request
         """
         web_actions = None
-        if action_request is not None:
+        if action_request is not None and type(action_request) is dict and h.CMD in action_request.keys():
             # get correct web action call template
             action_call_template = self.action_call_map[action_request[h.CMD]].copy()
 
             # add arguments to action call
-            # action_call_template[h.CMD_ARGS_DICT] = action_request[h.CMD_ARGS_DICT]
             action_call_template[h.CMD_ARGS_LIST] = []
             for arg_type in action_call_template[h.CMD_ARGS_DICT].keys():
+                # try to match expected arguments in input text
                 if arg_type in action_request[h.CMD_ARGS_DICT].keys():
                     value = action_request[h.CMD_ARGS_DICT][arg_type]
+                    # set value if an actual arg value was given with the expected type
                     if value is not None:
                         action_call_template[h.CMD_ARGS_DICT][arg_type] = value
                         action_call_template[h.CMD_ARGS_LIST].append(value)
                 else:
+                    # use the default value for this argument type from the action call template
                     action_call_template[h.CMD_ARGS_LIST].append(action_call_template[h.CMD_ARGS_DICT][arg_type])
             # append to web action call list
             web_actions = action_call_template

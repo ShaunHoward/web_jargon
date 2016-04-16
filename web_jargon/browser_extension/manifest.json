@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Web Jargon",
-  "description": "Control the web via text commands",
+  "description": "Control the web via text or voice commands",
   "version": "1.0",
 
   "browser_action": {

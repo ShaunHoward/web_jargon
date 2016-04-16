@@ -1,22 +1,15 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <style>
-   th {
-                text-align: center;
-            }
-            td {
-                padding: 4px 4px 4px 4px;
-            }
-            table {
-                border: 1px solid black;
-            }
-  </style>
+  <link href="help_style.css" rel="stylesheet" type="text/css"/>
  </head>
  <body>
   <h1>
-   Web Jargon Cheat Sheet
+   Web Jargon Help Page
   </h1>
+  <h2>
+   You are currently browsing in the document context.
+  </h2>
   <table border="1">
    <h1>
     Wake Words
@@ -93,7 +86,7 @@
    </tr>
   </table>
   <h1>
-   Action Command Templates
+   Available Action Commands and Templates
   </h1>
   <table border="1">
    <tr>
@@ -103,6 +96,43 @@
     <th>
      Command
     </th>
+    <tr>
+     <td>
+      D: GO_TO_PDF_PAGE
+     </td>
+     <td>
+      go to page number (PAGE_NUM)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go to page (PAGE_NUM)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      go to (PAGE_NUM)
+     </td>
+    </tr>
+    <tr>
+     <td>
+      D: SEARCH_PDF
+     </td>
+     <td>
+      search for (EXCERPT)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      search (EXCERPT)
+     </td>
+    </tr>
     <tr>
      <td>
       G: SCROLL_LEFT
@@ -319,6 +349,13 @@
      </td>
      <td>
       exit the tab
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      exit tab
      </td>
     </tr>
     <tr>
@@ -575,49 +612,49 @@
       G: CLICK
      </td>
      <td>
-      click (ELEMENT_NAME|LINK_NAME)
+      click (DOMAIN_NAME|ELEMENT_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      click (ELEMENT_NAME|LINK_NAME) button
+      click (DOMAIN_NAME|ELEMENT_NAME) button
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      click the (ELEMENT_NAME|LINK_NAME) button
+      click the (DOMAIN_NAME|ELEMENT_NAME) button
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      open link (ELEMENT_NAME|LINK_NAME)
+      open link (DOMAIN_NAME|ELEMENT_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      click link (ELEMENT_NAME|LINK_NAME)
+      click link (DOMAIN_NAME|ELEMENT_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      click (ELEMENT_NAME|LINK_NAME) link
+      click (DOMAIN_NAME|ELEMENT_NAME) link
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      enter (ELEMENT_NAME|LINK_NAME)
+      enter (DOMAIN_NAME|ELEMENT_NAME)
      </td>
     </tr>
     <tr>
@@ -676,33 +713,19 @@
       G: ENTER_TEXT
      </td>
      <td>
-      enter text short (EXCERPT) (WAIT=5)
+      enter text (EXCERPT)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      enter text long (EXCERPT) (WAIT=10)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      write (EXCERPT)(WAIT=5)
+      write (EXCERPT)
      </td>
     </tr>
     <tr>
      <td>
       G: SUBMIT_TEXT
-     </td>
-     <td>
-      submit text using (BUTTON_NAME)
-     </td>
-    </tr>
-    <tr>
-     <td>
      </td>
      <td>
       submit
@@ -712,21 +735,7 @@
      <td>
      </td>
      <td>
-      submit text (BUTTON_NAME)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      submit (BUTTON_NAME)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      click (BUTTON_NAME) to submit
+      submit text
      </td>
     </tr>
     <tr>
@@ -868,729 +877,42 @@
      <td>
      </td>
      <td>
-      I'm good
+      close help page
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      thanks
+      hide commands
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      I am good
+      hide help
      </td>
     </tr>
     <tr>
      <td>
-      G: OPEN_CHEAT_SHEET
      </td>
      <td>
-      open cheat sheet
+      hide hints
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      let me cheat
+      hide functions
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      display cheats
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      show cheats
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      show me cheats
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      open cheats
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      open functions
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      list all functions
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      list all commands
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      list all actions
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      show all actions
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      show all commands
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      show all hints
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      open all hints
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      display all hints
-     </td>
-    </tr>
-    <tr>
-     <td>
-      G: CLOSE_CHEAT_SHEET
-     </td>
-     <td>
-      close cheat sheet
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      close cheats
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      hide cheats
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      hide cheat sheet
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      hide sheet
-     </td>
-    </tr>
-    <tr>
-     <td>
-      G: OPEN_SETUP_PAGE
-     </td>
-     <td>
-      display setup
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      display setup page
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      open setup
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      open setup page
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      show setup
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      show setup page
-     </td>
-    </tr>
-    <tr>
-     <td>
-      G: CLOSE_SETUP_PAGE
-     </td>
-     <td>
-      hide setup
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      close setup
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      exit setup
-     </td>
-    </tr>
-    <tr>
-     <td>
-      V: START_VIDEO
-     </td>
-     <td>
-      play video
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      start video
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      start
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play movie
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      start movie
-     </td>
-    </tr>
-    <tr>
-     <td>
-      V: STOP_VIDEO
-     </td>
-     <td>
-      stop video
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop movie
-     </td>
-    </tr>
-    <tr>
-     <td>
-      V: RESTART_VIDEO
-     </td>
-     <td>
-      restart video
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      restart
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      restart movie
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      replay movie
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      replay video
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      replay
-     </td>
-    </tr>
-    <tr>
-     <td>
-      V: OPEN_FULLSCREEN
-     </td>
-     <td>
-      fullscreen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      full screen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      open fullscreen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      open full screen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      toggle fullscreen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      toggle full screen
-     </td>
-    </tr>
-    <tr>
-     <td>
-      V: CLOSE_FULLSCREEN
-     </td>
-     <td>
-      escape
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      quit
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      quit fullscreen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      close fullscreen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      close full screen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      exit fullscreen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      exit full screen
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      toggle fullscreen off
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      toggle full screen off
-     </td>
-    </tr>
-    <tr>
-     <td>
-      M: START_MUSIC
-     </td>
-     <td>
-      play spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play on spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play on pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play music
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play my music
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play song
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play tune
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      play
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      start music
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      start pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      start spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-      M: STOP_MUSIC
-     </td>
-     <td>
-      stop spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop on spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop on pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop music
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop my music
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop song
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop tune
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      stop pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-      M: NEXT_SONG
-     </td>
-     <td>
-      next on spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      next on pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      next song on spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      next song on pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      next song
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      next
-     </td>
-    </tr>
-    <tr>
-     <td>
-      M: SEARCH_MUSIC
-     </td>
-     <td>
-      search for (ARTIS
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      LBU
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      ONG)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      search for (ARTIS
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      LBU
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      ONG) in spotify (IS_SPOTIFY=true)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      search for (ARTIS
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      LBU
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      ONG) in pandora (IS_SPOTIFY=false)
-     </td>
-    </tr>
-    <tr>
-     <td>
-      D: SEARCH_PDF
-     </td>
-     <td>
-      search for (EXCERPT)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      search (EXCERPT)
-     </td>
-    </tr>
-    <tr>
-     <td>
-      D: GO_TO_PDF_PAGE
-     </td>
-     <td>
-      go to page number (PAGE_NUM)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      go to page (PAGE_NUM)
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      go to (PAGE_NUM)
+      close browsing assistance
      </td>
     </tr>
    </tr>

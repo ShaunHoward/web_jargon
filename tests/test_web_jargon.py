@@ -55,7 +55,7 @@ class WebJargonTest(unittest.TestCase):
         if len(self.action_commands[action_key]) > 0:
             # iterate through all possible action command samples
             for command in self.action_commands[action_key]:
-                request_dict = {"command": command, "sec_key": "ADFW#R$#$%$452354345345e23@#FSDFASFw3r",
+                request_dict = {"command": command, "session_id": "ADFW#R$#$%$452354345345e23@#FSDFASFw3r",
                                 "url": possible_url}
                 # get the json action response and validate it
                 json_actions = wj.extract_web_actions(request_dict, self.processor, self.mapper)
