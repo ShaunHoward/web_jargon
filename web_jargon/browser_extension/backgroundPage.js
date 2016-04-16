@@ -13,7 +13,11 @@ audio_fail.src = "audio/fail.wav";
 var startPhrases = ["web jargon", "browser", "chrome"];
 var stopPhrases = ["stop web jargon", "stop listening"];
 
-var server = localStorage["serverURL"];//"http://localhost:8080/";
+
+var server;
+var audioResponse;
+var textResponse;
+_loadOptions();
 
 var keepListening = true;
 var asked = false;
@@ -26,7 +30,7 @@ recognition.onerror = function(event) {
   //check if microphone is available
   if(event.error == 'not-allowed' && asked == false){
    asked = true;
-    _getAudioPermission();
+   _getAudioPermission();
   }
 }
 recognition.onresult = function(event) {
@@ -70,23 +74,29 @@ function _processText(str){
 
 function _sendText(str){
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+    var url;
     if (tabs != undefined) {
-        var url = tabs[0].url;
+        url = tabs[0].url;
     } else {
-        var url = "www.google.com";
+        url = "www.google.com";
     }
+    var key = (Math.random()*1e20).toString(36);
     _setBusy();
     var sendData = new Object();
     sendData.command = str;
     sendData.url = url;
-    sendData.session_id = sha256_digest("any message");
+    sendData.session_id = key;
     $.post( server, JSON.stringify(sendData), function( data ) {
       console.log(data);
       var cmd = JSON.parse(data)["action"];
       var func = cmd["action"];
-      var params = cmd["arg_list"]; 
-      var msg = _doCommand(func, params);
-      _showResult(str, func, params);
+      var params = cmd["arg_list"];
+      if(func != null){
+        var msg = _doCommand(func, params);
+        _onSuccess(str, func, params);
+      } else{
+        _onError();
+      }
     })
     .fail(function() {
       _setError();
@@ -96,10 +106,24 @@ function _sendText(str){
   });
 }
 
-function _showResult(inputStr, func, params){
-  _doCommand("_addMessage",[func]);
+function _onError(){
   _setReady();
-  audio_success.play(); 
+  if(audioResponse){
+    audio_fail.play();
+  }
+  if(textResponse){
+    _doCommand("_addMessage",["no match"]);
+  }
+}
+
+function _onSuccess(inputStr, func, params){
+  _setReady();
+  if(audioResponse){
+    audio_success.play(); 
+  }
+  if(textResponse){
+    _doCommand("_addMessage",[func]);
+  }
 }
 
 function openUrl(u, currentTab){
@@ -227,6 +251,22 @@ function _doCommand(cmd, params){
 
 function _getAudioPermission(){
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
+}
+
+function _loadOptions(){
+  //set defaults if needed
+  if(localStorage["serverURL"] == undefined){
+    localStorage["serverURL"] == "http://localhost:8080/";
+  }
+  if(localStorage["audioResponse"] == undefined){
+    localStorage["audioResponse"] == true;
+  }
+  if(localStorage["textResponse"] == undefined){
+    localStorage["textResponse"] == true;
+  }
+  server = localStorage["serverURL"];
+  audioResponse = localStorage["audioResponse"] == "false" ? false : true;
+  textResponse = localStorage["textResponse"] == "false" ? false : true;
 }
 
 function _startRecognition(){
