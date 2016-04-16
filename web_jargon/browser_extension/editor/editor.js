@@ -72,12 +72,12 @@ function forwardPage(){
 
 function zoomIn(amount){
   var dec_amount = amount / 100;
-  _zetZoom(currentZoom + dec_amount);
+  _setZoom(currentZoom + dec_amount);
 }
 
-function zoomOut(amount)
+function zoomOut(amount){
   var dec_amount = amount / 100;
-  _zetZoom(currentZoom - dec_amount);
+  _setZoom(currentZoom - dec_amount);
 }
 
 function click(str){
@@ -90,7 +90,17 @@ function enterText(str){
 }
 
 function selectElement(name){
-  var e = $("input[placeholder*='"+name+"']");
+  var re =  RegExp(name ,"i"); 
+  var e;
+  e = $("input[placeholder]").filter(function() {
+   return re.test(this.placeholder);
+  }).first();
+
+  if(e.val() == undefined){
+    e = $("input[title]").filter(function() {
+      return re.test(this.title);
+    }).first();
+  }
   lastEditedInput = e;
   e.focus();
 }
@@ -162,7 +172,7 @@ function goToPage(num){
   window.location.href = window.location.href.split("#page")[0]+"#page="+num;
 }
 
-function _zetZoom(z){
+function _setZoom(z){
   $('body').css('zoom', z.toString());
   currentZoom = z;
 }

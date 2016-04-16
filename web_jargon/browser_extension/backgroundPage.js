@@ -89,14 +89,14 @@ function _sendText(str){
     $.post( server, JSON.stringify(sendData), function( data ) {
       console.log(data);
       var cmd = JSON.parse(data)["action"];
+      if(cmd == null){
+        _onError();
+        return;
+      }
       var func = cmd["action"];
       var params = cmd["arg_list"];
-      if(func != null){
-        var msg = _doCommand(func, params);
-        _onSuccess(str, func, params);
-      } else{
-        _onError();
-      }
+      var msg = _doCommand(func, params);
+      _onSuccess(str, func, params);
     })
     .fail(function() {
       _setError();
