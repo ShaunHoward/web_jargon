@@ -68,22 +68,23 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.ZOOM_OUT, args)
 
     def test_open_new_tab(self):
-        template_phrases = ["open a tab facebook.com", "open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab",
+        template_phrases = ["open tab Spotify", "open tab cnn", "open a tab facebook.com", "open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab",
                             "create new tab"]
-        args = [['facebook.com']] + [['google.com'] for i in range(len(template_phrases))]
+        args = [["spotify"], ["cnn"], ['facebook.com']] + [['google.com'] for i in range(len(template_phrases))]
         self.validate_phrases(template_phrases, h.OPEN_TAB, args)
 
     def test_close_tab(self):
-        template_phrases = ["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab",
-                            "exit the tab"]
-        self.validate_phrases(template_phrases, h.CLOSE_TAB)
+        template_phrases = ["close tab three", "close tab facebook", "exit tab 2", "exit tab StackOverflow", "leave tab twelve", "leave tab google"]
+        args = [[3], ["facebook"], [2], ["stackoverflow"], [12], ["google"]]
+        self.validate_phrases(template_phrases, h.CLOSE_TAB, args)
 
     def test_switch_tab(self):
-        template_phrases = ["switch to tab Facebook", "switch to tab three", "switch to tab google", "switch to Facebook", "change to CNN", "open tab Spotify", "open tab 10",
-                           "open the twelfth tab", "switch to the first tab",
-                           "change to Facebook tab", "change to tab four", "change to Pandora",
-                            "change tab to tab 4", "change tab to the weather"]
-        args = [["facebook"], [3], ["google"], ["facebook"], ["cnn"], ["spotify"], [10], [12], [1], ["facebook"], [4], ["pandora"], [4], ["the weather"]]
+        template_phrases = ["switch to facebook", "switch to four", "switch to tab three", "switch to tab google.com",
+                            "switch to Facebook", "change to CNN", "open the twelfth tab", "switch to the first tab", "change to Facebook tab",
+                            "change to tab four", "change to Pandora", "change tab to tab 4",
+                            "change tab to the weather"]
+
+        args = [["facebook"], [4], [3], ["google.com"], ["facebook"], ["cnn"], [12], [1], ["facebook"], [4], ["pandora"], [4], ["the weather"]]
         self.validate_phrases(template_phrases, h.SWITCH_TAB, args)
 
     def test_forward_page(self):

@@ -14,9 +14,9 @@ ZOOM_IN:["zoom in by (PERCENT)", "zoom in (PERCENT=25)", "zoom (PERCENT=25)", "z
 ZOOM_OUT:["zoom out by (PERCENT)", "zoom out (PERCENT=25)", "zoom away (PERCENT=25)", "zoom smaller (PERCENT=25)", "zoom out (PERCENT=25)"]
 
 # requirement 4.5
-OPEN_TAB:["open a tab (DOMAIN_NAME=google.com)", "open a new tab (DOMAIN_NAME=google.com)", "new tab (DOMAIN_NAME=google.com)", "open new tab (DOMAIN_NAME=google.com)", "create tab (DOMAIN_NAME=google.com)", "create a new tab (DOMAIN_NAME=google.com)", "create new tab (DOMAIN_NAME=google.com)"]
-CLOSE_TAB:["close tab", "close this tab", "close my tab", "exit this tab", "leave this tab", "exit the tab", "exit tab"]
-SWITCH_TAB:["switch to tab (TAB_INDEX|TAB_NAME)", "open tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME) tab", "change to (TAB_INDEX|TAB_NAME)", "open the (TAB_INDEX) tab"]
+OPEN_TAB:["open tab (DOMAIN_NAME|TAB_NAME)", "open a tab (DOMAIN_NAME|TAB_NAME)", "open a new tab (DOMAIN_NAME|TAB_NAME)", "new tab (DOMAIN_NAME|TAB_NAME)", "open new tab (DOMAIN_NAME|TAB_NAME)", "create tab (DOMAIN_NAME|TAB_NAME)", "create a new tab (DOMAIN_NAME|TAB_NAME)", "create new tab (DOMAIN_NAME|TAB_NAME)"]
+CLOSE_TAB:["close tab (TAB_INDEX|TAB_NAME)", "exit tab (TAB_INDEX|TAB_NAME)", "leave tab (TAB_INDEX|TAB_NAME)"]
+SWITCH_TAB:["open existing (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "switch to tab (TAB_INDEX|TAB_NAME)", "change to tab (TAB_INDEX|TAB_NAME)", "switch tab to (TAB_INDEX|TAB_NAME)", "change tab to (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME)", "change to (TAB_INDEX|TAB_NAME) tab", "change to (TAB_INDEX|TAB_NAME)", "open the (TAB_INDEX) tab"]
 
 # requirement 4.6
 FORWARD:["forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead"]
