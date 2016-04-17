@@ -91,36 +91,38 @@ function _sendText(str){
     sendData.session_id = key;
     $.post( server, JSON.stringify(sendData), function( data ) {
       console.log(data);
+      var ret_id = JSON.parse(data)["session_id"];
+      if(key != ret_id){
+        return; //unknown response
+      }
       var cmd = JSON.parse(data)["action"];
       if(cmd == null){
-        _onError();
+        _onError("command not found");
         return;
       }
       var func = cmd["action"];
       var params = cmd["arg_list"];
-      var msg = _doCommand(func, params);
+      var msg = _doCommand(func, params, url);
+      _setReady();
       _onSuccess(str, func, params);
     })
     .fail(function() {
+      _onError("could not connect to server");
       _setError();
-      _doCommand("_addMessage",["Could not connect to server"]);
-      audio_fail.play();
     });
   });
 }
 
-function _onError(){
-  _setReady();
+function _onError(msg){
   if(audioResponse){
     audio_fail.play();
   }
   if(textResponse){
-    _doCommand("_addMessage",["no match"]);
+    _doCommand("_addMessage",[msg]);
   }
 }
 
 function _onSuccess(inputStr, func, params){
-  _setReady();
   if(audioResponse){
     audio_success.play(); 
   }
@@ -237,14 +239,14 @@ function _closeTabAtIndex(tabIndex) {
 Executes input command
 Checks background page functions first, then checks current tab functions
 */
-function _doCommand(cmd, params){
+function _doCommand(cmd, params, curr_url){
   if (typeof window[cmd] == 'function') { 
     window[cmd].apply(null, params);
     return;
   }
   //if function not found in background page, check content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
+    chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params, url: curr_url}, function(response) {
       if(response){
         return response;
       }

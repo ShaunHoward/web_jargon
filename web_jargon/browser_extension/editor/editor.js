@@ -4,6 +4,7 @@ The editor controls tab-specific functions. It receives commands from the backgr
 var zoomLevel = .25;
 var currentZoom = parseInt($('body').css('zoom'));//TODO css is not updated after a zoom
 var lastEditedInput = null;
+var url = null;
 
 //from https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
 $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
@@ -18,6 +19,7 @@ $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (typeof window[request.func] == 'function') {
+      url = request.url;
       window[request.func].apply(null, request.params);
     } else{
       //sendResponse({msg: "not found"}); 
@@ -128,43 +130,44 @@ function closeFullscreen(){
 }
 
 function playMusic(){
-  var frame = $("#app-player");
-  var contents = frame.contents();
-  var btn = contents.find("button[id='play-pause']");
-  btn.click();
+  if(url.indexOf("pandora") >= 0){
+    $(".playButton").click();
+  } else{
+    var frame = $("#app-player");
+    var contents = frame.contents();
+    var btn = contents.find("button[id='play-pause']");
+    btn.click();
+  }
 }
 
 function pauseMusic(){
-  var frame = $("#app-player");
-  var contents = frame.contents();
-  var btn = contents.find("button[id='play-pause']");
-  btn.click();
+  if(url.indexOf("pandora") >= 0){
+    $(".pauseButton").click();
+  } else{
+    var frame = $("#app-player");
+    var contents = frame.contents();
+    var btn = contents.find("button[id='play-pause']");
+    btn.click();
+  }
 }
 
 function nextSong(){
-  var frame = $("#app-player");
-  var contents = frame.contents();
-  var btn = contents.find("button[id='next']");
-  btn.click();
+  if(url.indexOf("pandora") >= 0){
+    $(".skipButton").click();
+  } else{
+    var frame = $("#app-player");
+    var contents = frame.contents();
+    var btn = contents.find("button[id='next']");
+    btn.click();
+  }
 }
 
 function searchMusic(artist_info){
-  var frame = $("#suggest");
-  var contents = frame.contents();
-  var input = contents.find("input[class='form-control focus']");
-  input.focus();
-  input.keypress();
-  input.val(artist_info);
-  input.keypress();
-  lastEditedInput = input;
-  /*input.trigger(
-      jQuery.Event( 'keydown', { keyCode: 69, which: 69 } )
-  );*/
-  //alert("done");
-  //submitText();
-  
-  //lastEditedInput.val(artist);//(artist+" "+album+" "+song);
-  //submitText();
+  if(url.indexOf("pandora") >= 0){
+    window.location.href = "http://www.pandora.com/search/"+artist_info;
+  } else{
+    window.location.href = "http://play.spotify.com/search/"+artist_info;
+  }
 }
 
 function goToPage(num){
