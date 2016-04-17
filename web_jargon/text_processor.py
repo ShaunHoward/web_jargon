@@ -48,12 +48,14 @@ class TextProcessor():
     basic_name_pattern = "[a-zA-Z\s\.]+$"
     valid_web_jargon_pattern = "^[\s\w\d\>\<\;\,\{\}\[\]\-\_\+\=\!\@\#\$\%\^\&\*\|\'\.\:\(\)\\\/\"\?]+$"
     url_pattern = ".* ?(\.|dot){0,1} ?[a-z]{2,3}"
+    percentage_pattern = "\d+ ?(%|percent)"
 
     # store pre-compiled matchers for fast matching
     basic_name_matcher = None
     web_jargon_matcher = None
     words_to_numbers = None
     url_matcher = None
+    percent_matcher = None
 
     # initialize action-text mapping dict and patter_dict
     action_text_mappings = dict()
@@ -66,13 +68,14 @@ class TextProcessor():
         self.basic_name_matcher = re.compile(self.basic_name_pattern)
         self.web_jargon_matcher = re.compile(self.valid_web_jargon_pattern)
         self.url_matcher = re.compile(self.url_pattern)
+        self.percent_matcher = re.compile(self.percentage_pattern)
         self.action_text_mappings = h.load_web_action_template(h.DEFAULT_ACTIONS_PATH, False)
         self.split_action_keys = [x.split("_") for x in self.action_text_mappings.keys()]
 
     def create_argument_pattern_dict(self):
         # creates a dictionary from command argument token type to the callable match function to parse that argument
         self.PATTERN_DICT = {'ELEMENT_NAME': self.match_web_jargon, 'NUM_PAGES': self.words_to_numbers.parse,
-                             'PERCENT': self.words_to_numbers.parse, 'TAB_INDEX': self.tab_index,
+                             'PERCENT': self.percentage, 'TAB_INDEX': self.tab_index,
                              'TAB_NAME': self.basic_names, 'URL': self.url, 'FORM_NAME': self.basic_names,
                              'EXCERPT': self.match_web_jargon, 'BUTTON_NAME': self.basic_names, 'DOMAIN_NAME': self.url,
                              'PAGE_NUM': self.words_to_numbers.parse, 'ARTIST_INFO': self.match_web_jargon}
@@ -260,6 +263,30 @@ class TextProcessor():
         if result < 0:
             result = self.get_index(words.split(" "))
         return result
+
+    def percentage(self, words):
+        """
+        Try to match the given words string to a regular expression for percentages
+        or use the number parser for long-form words.
+        :param words: the word string that might contain a percentage-like number
+        :return: the first match for a percentage in the string
+        """
+        parsed_arg = ''
+        # try to match the percentage pattern
+        match = self.percent_matcher.match(words)
+        # check if match is valid
+        if match is not None and len(match.group()) > 0:
+            # extract match
+            parsed_arg = match.group()
+            # remove percent and strip off whitespace
+            parsed_arg = parsed_arg.rstrip("%").rstrip("percent").strip()
+        # check if nothing was found to match
+        if len(parsed_arg) == 0:
+            # try to use number parser to extract percentage
+            result = self.words_to_numbers.parse(words)
+            if result >= 0:
+                parsed_arg = result
+        return parsed_arg
 
     @staticmethod
     def get_index(words):

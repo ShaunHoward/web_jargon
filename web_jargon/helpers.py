@@ -57,7 +57,7 @@ DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 VIDEO_CONTEXT = {PLAY_VIDEO, PAUSE_VIDEO, NEXT_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
 MUSIC_CONTEXT = {PLAY_MUSIC, PAUSE_MUSIC, NEXT_SONG, SEARCH_MUSIC}
 DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
-DOMAINS = {"youtube": VIDEO_CONTEXT, "pandora": MUSIC_CONTEXT, "spotify": MUSIC_CONTEXT, ".pdf": DOC_CONTEXT}
+DOMAINS = {"facebook": VIDEO_CONTEXT, "youtube": VIDEO_CONTEXT, "pandora": MUSIC_CONTEXT, "spotify": MUSIC_CONTEXT, ".pdf": DOC_CONTEXT}
 
 spot = "https://play.spotify.com/browse"
 pandora = "http://www.pandora.com/station/play/2880225754266056244"

@@ -33,6 +33,7 @@ recognition.onerror = function(event) {
    _getAudioPermission();
   }
 }
+
 recognition.onresult = function(event) {
   var final_transcript = "";
   var interim_transcript = "";
@@ -46,6 +47,7 @@ recognition.onresult = function(event) {
     }
   }
 }
+
 recognition.onend = function() {
   if(keepListening){
     recognition.start();
@@ -53,6 +55,7 @@ recognition.onend = function() {
     listening = false;
   }
 }
+
 recognition.onstart = function(){
 }
 
