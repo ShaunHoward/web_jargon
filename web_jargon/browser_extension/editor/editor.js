@@ -135,6 +135,18 @@ function pauseVideo(){
   });
 }
 
+function nextVideo(){
+  var doc = $(window).scrollTop();
+  $("a[title='Next']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      window.location.href = $(this).attr("href");
+      return false;
+    }
+  });
+}
+
+
 function openFullscreen(){
   var doc = $(window).scrollTop();
   $("button[aria-label='Full screen']").each(function(){
@@ -223,7 +235,7 @@ function _scrollVertical(dest){
 }
 
 function _addMessage(str){
-  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:5px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
+  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:45px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
   $("#WebJargonInfo").fadeOut(2000, function(){
     $("#WebJargonInfo").remove();
   });
