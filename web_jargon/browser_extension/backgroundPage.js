@@ -88,36 +88,38 @@ function _sendText(str){
     sendData.session_id = key;
     $.post( server, JSON.stringify(sendData), function( data ) {
       console.log(data);
+      var ret_id = JSON.parse(data)["session_id"];
+      if(key != ret_id){
+        return; //unknown response
+      }
       var cmd = JSON.parse(data)["action"];
       if(cmd == null){
-        _onError();
+        _onError("command not found");
         return;
       }
       var func = cmd["action"];
       var params = cmd["arg_list"];
       var msg = _doCommand(func, params);
+      _setReady();
       _onSuccess(str, func, params);
     })
     .fail(function() {
+      _onError("could not connect to server");
       _setError();
-      _doCommand("_addMessage",["Could not connect to server"]);
-      audio_fail.play();
     });
   });
 }
 
-function _onError(){
-  _setReady();
+function _onError(msg){
   if(audioResponse){
     audio_fail.play();
   }
   if(textResponse){
-    _doCommand("_addMessage",["no match"]);
+    _doCommand("_addMessage",[msg]);
   }
 }
 
 function _onSuccess(inputStr, func, params){
-  _setReady();
   if(audioResponse){
     audio_success.play(); 
   }
