@@ -114,19 +114,49 @@ function submitText(){
 }
 
 function playVideo(){
-  $("button[aria-label='Play']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Play']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
 }
 
 function pauseVideo(){
-  $("button[aria-label='Pause']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Pause']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
 }
 
 function openFullscreen(){
-  $("button[title='Full screen']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Full screen']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
+
 }
 
 function closeFullscreen(){
-  $("button[title='Exit full screen']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Exit full screen']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
+
 }
 
 function playMusic(){
