@@ -11,8 +11,6 @@ var audio_fail = new Audio();
 audio_fail.src = "audio/fail.mp3";
 
 var startPhrases = ["web jargon", "browser", "chrome"];
-var stopPhrases = ["stop web jargon", "stop listening"];
-
 
 var server;
 var audioResponse;
@@ -90,7 +88,13 @@ function _sendText(str){
     sendData.url = url;
     sendData.session_id = key;
     $.post( server, JSON.stringify(sendData), function( data ) {
-      console.log(data);
+      // try to log data, otherwise, server is in error
+      try {
+        console.log(data);
+      } catch (err) {
+        console.log("server needs to be configured...");
+        return;
+      }
       var ret_id = JSON.parse(data)["session_id"];
       if(key != ret_id){
         return; //unknown response
@@ -102,13 +106,18 @@ function _sendText(str){
       }
       var func = cmd["action"];
       var params = cmd["arg_list"];
-      var context = cmd["context"]
+      var context = cmd["context"];
       var msg = _doCommand(func, params, context);
       _setReady();
-      _onSuccess(str, func, params);
+      if (msg != "error"){
+        _onSuccess(str, func, params);
+      } else {
+        _onError("error executing action, please try again...");
+        _setError();
+      }
     })
     .fail(function() {
-      _onError("could not connect to server");
+      _onError("could not connect to server...");
       _setError();
     });
   });
@@ -133,20 +142,46 @@ function _onSuccess(inputStr, func, params){
 }
 
 function openURL(u, currentTab){
-  if(!currentTab){
-   openTab(u);
-   return;
-  }
-  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-    chrome.tabs.update(tabs[0].id, {url: "http://www."+u+".com"});
-  });
-}
-
-function openTab(u){
   if (u == undefined){
     u = "google";
   }
-  chrome.tabs.create({url: "http://www."+u+".com"});
+  // either resolve the input domain name/url or create a google search
+  u = _resolveOrSearch(u);
+  if(currentTab){
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      chrome.tabs.update(tabs[0].id, {url: u});
+    });
+  } else {
+    chrome.tabs.create({url: u});
+  }
+}
+
+function _norm_url(u) {
+  u.trim();
+  var http = "http://";
+  var www = "www.";
+  var com = ".com";
+
+  // add www. to front of url to go to the world-wide web
+  if (u.indexOf(www) < 0) {
+    u = www.concat(u);
+  }
+  // add http:// to front of url to go to correct protocol
+  if (u.indexOf(http) < 0) {
+    u = http.concat(u);
+  }
+
+  // try to find .com or ..*{2,3}
+  //matches = u.match(".* ?(//.|dot){0,1} ?[a-z]{2,3}");
+  if (matches == undefined) {
+    // if no match was found, add .com to give url a chance
+    u = u.concat(com);
+  }
+  return u;
+}
+
+function openTab(u){
+  openURL(u, false);
 }
 
 /**
@@ -247,6 +282,8 @@ function _doCommand(cmd, params, context){
     chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
       if(response){
         return response;
+      } else {
+        return "error";
       }
   });
 });
@@ -275,7 +312,9 @@ function _loadOptions(){
   var sendData = new Object();
   sendData.command = "test";
   sendData.url = "test";
-  sendData.session_id = 1234;
+
+  var key = 1234;
+  sendData.session_id = key;
   $.post( server, JSON.stringify(sendData), function( data ) {
     var ret_id = JSON.parse(data)["session_id"];
     if(key != ret_id){
@@ -288,10 +327,17 @@ function _loadOptions(){
   });
 }
 
-function _getURL(name){
-  var fullURL = "http://www."+name+".com";
-  alert(_websiteExists(fullURL));
-  return _websiteExists(fullURL) ? fullURL : "http://www.google.com/#q="+name;
+function _resolveOrSearch(input){
+  if (input == undefined){
+    input = "";
+    u = "google";
+  }
+  // get and normalize url
+  url = _norm_url(input);
+  var exists = _websiteExists(url);
+  alert(exists);
+  // return either the url or a google search
+  return exists ? url : "http://www.google.com/#q=" + input;
 }
 
 function _websiteExists(url){
