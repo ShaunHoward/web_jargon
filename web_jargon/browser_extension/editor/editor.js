@@ -217,7 +217,7 @@ function searchMusic(is_spotify, artist, album, song, type){
       //do song search
     } else {
       //do search using all input
-      window.location.href = "http://play.spotify.com/search/" + [artist, album, song].join(" ");
+      window.location.href = "http://play.spotify.com/search/" + [artist, album, song].join(" ").trim();
     }
   } else{
       window.location.href = "http://www.pandora.com/search/" + [artist, album, song].join(" ").trim();
