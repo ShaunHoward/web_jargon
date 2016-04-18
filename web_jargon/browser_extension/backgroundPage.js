@@ -270,6 +270,22 @@ function _loadOptions(){
   server = localStorage["serverURL"];
   audioResponse = localStorage["audioResponse"] == "false" ? false : true;
   textResponse = localStorage["textResponse"] == "false" ? false : true;
+
+  //ping server
+  var sendData = new Object();
+  sendData.command = "test";
+  sendData.url = "test";
+  sendData.session_id = 1234;
+  $.post( server, JSON.stringify(sendData), function( data ) {
+    var ret_id = JSON.parse(data)["session_id"];
+    if(key != ret_id){
+      return; //unknown response
+    }
+    _setReady();
+  })
+  .fail(function() {
+    _setError();
+  });
 }
 
 function _getURL(name){

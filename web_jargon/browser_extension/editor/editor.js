@@ -226,6 +226,7 @@ function searchMusic(is_spotify, artist, album, song, type){
 
 function goToPage(num){
   window.location.href = window.location.href.split("#page")[0]+"#page="+num;
+  window.location.reload(true);
 }
 
 function _setZoom(z){
@@ -246,7 +247,7 @@ function _scrollVertical(dest){
 }
 
 function _addMessage(str){
-  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:45px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
+  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:55px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
   $("#WebJargonInfo").fadeOut(2000, function(){
     $("#WebJargonInfo").remove();
   });
