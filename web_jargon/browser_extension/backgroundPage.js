@@ -88,11 +88,11 @@ function _sendText(str){
     sendData.url = url;
     sendData.session_id = key;
     $.post( server, JSON.stringify(sendData), function( data ) {
-      // try to log data, otherwise, server is in error
-      try {
+      // expect json, but if html received, server is not configured properly
+      if (data != undefined && data.indexOf("<!DOCTYPE html>") < 0) {
         console.log(data);
-      } catch (err) {
-        console.log("server needs to be configured...");
+      } else {
+        console.log("server needs to be configured...make sure to save configuration options!");
         return;
       }
       var ret_id = JSON.parse(data)["session_id"];
@@ -146,18 +146,11 @@ function openURL(u, currentTab){
     u = "google";
   }
   // either resolve the input domain name/url or create a google search
-  u = _resolveOrSearch(u);
-  if(currentTab){
-    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
-      chrome.tabs.update(tabs[0].id, {url: u});
-    });
-  } else {
-    chrome.tabs.create({url: u});
-  }
+  u = _resolveOrSearch(u, currentTab);
 }
 
 function _norm_url(u) {
-  u.trim();
+  u = u.trim();
   var http = "http://";
   var www = "www.";
   var com = ".com";
@@ -172,7 +165,7 @@ function _norm_url(u) {
   }
 
   // try to find .com or ..*{2,3}
-  //matches = u.match(".* ?(//.|dot){0,1} ?[a-z]{2,3}");
+  matches = u.match("\\.[a-z]{2,3}$");
   if (matches == undefined) {
     // if no match was found, add .com to give url a chance
     u = u.concat(com);
@@ -296,13 +289,13 @@ function _getAudioPermission(){
 function _loadOptions(){
   //set defaults if needed
   if(localStorage["serverURL"] == undefined){
-    localStorage["serverURL"] == "http://localhost:8080/";
+    localStorage["serverURL"] = "http://localhost:8080/WebJargon";
   }
   if(localStorage["audioResponse"] == undefined){
-    localStorage["audioResponse"] == true;
+    localStorage["audioResponse"] = true;
   }
   if(localStorage["textResponse"] == undefined){
-    localStorage["textResponse"] == true;
+    localStorage["textResponse"] = true;
   }
   server = localStorage["serverURL"];
   audioResponse = localStorage["audioResponse"] == "false" ? false : true;
@@ -327,34 +320,32 @@ function _loadOptions(){
   });
 }
 
-function _resolveOrSearch(input){
+function _resolveOrSearch(input, url, curr_tab){
   if (input == undefined){
     input = "";
-    u = "google";
   }
-  // get and normalize url
-  url = _norm_url(input);
-  var exists = _websiteExists(url);
-  alert(exists);
-  // return either the url or a google search
-  return exists ? url : "http://www.google.com/#q=" + input;
+  if (url == undefined) {
+    url = "";
+  }
+  // normalize url
+  var url = _norm_url(input);
+  $.get(url, function () {
+    // url exists
+    _finishOpeningURL(url, curr_tab);
+  }).fail(function () {
+    // need to do a google search
+    _finishOpeningURL("http://www.google.com/#q=" + input, curr_tab);
+  });
 }
 
-function _websiteExists(url){
-  var request;
-  if(window.XMLHttpRequest){
-    request = new XMLHttpRequest();
+function _finishOpeningURL(u, currentTab){
+  if(currentTab){
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+      chrome.tabs.update(tabs[0].id, {url: u});
+    });
+  } else {
+    chrome.tabs.create({url: u});
   }
-  else{
-    request = new ActiveXObject("Microsoft.XMLHTTP");
-  }
-  request.open('HEAD', url, false);
-  request.send(); // there will be a 'pause' here until the response to come.
-  // the object request will be actually modified
-  if (request.status === 404) {
-    return false;
-  }
-  return true;
 }
 
 function _startRecognition(){
