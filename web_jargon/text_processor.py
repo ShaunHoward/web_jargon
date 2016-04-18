@@ -3,7 +3,6 @@ __author__ = 'shaun'
 import re
 import helpers as h
 from arg_parsers import WordsToNumbers
-import string
 
 NUM_TO_INT = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6, "seventh": 7, "eighth": 8,
               "ninth": 9, "tenth": 10, "eleventh": 11, "twelfth": 12, "thirteenth": 13, "fourteenth": 14,
@@ -20,14 +19,6 @@ IS_SPOTIFY = "IS_SPOTIFY"
 SPOTIFY = "spotify"
 GOOGLE = "google"
 YOUTUBE = "youtube"
-
-
-def load_training_data(training_data_dir):
-    # load the training data
-    with open(training_data_dir, 'r') as training_file:
-        training_data = training_file.read()
-    training_data_list = training_data.split('\n')
-    return training_data_list
 
 
 def extract_match(str_to_search, matcher):
@@ -78,7 +69,8 @@ class TextProcessor():
                              'PERCENT': self.percentage, 'TAB_INDEX': self.tab_index,
                              'TAB_NAME': self.basic_names, 'URL': self.url, 'FORM_NAME': self.basic_names,
                              'EXCERPT': self.match_web_jargon, 'BUTTON_NAME': self.basic_names, 'DOMAIN_NAME': self.url,
-                             'PAGE_NUM': self.words_to_numbers.parse, 'ARTIST_INFO': self.match_web_jargon}
+                             'PAGE_NUM': self.words_to_numbers.parse, 'ARTIST': self.match_web_jargon,
+                             'ALBUM': self.match_web_jargon, 'SONG': self.match_web_jargon}
 
     def basic_names(self, text):
         # matches to the basic names pattern in this class
@@ -286,6 +278,11 @@ class TextProcessor():
             result = self.words_to_numbers.parse(words)
             if result >= 0:
                 parsed_arg = result
+        # try to convert the parsed number into an integer, or fall back to the default value if any error occurs
+        try:
+            parsed_arg = int(parsed_arg)
+        except:
+            parsed_arg = 25
         return parsed_arg
 
     @staticmethod

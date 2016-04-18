@@ -1,7 +1,8 @@
 __author__ = 'shaun'
-from os import path
 
+import copy
 import helpers as h
+from os import path
 
 
 CONTEXT = 'context'
@@ -34,7 +35,7 @@ class Mapper():
         web_actions = None
         if action_request is not None and type(action_request) is dict and h.CMD in action_request.keys():
             # get correct web action call template
-            action_call_template = self.action_call_map[action_request[h.CMD]].copy()
+            action_call_template = copy.deepcopy(self.action_call_map[action_request[h.CMD]])
 
             # add arguments to action call
             action_call_template[h.CMD_ARGS_LIST] = []

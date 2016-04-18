@@ -14,7 +14,11 @@ function save_options() {
 function restore_options() {
   var ar = localStorage["audioResponse"] == "false" ? false : true;
   var tr = localStorage["textResponse"] == "false" ? false : true;
-  document.getElementById('serverURL').value = localStorage["serverURL"];
+  var url =  localStorage["serverURL"];
+  if (url == undefined || url.length < 1){
+      url = "http://localhost:8080/WebJargon";
+  }
+  document.getElementById('serverURL').value = url;
   document.getElementById('audioResponse').checked = ar;
   document.getElementById('textResponse').checked = tr;
 }

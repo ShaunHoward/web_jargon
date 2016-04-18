@@ -151,14 +151,42 @@
       M: SEARCH_MUSIC
      </td>
      <td>
-      search for (ARTIST_INFO)
+      search artist (ARTIST) (TYPE=artist)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      search (ARTIST_INFO)
+      search for artist (ARTIST) (TYPE=artist)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      search album (ALBUM) (TYPE=album)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      search for album (ALBUM) (TYPE=album)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      search song (SONG) (TYPE=song)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      search for song (SONG) (TYPE=song)
      </td>
     </tr>
     <tr>
@@ -391,49 +419,56 @@
       G: OPEN_TAB
      </td>
      <td>
-      open a tab (DOMAIN_NAME=google.com)
+      open tab (DOMAIN_NAME|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      open a new tab (DOMAIN_NAME=google.com)
+      open a tab (DOMAIN_NAME|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      new tab (DOMAIN_NAME=google.com)
+      open a new tab (DOMAIN_NAME|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      open new tab (DOMAIN_NAME=google.com)
+      new tab (DOMAIN_NAME|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      create tab (DOMAIN_NAME=google.com)
+      open new tab (DOMAIN_NAME|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      create a new tab (DOMAIN_NAME=google.com)
+      create tab (DOMAIN_NAME|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      create new tab (DOMAIN_NAME=google.com)
+      create a new tab (DOMAIN_NAME|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      create new tab (DOMAIN_NAME|TAB_NAME)
      </td>
     </tr>
     <tr>
@@ -441,49 +476,21 @@
       G: CLOSE_TAB
      </td>
      <td>
-      close tab
+      close tab (TAB_INDEX|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      close this tab
+      exit tab (TAB_INDEX|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      close my tab
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      exit this tab
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      leave this tab
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      exit the tab
-     </td>
-    </tr>
-    <tr>
-     <td>
-     </td>
-     <td>
-      exit tab
+      leave tab (TAB_INDEX|TAB_NAME)
      </td>
     </tr>
     <tr>
@@ -491,14 +498,21 @@
       G: SWITCH_TAB
      </td>
      <td>
-      switch to tab (TAB_INDEX|TAB_NAME)
+      open existing (TAB_INDEX|TAB_NAME)
      </td>
     </tr>
     <tr>
      <td>
      </td>
      <td>
-      open tab (TAB_INDEX|TAB_NAME)
+      switch to (TAB_INDEX|TAB_NAME)
+     </td>
+    </tr>
+    <tr>
+     <td>
+     </td>
+     <td>
+      switch to tab (TAB_INDEX|TAB_NAME)
      </td>
     </tr>
     <tr>

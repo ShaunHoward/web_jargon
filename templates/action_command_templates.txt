@@ -56,7 +56,7 @@ CLOSE_FULLSCREEN:["close", "exit", "escape", "quit", "quit fullscreen", "close f
 PLAY_MUSIC:["play", "start", "play music", "play my music", "play song", "play tune", "start music", "start song", "start tune"]
 PAUSE_MUSIC:["pause", "pause music", "paws music", "paws", "paws song", "stop", "stop music", "stop my music", "stop song", "stop tune"]
 NEXT_SONG:["next", "next song", "next tune", "next on playlist", "next in playlist"]
-SEARCH_MUSIC:["search for (ARTIST_INFO)", "search (ARTIST_INFO)"]
+SEARCH_MUSIC:["search artist (ARTIST) (TYPE=artist)", "search for artist (ARTIST) (TYPE=artist)", "search album (ALBUM) (TYPE=album)", "search for album (ALBUM) (TYPE=album)", "search song (SONG) (TYPE=song)", "search for song (SONG) (TYPE=song)"]
 
 # requirement 4.16
 SEARCH_PDF:["search for (EXCERPT)", "search (EXCERPT)"]
