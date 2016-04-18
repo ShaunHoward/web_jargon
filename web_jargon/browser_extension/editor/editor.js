@@ -206,11 +206,21 @@ function nextSong(is_spotify){
   }
 }
 
-function searchMusic(artist_info){
-  if(url.indexOf("pandora") >= 0){
-    window.location.href = "http://www.pandora.com/search/"+artist_info;
+function searchMusic(is_spotify, artist, album, song, type){
+  var is_spotify = _getBool(is_spotify);
+  if(is_spotify){
+    if (type=="artist"){
+      // do artist search
+    } else if (type == "album") {
+      //do album search
+    } else if (type == "song") {
+      //do song search
+    } else {
+      //do search using all input
+      window.location.href = "http://play.spotify.com/search/" + [artist, album, song].join(" ");
+    }
   } else{
-    window.location.href = "http://play.spotify.com/search/"+artist_info;
+      window.location.href = "http://www.pandora.com/search/"+artist_info;
   }
 }
 
