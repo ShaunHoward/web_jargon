@@ -220,7 +220,7 @@ function searchMusic(is_spotify, artist, album, song, type){
       window.location.href = "http://play.spotify.com/search/" + [artist, album, song].join(" ");
     }
   } else{
-      window.location.href = "http://www.pandora.com/search/"+artist_info;
+      window.location.href = "http://www.pandora.com/search/" + [artist, album, song].join(" ").trim();
   }
 }
 
