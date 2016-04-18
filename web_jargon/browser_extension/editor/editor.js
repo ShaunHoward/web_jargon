@@ -103,8 +103,10 @@ function selectElement(name){
       return re.test(this.title);
     }).first();
   }
-  lastEditedInput = e;
-  e.focus();
+  if (e.val() != undefined){
+    lastEditedInput = e;
+    e.focus();
+  }
 }
 
 function submitText(){
@@ -146,7 +148,6 @@ function nextVideo(){
   });
 }
 
-
 function openFullscreen(){
   var doc = $(window).scrollTop();
   $("button[aria-label='Full screen']").each(function(){
@@ -156,7 +157,6 @@ function openFullscreen(){
       return false;
     }
   });
-
 }
 
 function closeFullscreen(){
@@ -168,39 +168,41 @@ function closeFullscreen(){
       return false;
     }
   });
-
 }
 
-function playMusic(){
-  if(url.indexOf("pandora") >= 0){
+function playMusic(is_spotify){
+  var is_spotify = _getBool(is_spotify);
+  if(is_spotify){
+    var frame = $("#app-player");
+    var contents = frame.contents();
+    var btn = contents.find("button[id='play-pause']");
+    btn.click();
+  } else {
     $(".playButton").click();
-  } else{
+  }
+}
+
+function pauseMusic(is_spotify){
+  var is_spotify = _getBool(is_spotify);
+  if(is_spotify){
     var frame = $("#app-player");
     var contents = frame.contents();
     var btn = contents.find("button[id='play-pause']");
     btn.click();
-  }
-}
-
-function pauseMusic(){
-  if(url.indexOf("pandora") >= 0){
+  } else {
     $(".pauseButton").click();
-  } else{
-    var frame = $("#app-player");
-    var contents = frame.contents();
-    var btn = contents.find("button[id='play-pause']");
-    btn.click();
   }
 }
 
-function nextSong(){
-  if(url.indexOf("pandora") >= 0){
-    $(".skipButton").click();
-  } else{
+function nextSong(is_spotify){
+  var is_spotify = _getBool(is_spotify);
+  if(is_spotify){
     var frame = $("#app-player");
     var contents = frame.contents();
     var btn = contents.find("button[id='next']");
     btn.click();
+  } else {
+    $(".skipButton").click();
   }
 }
 
@@ -213,7 +215,6 @@ function searchMusic(artist_info){
 }
 
 function goToPage(num){
-  
   window.location.href = window.location.href.split("#page")[0]+"#page="+num;
 }
 
@@ -239,4 +240,9 @@ function _addMessage(str){
   $("#WebJargonInfo").fadeOut(2000, function(){
     $("#WebJargonInfo").remove();
   });
+}
+
+function _getBool(str){
+  var bool = (str === "true");
+  return bool;
 }

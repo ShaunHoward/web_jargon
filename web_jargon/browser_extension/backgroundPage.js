@@ -8,7 +8,7 @@ var state = states.READY;
 var audio_success = new Audio();
 audio_success.src = "audio/success.mp3";
 var audio_fail = new Audio();
-audio_fail.src = "audio/fail.wav";
+audio_fail.src = "audio/fail.mp3";
 
 var startPhrases = ["web jargon", "browser", "chrome"];
 var stopPhrases = ["stop web jargon", "stop listening"];
@@ -102,7 +102,8 @@ function _sendText(str){
       }
       var func = cmd["action"];
       var params = cmd["arg_list"];
-      var msg = _doCommand(func, params, url);
+      var context = cmd["context"]
+      var msg = _doCommand(func, params, context);
       _setReady();
       _onSuccess(str, func, params);
     })
@@ -214,17 +215,13 @@ function displaySetup(){
   }
 }
 
-function displayHelp(show){
-  var show = Boolean(show);
+function displayHelp(show, context){
+  var show = (show === "true");
   if (show == true) {
-      chrome.tabs.create({ url: "/html_help_pages/G_help_page.html" });
+      chrome.tabs.create({ url: "/html_help_pages/"+context+"_help_page.html" });
   } else {
      closeTab("help_page");
   }
-}
-
-function _closeFirstTab() {
-    _closeTabAtIndex(0);
 }
 
 function _closeTabAtIndex(tabIndex) {
@@ -239,14 +236,15 @@ function _closeTabAtIndex(tabIndex) {
 Executes input command
 Checks background page functions first, then checks current tab functions
 */
-function _doCommand(cmd, params, curr_url){
-  if (typeof window[cmd] == 'function') { 
+function _doCommand(cmd, params, context){
+  if (typeof window[cmd] == 'function') {
+    params.push(context)
     window[cmd].apply(null, params);
     return;
   }
   //if function not found in background page, check content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params, url: curr_url}, function(response) {
+    chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
       if(response){
         return response;
       }

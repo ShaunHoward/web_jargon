@@ -47,7 +47,7 @@ def create_json_action_response(web_actions, session_id):
     return json.dumps(json_dict)
 
 
-def extract_web_actions(request_dict, processor, mapper):
+def extract_web_actions(request_dict, processor, mapper, is_debug=False):
     """
     Interprets the provided text as a web control command if possible.
     A message may be returned to the user in json to describe the status
@@ -56,6 +56,7 @@ def extract_web_actions(request_dict, processor, mapper):
     :param request_dict: the json request dict including txt command, sec key, and curr url
     :param processor: the processor instance to find the actions asked for
     :param mapper: the mapper instance for determining action list
+    :param is_debug: used for debug output purposes in response, default is false
     :return: the json text response of the web control service containing web actions to execute and other info
     """
 
@@ -74,7 +75,7 @@ def extract_web_actions(request_dict, processor, mapper):
                 # process command via text processor
                 web_command = processor.process_web_action_request(action_request, curr_url)
                 # create web action via parsed command template
-                web_action = mapper.create_web_action(web_command)
+                web_action = mapper.create_web_action(web_command, is_debug)
                 # create a json action response for the browser extension
                 json_action_response = create_json_action_response(web_action, sec_key)
     # return empty response so plugin knows about error

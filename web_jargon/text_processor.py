@@ -156,7 +156,7 @@ class TextProcessor():
 
         # clean up command url and get command context
         command_url = command_url.strip()
-        command_context = h.determine_url_context(command_url)
+        command_context, context_type = h.determine_url_context(command_url)
 
         # get possible action mappings
         possible_action_text_mapping_keys = h.get_possible_action_text_mapping_keys(command_context,
@@ -235,6 +235,7 @@ class TextProcessor():
             # set command and args from action text mappings
             curr_action_request[h.CMD] = matches[earliest_index][0]
             curr_action_request[h.CMD_ARGS_DICT] = matches[earliest_index][2]
+            curr_action_request[h.CONTEXT_TYPE] = context_type
 
             # handle music context boolean setting for music actions
             if command_context == h.MUSIC_CONTEXT:

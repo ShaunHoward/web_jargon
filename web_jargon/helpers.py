@@ -7,6 +7,7 @@ from collections import OrderedDict as dict
 # useful constants
 ACTION = 'action'
 CMD = 'command'
+CONTEXT_TYPE = 'context'
 CMD_ARGS_DICT = 'arguments'
 CMD_ARGS_LIST = 'arg_list'
 PARTS = 'parts'
@@ -57,7 +58,8 @@ DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 VIDEO_CONTEXT = {PLAY_VIDEO, PAUSE_VIDEO, NEXT_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
 MUSIC_CONTEXT = {PLAY_MUSIC, PAUSE_MUSIC, NEXT_SONG, SEARCH_MUSIC}
 DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
-DOMAINS = {"facebook": VIDEO_CONTEXT, "youtube": VIDEO_CONTEXT, "pandora": MUSIC_CONTEXT, "spotify": MUSIC_CONTEXT, ".pdf": DOC_CONTEXT}
+DOMAINS = {"facebook": (VIDEO_CONTEXT, "V"), "youtube": (VIDEO_CONTEXT, "V"), "pandora": (MUSIC_CONTEXT, "M"),
+           "spotify": (MUSIC_CONTEXT, "M"), ".pdf": (DOC_CONTEXT, "D")}
 
 spot = "https://play.spotify.com/browse"
 pandora = "http://www.pandora.com/station/play/2880225754266056244"
@@ -68,11 +70,12 @@ youtube = "https://www.youtube.com/watch?v=wYUSPkssfIY"
 def determine_url_context(curr_url):
     # determines the context of the provided url
     context = set()
+    str_type = "G"
     if is_text_type(curr_url):
         for domain in DOMAINS.keys():
             if domain in curr_url:
-                context = DOMAINS[domain]
-    return context
+                context, str_type = DOMAINS[domain]
+    return context, str_type
 
 
 def get_url_for_context(action_key):
@@ -385,6 +388,7 @@ def is_json(my_json):
     except ValueError, e:
         return False
     return True
+
 
 def is_text_type(string):
     return type(string) is str or type(string) is unicode

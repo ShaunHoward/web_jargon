@@ -33,7 +33,7 @@ class WebJargonTest(unittest.TestCase):
         print json_actions
         # assert one is returned
         self.assertEqual(len(json_actions), 2)
-        self.assertEqual(len(json_actions[h.ACTION]), 4)
+        self.assertEqual(len(json_actions[h.ACTION]), 5)
         action = json_actions[h.ACTION]
         print "returned action: " + action[h.CMD]
         print "desired action: " + action_key
@@ -57,8 +57,8 @@ class WebJargonTest(unittest.TestCase):
             for command in self.action_commands[action_key]:
                 request_dict = {"command": command, "session_id": "ADFW#R$#$%$452354345345e23@#FSDFASFw3r",
                                 "url": possible_url}
-                # get the json action response and validate it
-                json_actions = wj.extract_web_actions(request_dict, self.processor, self.mapper)
+                # get the json action response and validate it using debug mode
+                json_actions = wj.extract_web_actions(request_dict, self.processor, self.mapper, True)
                 print "checking: " + command
                 self.validate_web_actions(json_actions, action_key)
 
