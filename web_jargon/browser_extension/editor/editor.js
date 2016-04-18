@@ -114,19 +114,61 @@ function submitText(){
 }
 
 function playVideo(){
-  $("button[aria-label='Play']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Play']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
 }
 
 function pauseVideo(){
-  $("button[aria-label='Pause']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Pause']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
 }
 
+function nextVideo(){
+  var doc = $(window).scrollTop();
+  $("a[title='Next']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      window.location.href = $(this).attr("href");
+      return false;
+    }
+  });
+}
+
+
 function openFullscreen(){
-  $("button[title='Full screen']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Full screen']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
+
 }
 
 function closeFullscreen(){
-  $("button[title='Exit full screen']").click();
+  var doc = $(window).scrollTop();
+  $("button[aria-label='Exit full screen']").each(function(){
+    var relative = $(this).offset().top - doc;
+    if(relative > 0){
+      $(this).click();
+      return false;
+    }
+  });
+
 }
 
 function playMusic(){
@@ -193,7 +235,7 @@ function _scrollVertical(dest){
 }
 
 function _addMessage(str){
-  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:5px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
+  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:45px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
   $("#WebJargonInfo").fadeOut(2000, function(){
     $("#WebJargonInfo").remove();
   });
