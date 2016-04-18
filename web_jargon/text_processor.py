@@ -278,6 +278,11 @@ class TextProcessor():
             result = self.words_to_numbers.parse(words)
             if result >= 0:
                 parsed_arg = result
+        # try to convert the parsed number into an integer, or fall back to the default value if any error occurs
+        try:
+            parsed_arg = int(parsed_arg)
+        except:
+            parsed_arg = 25
         return parsed_arg
 
     @staticmethod

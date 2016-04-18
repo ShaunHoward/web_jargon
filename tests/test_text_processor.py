@@ -68,9 +68,10 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.ZOOM_OUT, args)
 
     def test_open_new_tab(self):
-        template_phrases = ["open tab Spotify", "open tab cnn", "open a tab facebook.com", "open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab",
+        template_phrases = ["open tab Spotify", "open tab cnn", "open a tab facebook.com",  "new tab google.com",
+                            "open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab",
                             "create new tab"]
-        args = [["spotify"], ["cnn"], ['facebook.com']] + [['google.com'] for i in range(len(template_phrases))]
+        args = [["spotify"], ["cnn"], ['facebook.com'], ['google.com']] + [[] for i in range(len(template_phrases))]
         self.validate_phrases(template_phrases, h.OPEN_TAB, args)
 
     def test_close_tab(self):

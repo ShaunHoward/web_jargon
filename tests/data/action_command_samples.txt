@@ -4,7 +4,7 @@ SCROLL_UP:["scroll up", "up scroll", "scroll up one page", "scroll up ten pages"
 SCROLL_DOWN:["scroll down", "down scroll", "scroll down one page", "scroll down four pages"]
 ZOOM_IN:["zoom in by ten percent", "zoom in 20 percent", "zoom 4 times", "zoom", "zoom larger", "zoom in"]
 ZOOM_OUT:["zoom out by fifty percent", "zoom out by thirty five percent", "zoom away 30 percent", "zoom out three times", "zoom out 100 percent", "zoom smaller", "zoom out"]
-OPEN_TAB:["open tab Spotify", "open tab cnn", "open a tab facebook.com", "open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab", "create new tab"]
+OPEN_TAB:["open tab Spotify", "open tab cnn", "open a tab facebook.com",  "new tab google.com", "open a tab", "open a new tab", "new tab", "open new tab", "create tab", "create a new tab", "create new tab"]
 CLOSE_TAB:["close tab three", "close tab facebook", "exit tab 2", "exit tab stackoverflow", "leave tab twelve", "leave tab google"]
 SWITCH_TAB:["switch to facebook", "switch to four", "switch to tab three", "switch to tab google.com", "switch to Facebook", "change to CNN", "open the twelfth tab", "switch to the first tab", "change to Facebook tab", "change to tab four", "change to Pandora", "change tab to tab 4", "change tab to the weather"]
 FORWARD:["forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead"]
