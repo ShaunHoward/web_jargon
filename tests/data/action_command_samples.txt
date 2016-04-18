@@ -25,6 +25,6 @@ CLOSE_FULLSCREEN:["close", "exit", "escape", "quit", "quit fullscreen", "close f
 PLAY_MUSIC:["play", "start", "play music", "play my music", "play song", "play tune", "start music", "start song", "start tune"]
 PAUSE_MUSIC:["pause", "pause music", "paws music", "paws", "paws song", "stop", "stop music", "stop my music", "stop song", "stop tune"]
 NEXT_SONG:["next", "next song", "next tune", "next on playlist", "next in playlist"]
-SEARCH_MUSIC:["search for Elvis Presley", "search Led Zeppelin", "search for red hot chili peppers"]
+SEARCH_MUSIC:["search artist Elvis Presley", "search artist Led Zeppelin", "search for artist red hot chili peppers", "search album the song remains the same", "search for album by the way", "search song star-spangled banner", "search for song Whole Lotta Love", "search for song one"]
 SEARCH_PDF:["search for the blue knight and dark horse", "search chapter 5 questions"]
 GO_TO_PDF_PAGE:["go to page number four hundred five", "go to page sixty seven", "go to two thousand seven hundred fifty three"]

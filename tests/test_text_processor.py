@@ -191,7 +191,6 @@ class TextProcessorTest(unittest.TestCase):
     def test_pause_music(self):
         template_phrases = ["pause", "pause music", "paws music", "paws", "paws song", "stop", "stop music",
                             "stop my music", "stop song", "stop tune"]
-
         args = [['true'], ['false'], ['true'], ['false'], ['false'], ['false'], ['false'], ['true'], ['false'], ['true']]
         urls = [spot, pandora, spot, pandora, pandora, pandora, pandora,  spot, pandora, spot]
         self.validate_phrases(template_phrases, h.PAUSE_MUSIC, args, urls=urls)
@@ -203,9 +202,15 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.NEXT_SONG, args, urls=urls)
 
     def test_search_music(self):
-        template_phrases = ["search for Elvis Presley", "search Led Zeppelin", "search for red hot chili peppers"]
-        args = [['false', 'elvis presley'], ['true', 'led zeppelin'], ['false', 'red hot chili peppers']]
-        urls = [pandora, spot, pandora]
+        template_phrases = ["search artist Elvis Presley", "search artist Led Zeppelin", "search for artist red hot chili peppers",
+                            "search album the song remains the same", "search for album by the way",
+                            "search song star-spangled banner", "search for song Whole Lotta Love",
+                            "search for song one"]
+        args = [['false', 'elvis presley', 'artist'], ['true', 'led zeppelin', 'artist'], ['false', 'red hot chili peppers', 'artist'],
+                ['false', 'the song remains the same', 'album'], ['true', 'by the way', 'album'],
+                ['true', 'star-spangled banner', 'song'], ['true', 'whole lotta love', 'song'],
+                ['false', 'one', 'song']]
+        urls = [pandora, spot, pandora, pandora, spot, spot, spot, pandora]
         self.validate_phrases(template_phrases, h.SEARCH_MUSIC, args, urls=urls)
 
     # start doc context

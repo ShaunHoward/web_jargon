@@ -9,11 +9,13 @@ td {
     padding: 6px;
 }
 table {
-    #border: 1px solid black;
+    margin: auto;
     border-collapse: collapse;
+    text-align: left;
 }
 body {
-    background-color: rgb(193, 224, 254);
+    background-color: #a5c7ef;
+    text-align: center;
 }
 h1 {
     color: navy;

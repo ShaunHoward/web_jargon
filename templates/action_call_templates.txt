@@ -55,7 +55,7 @@ CLOSE_FULLSCREEN:[closeFullscreen()]
 PLAY_MUSIC:[playMusic(IS_SPOTIFY=false)]
 PAUSE_MUSIC:[pauseMusic(IS_SPOTIFY=false)]
 NEXT_SONG:[nextSong(IS_SPOTIFY=false)]
-SEARCH_MUSIC:[searchMusic(ARTIST_INFO, IS_SPOTIFY=false)]
+SEARCH_MUSIC:[searchMusic(IS_SPOTIFY=false, ARTIST, ALBUM, SONG, TYPE)]
 
 # requirement 4.16
 SEARCH_PDF:[searchPDF(EXCERPT)]
