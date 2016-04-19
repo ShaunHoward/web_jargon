@@ -241,7 +241,7 @@ function _sendExecuteAndNotify(action_command_request){
     // set up variable for session id
     // generate random sha256 key
     var random_str = make_random_id();
-    var key = random_str;//Sha256.hash(random_str);
+    var key = Sha256.hash(random_str);
 
     // set busy state since extension is reaching out to API server
     _setBusy();
@@ -347,10 +347,25 @@ function _doCommand(cmd, params, context){
  * Closes the tab at the specified index from the leftmost tab starting with choice 1 and ending at
  * the number of open tabs.
  */
-function _closeTabAtIndex(tabIndex) {
+function _closeTabAtIndex(tabId) {
   chrome.tabs.query({currentWindow: true}, function (tabs) {
-    if (0 < tabIndex && tabIndex <= tabs.length) {
-      chrome.tabs.remove(tabs[tabIndex-1].id);
+    if (0 < tabId && tabId <= tabs.length) {
+      chrome.tabs.remove(tabs[tabId-1].id);
+    }
+  });
+}
+
+// Closes all the tabs containing the given name
+function _closeTabWithName(tabId) {
+  chrome.tabs.query({currentWindow: true}, function (tabs) {
+    // close all tabs containing the specified substring
+    for (t in tabs){
+      // normalize case of text for substring matching
+      lower_title = tabs[t].title.toLowerCase();
+      if(lower_title.indexOf(tabId) > -1){
+        // close the tab if match found
+        chrome.tabs.remove(tabs[t].id);
+      }
     }
   });
 }
@@ -359,10 +374,26 @@ function _closeTabAtIndex(tabIndex) {
  * Switches to the tab at the specified index from the leftmost tab with choices starting at 1 and
  * ending at the number of open tabs.
  */
-function _switchToTabAtIndex(index) {
+function _switchToTabAtIndex(tabId) {
   chrome.tabs.query({currentWindow: true}, function (tabs) {
     if (0 < tabId && tabId <= tabs.length){
       chrome.tabs.update(tabs[tabId-1].id, {active: true});
+    }
+  });
+}
+
+// switches to the first tab including the specified name
+function _switchToTabWithName(tabId) {
+  // open the first tab including the input string id
+  chrome.tabs.query({currentWindow: true}, function (tabs) {
+    for (t in tabs){
+      // normalize case of title
+      lower_title = tabs[t].title.toLowerCase();
+      if(lower_title.indexOf(tabId) > -1){
+        // switch to matching tab and leave loop
+        chrome.tabs.update(tabs[t].id, {active: true});
+        break;
+      }
     }
   });
 }
@@ -480,23 +511,13 @@ function closeTab(tabId){
   if(tabId == undefined){
     return;
   }
-
   // either close tab at index or with name containing substring
   if (typeof(tabId) == "number") {
     // close tab at specified index
     _closeTabAtIndex(tabId);
   } else if (typeof(tabId) == "string") {
-    chrome.tabs.query({currentWindow: true}, function (tabs) {
-      // close all tabs containing the specified substring
-      for (t in tabs){
-        // normalize case of text for substring matching
-        lower_title = tabs[t].title.toLowerCase();
-        if(lower_title.indexOf(tabId) > -1){
-          // close the tab if match found
-          chrome.tabs.remove(tabs[t].id);
-        }
-      }
-    });
+    // close tab with given name
+    _closeTabWithName(tabId);
   }
   return;
 }
@@ -517,18 +538,8 @@ function switchTab(tabId){
     // switch to tab at specified index
     _switchToTabAtIndex(tabId);
   } else if (typeof(tabId) == "string") {
-    // open the first tab including the input string id
-    chrome.tabs.query({currentWindow: true}, function (tabs) {
-      for (t in tabs){
-        // normalize case of title
-        lower_title = tabs[t].title.toLowerCase();
-        if(lower_title.indexOf(tabId) > -1){
-          // switch to matching tab and leave loop
-          chrome.tabs.update(tabs[t].id, {active: true});
-          break;
-        }
-      }
-    });
+    // switch to tab with specified name
+    _switchToTabWithName(tabId);
   }
   return;
 }
