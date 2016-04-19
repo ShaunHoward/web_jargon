@@ -60,7 +60,7 @@ def extract_web_actions(request_dict, processor, mapper, is_debug=False):
     :return: the json text response of the web control service containing web actions to execute and other info
     """
 
-    response_dict = {"action": "", "session_id": ""}
+    response_dict = {"session_id": ""}
     json_action_response = None
     # make sure input is valid json
     if type(request_dict) is dict:
@@ -68,16 +68,21 @@ def extract_web_actions(request_dict, processor, mapper, is_debug=False):
         if "session_id" in request_dict.keys():
             sec_key = request_dict["session_id"]
             response_dict["session_id"] = sec_key
+
             # the request can be parsed if it has a command and url
             if "command" in request_dict.keys() and "url" in request_dict.keys():
                 action_request = request_dict["command"]
                 curr_url = request_dict["url"]
-                # process command via text processor
-                web_command = processor.process_web_action_request(action_request, curr_url)
-                # create web action via parsed command template
-                web_action = mapper.create_web_action(web_command, is_debug)
-                # create a json action response for the browser extension
-                json_action_response = create_json_action_response(web_action, sec_key)
+
+                # check if test scenario
+                if action_request != "test" and curr_url != "test":
+                    # process command via text processor
+                    web_command = processor.process_web_action_request(action_request, curr_url)
+                    # create web action via parsed command template
+                    web_action = mapper.create_web_action(web_command, is_debug)
+                    # create a json action response for the browser extension
+                    json_action_response = create_json_action_response(web_action, sec_key)
+
     # return empty response so plugin knows about error
     if json_action_response is None:
         json_action_response = json.dumps(response_dict)
