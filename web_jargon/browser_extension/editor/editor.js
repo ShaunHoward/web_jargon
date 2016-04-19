@@ -21,8 +21,9 @@ chrome.runtime.onMessage.addListener(
     if (typeof window[request.func] == 'function') {
       url = request.url;
       window[request.func].apply(null, request.params);
-    } else{
-      //sendResponse({msg: "not found"}); 
+      sendResponse({msg: "success"});
+    } else {
+      sendResponse({msg: "error"});
     }   
   });
 

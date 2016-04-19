@@ -14,45 +14,45 @@ var audio_fail = new Audio();
 audio_fail.src = "audio/fail.mp3";
 
 // phrases to start web jargon listening -- system stops listening after reasonable pause
-var startPhrases = ["web jargon", "browser", "chrome"];
+var startPhrases = ["web jargon", "web", "jargon", "browser", "chrome"];
 
 // Globally store server information as well as notification options
 var server;
 var audioResponse;
 var textResponse;
 
-// whether to keep listening in the web speech API, always true for our extension
-var keepListening = true;
-
-// whether permission has been granted to the microphone by the user
-var permission_granted = false;
-
-// variable for speech recognition object
-var recognition;
-
-// http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
-function load_jscss_file(filename, file_type){
-  if (file_type=="js") { //if filename is a external JavaScript file
-    var file_ref=document.createElement('script');
-    file_ref.setAttribute("type","text/javascript");
-    file_ref.setAttribute("src", filename);
-  } else if (file_type=="css") { //if filename is an external CSS file
-    var file_ref=document.createElement("link");
-    file_ref.setAttribute("rel", "stylesheet");
-    file_ref.setAttribute("type", "text/css");
-    file_ref.setAttribute("href", filename);
-  }
-  if (typeof file_ref!="undefined") {
-    document.getElementsByTagName("head")[0].appendChild(file_ref);
-  }
-}
+//// http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
+//function load_jscss_file(filename, file_type){
+//  if (file_type=="js") { //if filename is a external JavaScript file
+//    var file_ref=document.createElement('script');
+//    file_ref.setAttribute("type","text/javascript");
+//    file_ref.setAttribute("src", filename);
+//  } else if (file_type=="css") { //if filename is an external CSS file
+//    var file_ref=document.createElement("link");
+//    file_ref.setAttribute("rel", "stylesheet");
+//    file_ref.setAttribute("type", "text/css");
+//    file_ref.setAttribute("href", filename);
+//  }
+//  if (typeof file_ref!="undefined") {
+//    document.getElementsByTagName("head")[0].appendChild(file_ref);
+//  }
+//}
 
 //dynamically load and add the sha256 .js file
-load_jscss_file("/3rd-party/sha256.js", "js");
+//load_jscss_file("/3rd-party/sha256.js", "js");
 
 // used to give permission to the extension for web speech microphone access
 function _getAudioPermission(){
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
+}
+
+//http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript
+function make_random_id() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 32; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
 }
 
 /**
@@ -106,6 +106,15 @@ function _loadOptions(){
   });
 }
 
+// load options into global variables
+_loadOptions();
+
+// whether to keep listening in the web speech API, always true for our extension
+var keepListening = true;
+
+// whether permission has been granted to the microphone by the user
+var permission_granted = false;
+
 // instantiate a new web speech api recognition object
 var recognition = new webkitSpeechRecognition();
 // include all results
@@ -123,12 +132,19 @@ recognition.onerror = function(event) {
 
 // define a speech recognition result callback
 recognition.onresult = function(event) {
+  // store interim and final transcripts
+  var interim_transcript = "";
+  var final_transcript = "";
+
   // process the final command transcript received from the web speech api
   for (var i = event.resultIndex; i < event.results.length; ++i) {
     if (event.results[i].isFinal) {
-      var command = event.results[i][0].transcript;
+      final_transcript += event.results[i][0].transcript;
       // send command data to be processed, executed and user notified
-      _processExecuteAndNotify(command);
+      _processExecuteAndNotify(final_transcript);
+      return;
+    } else {
+      interim_transcript += event.results[i][0].transcript;
     }
   }
 }
@@ -157,6 +173,9 @@ function _startRecognition(){
   recognition.start();
 }
 
+// start speech recognition
+_startRecognition();
+
 // used to set the extension toolbar icon
 function _setIcon(file){
   chrome.browserAction.setIcon({
@@ -183,8 +202,8 @@ function _setError(){
  * extracting the request and executing it as well as notifying the user.
  */
 function _processExecuteAndNotify(command){
-  // clean command of whitespace
-  command = command.trim();
+  // clean command of whitespace and convert to lowercase
+  command = command.trim().toLowerCase();
   console.log(command);
 
   // try to find a start phrase in the command input
@@ -222,7 +241,7 @@ function _sendExecuteAndNotify(action_command_request){
     // set up variable for session id
     // generate random sha256 key
     var random_str = make_random_id();
-    var key = Sha256.hash(random_str);
+    var key = random_str;//Sha256.hash(random_str);
 
     // set busy state since extension is reaching out to API server
     _setBusy();
@@ -240,12 +259,14 @@ function _sendExecuteAndNotify(action_command_request){
         console.log(data);
       } else {
         console.log("server needs to be configured...make sure to save configuration options!");
+        _setError();
         return;
       }
 
       // validate return id matches generated id
       var ret_id = JSON.parse(data)["session_id"];
       if(key != ret_id){
+        _setReady();
         return; //unknown response
       }
 
@@ -314,14 +335,12 @@ function _doCommand(cmd, params, context){
   }
   //if function not found in background page, check content script
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {func: cmd, params: params}, function(response) {
-      if(response){
-        return response;
-      } else {
-        return "error";
+    chrome.tabs.sendMessage(tabs[0].id, {func : cmd, params : params}, function(response) {
+      if(response && response.msg){
+        return response.msg;
       }
+    });
   });
-});
 }
 
 /**
@@ -329,7 +348,7 @@ function _doCommand(cmd, params, context){
  * the number of open tabs.
  */
 function _closeTabAtIndex(tabIndex) {
-  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+  chrome.tabs.query({currentWindow: true}, function (tabs) {
     if (0 < tabIndex && tabIndex <= tabs.length) {
       chrome.tabs.remove(tabs[tabIndex-1].id);
     }
@@ -368,12 +387,12 @@ function _norm_url(input) {
     url = www.concat(url);
   }
   // add http:// to front of url to go to correct protocol
-  if (u.indexOf(http) < 0) {
+  if (url.indexOf(http) < 0) {
     url = http.concat(url);
   }
 
   // try to find .com or ..*{2,3}
-  matches = u.match("\\.[a-z]{2,3}$");
+  matches = url.match("\\.[a-z]{2,3}$");
   if (matches == undefined) {
     // if no match was found, add .com to give url a chance
     url = url.concat(com);
@@ -421,7 +440,7 @@ function _finishOpeningURL(input_url, currentTab){
     });
   } else {
     // open the url in a new tab
-    chrome.tabs.create({url: u});
+    chrome.tabs.create({url: input_url});
   }
 }
 
@@ -534,9 +553,3 @@ function displayHelp(show, context){
     closeTab("help_page");
   }
 }
-
-// load options into global variables
-_loadOptions();
-
-// start speech recognition once everything is defined
-_startRecognition();
