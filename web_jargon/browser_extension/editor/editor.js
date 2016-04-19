@@ -4,7 +4,6 @@ The editor controls tab-specific functions. It receives commands from the backgr
 var zoomLevel = .25;
 var currentZoom = parseInt($('body').css('zoom'));//TODO css is not updated after a zoom
 var lastEditedInput = null;
-var url = null;
 
 //from https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
 $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
@@ -19,7 +18,6 @@ $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (typeof window[request.func] == 'function') {
-      url = request.url;
       window[request.func].apply(null, request.params);
       sendResponse({msg: "success"});
     } else {
@@ -73,14 +71,22 @@ function forwardPage(){
   parent.history.forward();
 }
 
-function zoomIn(amount){
-  var dec_amount = amount / 100;
-  _setZoom(currentZoom + dec_amount);
+function zoomIn(amount, context){
+  if(context == "D"){
+    var tb = $("viewer-toolbar");
+  } else{
+    var dec_amount = amount / 100;
+    _setZoom(currentZoom + dec_amount);
+  }
 }
 
 function zoomOut(amount){
-  var dec_amount = amount / 100;
-  _setZoom(currentZoom - dec_amount);
+  if(url.indexOf(".pdf")>=0){
+    //alert($("#zoom-out-button").find("div").attr("id"));
+  } else{
+    var dec_amount = amount / 100;
+    _setZoom(currentZoom - dec_amount);
+  }
 }
 
 function click(str){
@@ -211,14 +217,26 @@ function searchMusic(is_spotify, artist, album, song, type){
   var is_spotify = _getBool(is_spotify);
   if(is_spotify){
     if (type=="artist"){
-      // do artist search
+      $.get( "https://api.spotify.com/v1/search?q="+artist+"&type=artist&limit=1", function( data ) {
+        window.location.href = data["artists"]["items"][0]["external_urls"]["spotify"];
+      });
     } else if (type == "album") {
-      //do album search
+      $.get( "https://api.spotify.com/v1/search?q="+album+"&type=album&limit=1", function( data ) {
+        window.location.href = data["albums"]["items"][0]["external_urls"]["spotify"];
+      });
     } else if (type == "song") {
-      //do song search
+      $.get( "https://api.spotify.com/v1/search?q="+song+"&type=track&limit=1", function( data ) {
+        window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+      });
     } else {
-      //do search using all input
-      window.location.href = "http://play.spotify.com/search/" + [artist, album, song].join(" ").trim();
+      var query = "https://api.spotify.com/v1/search?q=";
+      if(artist){ query += "artist:"+artist; }
+      if(album){ query += "%20album:"+album }
+      if(song){ query += "%20track:"+song }
+      query += "&type=track&limit=1";
+      $.get(query, function( data ) {
+        window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+      });
     }
   } else{
       window.location.href = "http://www.pandora.com/search/" + [artist, album, song].join(" ").trim();
