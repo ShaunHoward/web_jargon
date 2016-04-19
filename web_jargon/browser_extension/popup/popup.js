@@ -6,7 +6,7 @@ var backgroundPage = chrome.extension.getBackgroundPage();
 $("#textInput").submit(function( event ) {
   var inputText = $("input:first").val();
   event.preventDefault();
-  backgroundPage._sendText(inputText);
+  backgroundPage._sendExecuteAndNotify(inputText);
 });
 
 $("#settings").click(function( event ) {

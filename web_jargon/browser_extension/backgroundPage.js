@@ -21,69 +21,27 @@ var server;
 var audioResponse;
 var textResponse;
 
-// load options into global variables
-_loadOptions();
-
 // whether to keep listening in the web speech API, always true for our extension
 var keepListening = true;
 
 // whether permission has been granted to the microphone by the user
 var permission_granted = false;
 
-// instantiate a new web speech api recognition object
-var recognition = new webkitSpeechRecognition();
-// include all results
-recognition.continuous = true;
-recognition.interimResults = true;
-
-// define a speech recognition error callback
-recognition.onerror = function(event) {
-  //check if microphone is available and permission has not already been granted
-  if(event.error == 'not-allowed' && permission_granted == false){
-   permission_granted = true;
-   _getAudioPermission();
-  }
-}
-
-// define a speech recognition result callback
-recognition.onresult = function(event) {
-  // process the final command transcript received from the web speech api
-  for (var i = event.resultIndex; i < event.results.length; ++i) {
-    if (event.results[i].isFinal) {
-      var command = event.results[i][0].transcript;
-      // send command data to be processed, executed and user notified
-      _processExecuteAndNotify(command);
-    }
-  }
-}
-
-// define a speech recognition end callback
-recognition.onend = function() {
-  // either restart listening or set non-listening state
-  if(keepListening){
-    _startRecognition();
-  } else{
-    listening = false;
-  }
-}
-
-// load options on start if last state was error state, otherwise no other necessary actions
-recognition.onstart = function(){
-  if (current_state == states.ERROR) {
-    _loadOptions();
-  }
-}
-
-/**
- * Define extension helper functions.
- */
-function _startRecognition(){
-  recognition.start();
-}
+// variable for speech recognition object
+var recognition;
 
 // used to give permission to the extension for web speech microphone access
 function _getAudioPermission(){
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
+}
+
+//http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript
+function make_random_id() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 32; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
 }
 
 /**
@@ -114,7 +72,7 @@ function _loadOptions(){
   sendData.url = "test";
 
   // generate random session id key
-  var key = 31 * Math.random();
+  var key = make_random_id();
   sendData.session_id = key;
 
   /**
@@ -135,6 +93,57 @@ function _loadOptions(){
     // failure to connect to server results in error state being set
     _setError();
   });
+}
+
+// instantiate a new web speech api recognition object
+var recognition = new webkitSpeechRecognition();
+// include all results
+recognition.continuous = true;
+recognition.interimResults = true;
+
+// define a speech recognition error callback
+recognition.onerror = function(event) {
+  //check if microphone is available and permission has not already been granted
+  if(event.error == 'not-allowed' && permission_granted == false){
+    permission_granted = true;
+    _getAudioPermission();
+  }
+}
+
+// define a speech recognition result callback
+recognition.onresult = function(event) {
+  // process the final command transcript received from the web speech api
+  for (var i = event.resultIndex; i < event.results.length; ++i) {
+    if (event.results[i].isFinal) {
+      var command = event.results[i][0].transcript;
+      // send command data to be processed, executed and user notified
+      _processExecuteAndNotify(command);
+    }
+  }
+}
+
+// define a speech recognition end callback
+recognition.onend = function() {
+  // either restart listening or set non-listening state
+  if (keepListening) {
+    _startRecognition();
+  } else {
+    listening = false;
+  }
+}
+
+// load options on start if last state was error state, otherwise no other necessary actions
+recognition.onstart = function(){
+  if (current_state == states.ERROR) {
+    _loadOptions();
+  }
+}
+
+/**
+ * Define extension helper functions.
+ */
+function _startRecognition(){
+  recognition.start();
 }
 
 // used to set the extension toolbar icon
@@ -199,8 +208,14 @@ function _sendExecuteAndNotify(action_command_request){
         url = "www.google.com";
     }
 
-    // generate random sha256 session id key
-    var key = sha256digest((Math.random()*31*23).toString(36));
+    // set up variable for session id
+    var key = "blah";
+//
+//    $.getScript("/3rd-party/sha256.js", function(){
+//      var random_str = make_random_id();
+//      // generate random sha256 key
+//      key = Sha256.hash(random_str);
+//    });
 
     // set busy state since extension is reaching out to API server
     _setBusy();
@@ -286,7 +301,7 @@ function _onSuccess(inputStr, func, params){
  */
 function _doCommand(cmd, params, context){
   if (typeof window[cmd] == 'function') {
-    params.push(context)
+    params.push(context);
     window[cmd].apply(null, params);
     return;
   }
@@ -479,6 +494,9 @@ function displayHelp(show, context){
     closeTab("help_page");
   }
 }
+
+// load options into global variables
+_loadOptions();
 
 // start speech recognition once everything is defined
 _startRecognition();
