@@ -237,8 +237,8 @@ Executes input command
 Checks background page functions first, then checks current tab functions
 */
 function _doCommand(cmd, params, context){
+  params.push(context);
   if (typeof window[cmd] == 'function') {
-    params.push(context)
     window[cmd].apply(null, params);
     return;
   }
@@ -272,10 +272,11 @@ function _loadOptions(){
   textResponse = localStorage["textResponse"] == "false" ? false : true;
 
   //ping server
+  var key = 1234;
   var sendData = new Object();
   sendData.command = "test";
   sendData.url = "test";
-  sendData.session_id = 1234;
+  sendData.session_id = key;
   $.post( server, JSON.stringify(sendData), function( data ) {
     var ret_id = JSON.parse(data)["session_id"];
     if(key != ret_id){
@@ -290,7 +291,7 @@ function _loadOptions(){
 
 function _getURL(name){
   var fullURL = "http://www."+name+".com";
-  alert(_websiteExists(fullURL));
+  //alert(_websiteExists(fullURL));
   return _websiteExists(fullURL) ? fullURL : "http://www.google.com/#q="+name;
 }
 

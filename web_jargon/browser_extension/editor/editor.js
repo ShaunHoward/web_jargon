@@ -4,7 +4,6 @@ The editor controls tab-specific functions. It receives commands from the backgr
 var zoomLevel = .25;
 var currentZoom = parseInt($('body').css('zoom'));//TODO css is not updated after a zoom
 var lastEditedInput = null;
-var url = null;
 
 //from https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
 $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
@@ -19,7 +18,6 @@ $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (typeof window[request.func] == 'function') {
-      url = request.url;
       window[request.func].apply(null, request.params);
     } else{
       //sendResponse({msg: "not found"}); 
@@ -72,14 +70,22 @@ function forwardPage(){
   parent.history.forward();
 }
 
-function zoomIn(amount){
-  var dec_amount = amount / 100;
-  _setZoom(currentZoom + dec_amount);
+function zoomIn(amount, context){
+  if(context == "D"){
+    var tb = $("viewer-toolbar");
+  } else{
+    var dec_amount = amount / 100;
+    _setZoom(currentZoom + dec_amount);
+  }
 }
 
 function zoomOut(amount){
-  var dec_amount = amount / 100;
-  _setZoom(currentZoom - dec_amount);
+  if(url.indexOf(".pdf")>=0){
+    //alert($("#zoom-out-button").find("div").attr("id"));
+  } else{
+    var dec_amount = amount / 100;
+    _setZoom(currentZoom - dec_amount);
+  }
 }
 
 function click(str){
