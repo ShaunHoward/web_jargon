@@ -20,12 +20,12 @@ SWITCH_TAB:["open existing (TAB_INDEX|TAB_NAME)", "switch to (TAB_INDEX|TAB_NAME
 
 # requirement 4.6
 FORWARD:["forward", "go forward", "go forward a page", "go to the next page", "next page", "ahead a page", "forward a page", "one page forward", "page forward", "page ahead"]
-BACKWARD:["backward", "go backward", "go backward a page", "go back a page", "go to the previous page", "previous page", "back a page", "backward a page", "one page backward", "page backward", "page back"]
+BACKWARD:["back", "backward", "go backward", "go backward a page", "go back a page", "go to the previous page", "previous page", "back a page", "backward a page", "one page backward", "page backward", "page back"]
 REFRESH:["refresh", "refresh the page", "refresh page", "page refresh", "refresh this page"]
 
 # requirement 4.7
 # allow only part of element name (fuzzy string search using html web page from plugin)
-CLICK:["click (DOMAIN_NAME|ELEMENT_NAME)", "click (DOMAIN_NAME|ELEMENT_NAME) button", "click the (DOMAIN_NAME|ELEMENT_NAME) button", "open link (DOMAIN_NAME|ELEMENT_NAME)", "click link (DOMAIN_NAME|ELEMENT_NAME)", "click (DOMAIN_NAME|ELEMENT_NAME) link", "enter (DOMAIN_NAME|ELEMENT_NAME)"]
+CLICK:["click (DOMAIN_NAME|ELEMENT_NAME)", "click (DOMAIN_NAME|ELEMENT_NAME) button", "click the (DOMAIN_NAME|ELEMENT_NAME) button", "open link (DOMAIN_NAME|ELEMENT_NAME)", "click link (DOMAIN_NAME|ELEMENT_NAME)", "click (DOMAIN_NAME|ELEMENT_NAME) link"]
 
 # requirement 4.8
 OPEN_URL:["open (URL) (IN_CURRENT_TAB=false)", "open (URL) in the current tab (IN_CURRENT_TAB=true)", "open url (URL) (IN_CURRENT_TAB=false)", "open new (URL) (IN_CURRENT_TAB=false)", "open (URL) in this tab (IN_CURRENT_TAB=true)", "open (URL) in new tab (IN_CURRENT_TAB=false)"]
@@ -35,7 +35,7 @@ SELECT_ELEMENT:["select (ELEMENT_NAME)"]
 
 # req 4.10
 # enter depends on select
-ENTER_TEXT:["enter text (EXCERPT)", "write (EXCERPT)"]
+ENTER_TEXT:["enter (EXCERPT)", "enter text (EXCERPT)", "write (EXCERPT)"]
 
 # req 4.11
 # submit depends on enter
