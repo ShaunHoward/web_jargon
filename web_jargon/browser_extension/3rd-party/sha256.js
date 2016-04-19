@@ -164,3 +164,12 @@ if (typeof String.prototype.utf8Decode == 'undefined') {
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  */
 if (typeof module != 'undefined' && module.exports) module.exports = Sha256; // CommonJs export
 if (typeof define == 'function' && define.amd) define([], function() { return Sha256; }); // AMD
+
+//http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript
+function make_random_id() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 32; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}

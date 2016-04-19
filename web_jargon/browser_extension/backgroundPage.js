@@ -30,18 +30,29 @@ var permission_granted = false;
 // variable for speech recognition object
 var recognition;
 
+// http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
+function loadjscssfile(filename, filetype){
+  if (filetype=="js") { //if filename is a external JavaScript file
+    var fileref=document.createElement('script');
+    fileref.setAttribute("type","text/javascript");
+    fileref.setAttribute("src", filename);
+  } else if (filetype=="css") { //if filename is an external CSS file
+    var fileref=document.createElement("link");
+    fileref.setAttribute("rel", "stylesheet");
+    fileref.setAttribute("type", "text/css");
+    fileref.setAttribute("href", filename);
+  }
+  if (typeof fileref!="undefined") {
+    document.getElementsByTagName("head")[0].appendChild(fileref);
+  }
+}
+
+//dynamically load and add the sha256 .js file
+loadjscssfile("/3rd-party/sha256.js", "js");
+
 // used to give permission to the extension for web speech microphone access
 function _getAudioPermission(){
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
-}
-
-//http://stackoverflow.com/questions/1349404/generate-a-string-of-5-random-characters-in-javascript
-function make_random_id() {
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < 32; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
 }
 
 /**
@@ -209,13 +220,9 @@ function _sendExecuteAndNotify(action_command_request){
     }
 
     // set up variable for session id
-    var key = "blah";
-//
-//    $.getScript("/3rd-party/sha256.js", function(){
-//      var random_str = make_random_id();
-//      // generate random sha256 key
-//      key = Sha256.hash(random_str);
-//    });
+    // generate random sha256 key
+    var random_str = make_random_id();
+    var key = Sha256.hash(random_str);
 
     // set busy state since extension is reaching out to API server
     _setBusy();
