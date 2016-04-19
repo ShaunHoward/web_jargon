@@ -31,24 +31,24 @@ var permission_granted = false;
 var recognition;
 
 // http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
-function loadjscssfile(filename, filetype){
-  if (filetype=="js") { //if filename is a external JavaScript file
-    var fileref=document.createElement('script');
-    fileref.setAttribute("type","text/javascript");
-    fileref.setAttribute("src", filename);
-  } else if (filetype=="css") { //if filename is an external CSS file
-    var fileref=document.createElement("link");
-    fileref.setAttribute("rel", "stylesheet");
-    fileref.setAttribute("type", "text/css");
-    fileref.setAttribute("href", filename);
+function load_jscss_file(filename, file_type){
+  if (file_type=="js") { //if filename is a external JavaScript file
+    var file_ref=document.createElement('script');
+    file_ref.setAttribute("type","text/javascript");
+    file_ref.setAttribute("src", filename);
+  } else if (file_type=="css") { //if filename is an external CSS file
+    var file_ref=document.createElement("link");
+    file_ref.setAttribute("rel", "stylesheet");
+    file_ref.setAttribute("type", "text/css");
+    file_ref.setAttribute("href", filename);
   }
-  if (typeof fileref!="undefined") {
-    document.getElementsByTagName("head")[0].appendChild(fileref);
+  if (typeof file_ref!="undefined") {
+    document.getElementsByTagName("head")[0].appendChild(file_ref);
   }
 }
 
 //dynamically load and add the sha256 .js file
-loadjscssfile("/3rd-party/sha256.js", "js");
+load_jscss_file("/3rd-party/sha256.js", "js");
 
 // used to give permission to the extension for web speech microphone access
 function _getAudioPermission(){
@@ -346,6 +346,39 @@ function _switchToTabAtIndex(index) {
       chrome.tabs.update(tabs[tabId-1].id, {active: true});
     }
   });
+}
+
+/**
+ * First, removes all spaces from the specified input string.
+ * Second, applies www. if it does not exist.
+ * Third, applies http:// if it does not exist.
+ * Fourth, attempts to find a domain extension in the string or adds .com.
+ * Returns the newly normalized url string.
+ */
+function _norm_url(input) {
+  input = input.trim();
+  var http = "http://";
+  var www = "www.";
+  var com = ".com";
+  // store new url rendition
+  var url = input;
+
+  // add www. to front of url to go to the world-wide web
+  if (url.indexOf(www) < 0) {
+    url = www.concat(url);
+  }
+  // add http:// to front of url to go to correct protocol
+  if (u.indexOf(http) < 0) {
+    url = http.concat(url);
+  }
+
+  // try to find .com or ..*{2,3}
+  matches = u.match("\\.[a-z]{2,3}$");
+  if (matches == undefined) {
+    // if no match was found, add .com to give url a chance
+    url = url.concat(com);
+  }
+  return url;
 }
 
 /**
