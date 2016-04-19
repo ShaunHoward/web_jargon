@@ -216,14 +216,26 @@ function searchMusic(is_spotify, artist, album, song, type){
   var is_spotify = _getBool(is_spotify);
   if(is_spotify){
     if (type=="artist"){
-      // do artist search
+      $.get( "https://api.spotify.com/v1/search?q="+artist+"&type=artist&limit=1", function( data ) {
+        window.location.href = data["artists"]["items"][0]["external_urls"]["spotify"];
+      });
     } else if (type == "album") {
-      //do album search
+      $.get( "https://api.spotify.com/v1/search?q="+album+"&type=album&limit=1", function( data ) {
+        window.location.href = data["albums"]["items"][0]["external_urls"]["spotify"];
+      });
     } else if (type == "song") {
-      //do song search
+      $.get( "https://api.spotify.com/v1/search?q="+song+"&type=track&limit=1", function( data ) {
+        window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+      });
     } else {
-      //do search using all input
-      window.location.href = "http://play.spotify.com/search/" + [artist, album, song].join(" ");
+      var query = "https://api.spotify.com/v1/search?q=";
+      if(artist){ query += "artist:"+artist; }
+      if(album){ query += "%20album:"+album }
+      if(song){ query += "%20track:"+song }
+      query += "&type=track&limit=1";
+      $.get(query, function( data ) {
+        window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+      });
     }
   } else{
       window.location.href = "http://www.pandora.com/search/" + [artist, album, song].join(" ").trim();
