@@ -214,7 +214,7 @@ function nextSong(is_spotify){
 }
 
 function _isValidArtistInfo(str) {
-  return str != undefined && typeof(str) == string && str.length > 0;
+  return str != undefined && typeof(str) == "string" && str.length > 0;
 }
 
 // searches spotify for specified artist
