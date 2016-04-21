@@ -7,9 +7,9 @@ var lastEditedInput = null;
 
 //from https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
 $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
-    return function( elem ) {
-        return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
-    };
+  return function( elem ) {
+    return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+  };
 });
 
 /**
@@ -19,17 +19,18 @@ chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     if (typeof window[request.func] == 'function') {
       window[request.func].apply(null, request.params);
-    } else{
-      //sendResponse({msg: "not found"}); 
+      sendResponse({msg: "success"});
+    } else {
+      sendResponse({msg: "error"});
     }   
   });
 
 function appendToLinks(){
-    $("a").append("yep");
+  $("a").append("yep");
 }
 
 function scrollDown(num){
-  if(num == undefined){
+  if (num == undefined) {
     num = 1;
   }
   var current = $(document).scrollTop();
@@ -38,7 +39,7 @@ function scrollDown(num){
 }
 
 function scrollUp(num){
-  if(num == undefined){
+  if (num == undefined) {
     num = 1;
   }
   var current = $(document).scrollTop();
@@ -71,18 +72,18 @@ function forwardPage(){
 }
 
 function zoomIn(amount, context){
-  if(context == "D"){
+  if (context == "D") {
     var tb = $("viewer-toolbar");
-  } else{
+  } else {
     var dec_amount = amount / 100;
     _setZoom(currentZoom + dec_amount);
   }
 }
 
-function zoomOut(amount){
-  if(url.indexOf(".pdf")>=0){
+function zoomOut(amount, context){
+  if (context == "D") {
     //alert($("#zoom-out-button").find("div").attr("id"));
-  } else{
+  } else {
     var dec_amount = amount / 100;
     _setZoom(currentZoom - dec_amount);
   }
@@ -114,7 +115,7 @@ function selectElement(name){
    return re.test(this.placeholder);
   }).first();
 
-  if(e.val() == undefined){
+  if (e.val() == undefined) {
     e = $("input[title]").filter(function() {
       return re.test(this.title);
     }).first();
@@ -126,7 +127,7 @@ function selectElement(name){
 }
 
 function submitText(){
-  if(lastEditedInput != null){
+  if (lastEditedInput != null) {
     lastEditedInput.closest('form').submit();
   }
 }
@@ -135,7 +136,7 @@ function playVideo(){
   var doc = $(window).scrollTop();
   $("button[aria-label='Play']").each(function(){
     var relative = $(this).offset().top - doc;
-    if(relative > 0){
+    if (relative > 0) {
       $(this).click();
       return false;
     }
@@ -146,7 +147,7 @@ function pauseVideo(){
   var doc = $(window).scrollTop();
   $("button[aria-label='Pause']").each(function(){
     var relative = $(this).offset().top - doc;
-    if(relative > 0){
+    if (relative > 0) {
       $(this).click();
       return false;
     }
@@ -157,7 +158,7 @@ function nextVideo(){
   var doc = $(window).scrollTop();
   $("a[title='Next']").each(function(){
     var relative = $(this).offset().top - doc;
-    if(relative > 0){
+    if (relative > 0) {
       window.location.href = $(this).attr("href");
       return false;
     }
@@ -179,7 +180,7 @@ function closeFullscreen(){
   var doc = $(window).scrollTop();
   $("button[title='Exit full screen']").each(function(){
     var relative = $(this).offset().top - doc;
-    if(relative > 0){
+    if (relative > 0) {
       $(this).click();
       return false;
     }
@@ -188,7 +189,7 @@ function closeFullscreen(){
 
 function playMusic(is_spotify){
   var is_spotify = _getBool(is_spotify);
-  if(is_spotify){
+  if (is_spotify) {
     var frame = $("#app-player");
     var contents = frame.contents();
     var btn = contents.find("button[id='play-pause']");
@@ -200,7 +201,7 @@ function playMusic(is_spotify){
 
 function pauseMusic(is_spotify){
   var is_spotify = _getBool(is_spotify);
-  if(is_spotify){
+  if (is_spotify) {
     var frame = $("#app-player");
     var contents = frame.contents();
     var btn = contents.find("button[id='play-pause']");
@@ -212,7 +213,7 @@ function pauseMusic(is_spotify){
 
 function nextSong(is_spotify){
   var is_spotify = _getBool(is_spotify);
-  if(is_spotify){
+  if (is_spotify) {
     var frame = $("#app-player");
     var contents = frame.contents();
     var btn = contents.find("button[id='next']");
@@ -222,30 +223,63 @@ function nextSong(is_spotify){
   }
 }
 
+function _isValidArtistInfo(str) {
+  return str != undefined && typeof(str) == "string" && str.length > 0;
+}
+
+// searches spotify for specified artist
+function _doArtistSearch(artist) {
+  if (!_isValidArtistInfo(artist)) {
+    return;
+  }
+  $.get( "https://api.spotify.com/v1/search?q="+artist+"&type=artist&limit=1", function( data ) {
+    window.location.href = data["artists"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
+// searches spotify for specified album
+function _doAlbumSearch(album) {
+  if (!_isValidArtistInfo(album)) {
+    return;
+  }
+  $.get( "https://api.spotify.com/v1/search?q="+album+"&type=album&limit=1", function( data ) {
+    window.location.href = data["albums"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
+// searches spotify for specified song
+function _doSongSearch(song) {
+  if (!_isValidArtistInfo(song)) {
+    return;
+  }
+  $.get( "https://api.spotify.com/v1/search?q="+song+"&type=track&limit=1", function( data ) {
+    window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
+// searches spotify for specified artist, album, and/or song
+function _doArtistInfoSearch(artist, album, song) {
+  var query = "https://api.spotify.com/v1/search?q=";
+  if (_isValidArtistInfo(artist)) { query += "artist:"+artist; }
+  if (_isValidArtistInfo(album)) { query += "%20album:"+album; }
+  if (_isValidArtistInfo(song)) { query += "%20track:"+song; }
+  query += "&type=track&limit=1";
+  $.get(query, function( data ) {
+    window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
 function searchMusic(is_spotify, artist, album, song, type){
   var is_spotify = _getBool(is_spotify);
   if(is_spotify){
     if (type=="artist"){
-      $.get( "https://api.spotify.com/v1/search?q="+artist+"&type=artist&limit=1", function( data ) {
-        window.location.href = data["artists"]["items"][0]["external_urls"]["spotify"];
-      });
+      _doArtistSearch(artist);
     } else if (type == "album") {
-      $.get( "https://api.spotify.com/v1/search?q="+album+"&type=album&limit=1", function( data ) {
-        window.location.href = data["albums"]["items"][0]["external_urls"]["spotify"];
-      });
+      _doAlbumSearch(album);
     } else if (type == "song") {
-      $.get( "https://api.spotify.com/v1/search?q="+song+"&type=track&limit=1", function( data ) {
-        window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
-      });
+      _doSongSearch(song);
     } else {
-      var query = "https://api.spotify.com/v1/search?q=";
-      if(artist){ query += "artist:"+artist; }
-      if(album){ query += "%20album:"+album }
-      if(song){ query += "%20track:"+song }
-      query += "&type=track&limit=1";
-      $.get(query, function( data ) {
-        window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
-      });
+      _doArtistInfoSearch(artist, album, song);
     }
   } else{
       window.location.href = "http://www.pandora.com/search/" + [artist, album, song].join(" ").trim();

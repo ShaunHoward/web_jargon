@@ -95,7 +95,7 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.FORWARD)
 
     def test_backward_page(self):
-        template_phrases = ["backward", "go backward", "go backward a page", "go back a page",
+        template_phrases = ["back", "backward", "go backward", "go backward a page", "go back a page",
                             "go to the previous page", "previous page", "back a page", "backward a page",
                             "one page backward", "page backward", "page back"]
         self.validate_phrases(template_phrases, h.BACKWARD)
@@ -108,10 +108,10 @@ class TextProcessorTest(unittest.TestCase):
         template_phrases = ["open link facebook", "click google doc link", "click link github.com",
                             "open link w w w dot google dot com", "click github dot com", "click search",
                             "click the home button", "click submit", "click more", "click sent mail", "click the submit button",
-                            "click the post button", "click the home button", "enter facebook"]
+                            "click the post button", "click the home button"]
 
         args = [['facebook'], ['google doc'], ['github.com'], ['www.google.com'], ['github.com'], ['search'], ['home'],
-                ['submit'], ['more'], ['sent mail'], ['submit'], ['post'], ['home'], ['facebook']]
+                ['submit'], ['more'], ['sent mail'], ['submit'], ['post'], ['home']]
         self.validate_phrases(template_phrases, h.CLICK, args)
 
     def test_open_url(self):
@@ -131,10 +131,12 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.SELECT_ELEMENT, args)
 
     def test_enter_text(self):
-        template_phrases = ["enter text I feel great today for some reason",
+        template_phrases = ["enter senior project has been a long process of testing",
+                            "enter text I feel great today for some reason",
                             "write I feel great today and want to go on vacation",
                             "enter text the wheels on the car are worth $2500"]
-        args = [['i feel great today for some reason'], ['i feel great today and want to go on vacation'],
+        args = [['senior project has been a long process of testing'],
+                ['i feel great today for some reason'], ['i feel great today and want to go on vacation'],
                 ['the wheels on the car are worth $2500']]
         self.validate_phrases(template_phrases, h.ENTER_TEXT, args)
 
