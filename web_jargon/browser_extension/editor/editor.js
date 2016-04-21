@@ -90,7 +90,17 @@ function zoomOut(amount){
 
 function click(str){
   var b = $("a:containsci("+str+")").first();
-  b[0].click();
+  if(b[0] == undefined){
+    b = $("div:containsci("+str+")").filter(function() {
+      return (
+      $(this).clone() //clone the element
+      .children() //select all the children
+      .remove() //remove all the children
+      .end() //again go back to selected element
+      .filter(":containsci("+str+")").length > 0)
+    });
+  } 
+    b[0].click();
 }
 
 function enterText(str){
@@ -156,7 +166,7 @@ function nextVideo(){
 
 function openFullscreen(){
   var doc = $(window).scrollTop();
-  $("button[aria-label='Full screen']").each(function(){
+  $("button[title='Full screen']").each(function(){
     var relative = $(this).offset().top - doc;
     if(relative > 0){
       $(this).click();
@@ -167,7 +177,7 @@ function openFullscreen(){
 
 function closeFullscreen(){
   var doc = $(window).scrollTop();
-  $("button[aria-label='Exit full screen']").each(function(){
+  $("button[title='Exit full screen']").each(function(){
     var relative = $(this).offset().top - doc;
     if(relative > 0){
       $(this).click();
