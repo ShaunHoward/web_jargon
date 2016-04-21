@@ -21,26 +21,6 @@ var server;
 var audioResponse;
 var textResponse;
 
-//// http://www.javascriptkit.com/javatutors/loadjavascriptcss.shtml
-//function load_jscss_file(filename, file_type){
-//  if (file_type=="js") { //if filename is a external JavaScript file
-//    var file_ref=document.createElement('script');
-//    file_ref.setAttribute("type","text/javascript");
-//    file_ref.setAttribute("src", filename);
-//  } else if (file_type=="css") { //if filename is an external CSS file
-//    var file_ref=document.createElement("link");
-//    file_ref.setAttribute("rel", "stylesheet");
-//    file_ref.setAttribute("type", "text/css");
-//    file_ref.setAttribute("href", filename);
-//  }
-//  if (typeof file_ref!="undefined") {
-//    document.getElementsByTagName("head")[0].appendChild(file_ref);
-//  }
-//}
-
-//dynamically load and add the sha256 .js file
-//load_jscss_file("/3rd-party/sha256.js", "js");
-
 // used to give permission to the extension for web speech microphone access
 function _getAudioPermission(){
   window.open("chrome-extension://"+chrome.runtime.id+"/additional/requestAudio.html");
