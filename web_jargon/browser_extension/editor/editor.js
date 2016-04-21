@@ -25,6 +25,194 @@ chrome.runtime.onMessage.addListener(
     }   
   });
 
+
+function _callBackgroundFunction(cmd, params) {
+  chrome.runtime.sendMessage({func: cmd, params: params}, function(response) {
+    if(response && response.msg){
+      return response.msg;
+    }
+  });
+}
+
+/**
+ * @author       Rob W <gwnRob@gmail.com>
+ * @website      http://stackoverflow.com/a/7513356/938089
+ * @version      20131010
+ * @description  Executes function on a framed YouTube video (see website link)
+ *               For a full list of possible functions, see:
+ *               https://developers.google.com/youtube/js_api_reference
+ * @param String frame_id The id of (the div containing) the frame
+ * @param String func     Desired function to call, eg. "playVideo"
+ *        (Function)      Function to call when the player is ready.
+ * @param Array  args     (optional) List of arguments to pass to function func*/
+function callPlayer(frame_id, func, args) {
+    if (window.jQuery && frame_id instanceof jQuery) frame_id = frame_id.get(0).id;
+    var iframe = document.getElementById(frame_id);
+    if (iframe && iframe.tagName.toUpperCase() != 'IFRAME') {
+        iframe = iframe.getElementsByTagName('iframe')[0];
+    }
+
+    // When the player is not ready yet, add the event to a queue
+    // Each frame_id is associated with an own queue.
+    // Each queue has three possible states:
+    //  undefined = uninitialised / array = queue / 0 = ready
+    if (!callPlayer.queue) callPlayer.queue = {};
+    var queue = callPlayer.queue[frame_id],
+        domReady = document.readyState == 'complete';
+
+    if (domReady && !iframe) {
+        // DOM is ready and iframe does not exist. Log a message
+        window.console && console.log('callPlayer: Frame not found; id=' + frame_id);
+        if (queue) clearInterval(queue.poller);
+    } else if (func === 'listening') {
+        // Sending the "listener" message to the frame, to request status updates
+        if (iframe && iframe.contentWindow) {
+            func = '{"event":"listening","id":' + JSON.stringify(''+frame_id) + '}';
+            iframe.contentWindow.postMessage(func, '*');
+        }
+    } else if (!domReady ||
+               iframe && (!iframe.contentWindow || queue && !queue.ready) ||
+               (!queue || !queue.ready) && typeof func === 'function') {
+        if (!queue) queue = callPlayer.queue[frame_id] = [];
+        queue.push([func, args]);
+        if (!('poller' in queue)) {
+            // keep polling until the document and frame is ready
+            queue.poller = setInterval(function() {
+                callPlayer(frame_id, 'listening');
+            }, 250);
+            // Add a global "message" event listener, to catch status updates:
+            messageEvent(1, function runOnceReady(e) {
+                    if (!iframe) {
+                        iframe = document.getElementById(frame_id);
+                        if (!iframe) return;
+                        if (iframe.tagName.toUpperCase() != 'IFRAME') {
+                            iframe = iframe.getElementsByTagName('iframe')[0];
+                            if (!iframe) return;
+                        }
+                    }
+                if (e.source === iframe.contentWindow) {
+                    // Assume that the player is ready if we receive a
+                    // message from the iframe
+                    clearInterval(queue.poller);
+                    queue.ready = true;
+                    messageEvent(0, runOnceReady);
+                    // .. and release the queue:
+                    while (tmp = queue.shift()) {
+                        callPlayer(frame_id, tmp[0], tmp[1]);
+                    }
+                }
+            }, false);
+        }
+    } else if (iframe && iframe.contentWindow) {
+        // When a function is supplied, just call it (like "onYouTubePlayerReady")
+        if (func.call) return func();
+        // Frame exists, send message
+        iframe.contentWindow.postMessage(JSON.stringify({
+            "event": "command",
+            "func": func,
+            "args": args || [],
+            "id": frame_id
+        }), "*");
+    }
+    /* IE8 does not support addEventListener... */
+    function messageEvent(add, listener) {
+        var w3 = add ? window.addEventListener : window.removeEventListener;
+        w3 ?
+            w3('message', listener, !1)
+        :
+            (add ? window.attachEvent : window.detachEvent)('onmessage', listener);
+    }
+}
+
+var videoTime = function _getVideoTime(isOpening) {
+  // get the iframe id of the youtube video
+  var frame_id;
+  var video_time;
+  var video_frames = [];
+  if (isOpening) {
+    $("[id^=apiproxy]").each(function() {
+      video_frames.push($(this));
+    });
+    frame_id = video_frames[0];
+    video_time = callPlayer(frame_id, "getCurrentTime");
+  } else {
+    $("[id$=player]").each(function() {
+      video_frames.push($(this));
+    });
+    video_time = video_frames[0].getCurrentTime();
+  }
+  if (video_time) {
+    // convert video time to hours, minutes and seconds from seconds
+    var hours = Math.floor(video_time / 3600);
+    var minutes = Math.floor(video_time / 60);
+    var seconds = video_time - minutes * 60;
+    return {
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds
+    };
+  }
+}
+
+// https://ctrlq.org/code/19797-regex-youtube-id
+function _extractVideoID(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match && match[7].length == 11){
+        return match[7];
+    }
+    return ""
+}
+
+function _openYoutubeFullscreen() {
+  // get the current video play time
+  var video_time = videoTime(true);
+  // store the embedded player prefix for substring checking
+  var embed_prefix = "http://www.youtube.com/embed/";
+  // get the current web page url
+  var curr_url = window.location.href;
+  // extract the video id from the url
+  var video_id = _extractVideoID(curr_url);
+
+  // open maximized almost full-screen player if not already in maximized mode
+  if (video_id != "" && curr_url.indexOf(embed_prefix) == -1) {
+    // create fullscreen url with autoplay
+    fullscreen_url = [embed_prefix, video_id, "&t=", video_time.hours.toString(), "h", video_time.minutes.toString(), "m", video_time.seconds.toString(), "s"].join("");
+    // print url to console
+    _callBackgroundFunction("_printConsoleMessage", [fullscreen_url]);
+    // open the fullscreen url in the current open tab
+    _callBackgroundFunction("_finishOpeningURL", [fullscreen_url, true]);
+    return "success";
+  } else {
+    return "error";
+  }
+}
+
+
+function _closeYoutubeFullscreen() {
+  // define the standard-sized youtube video prefix
+  var standard_prefix = "https://www.youtube.com/watch?v=";
+  // get the current video play time
+  var video_time = videoTime(false);
+  // get the current web page url
+  var curr_url = window.location.href;
+  // extract the video id from the url
+  var video_id = _extractVideoID(curr_url);
+
+  // open the standard video player page if possible
+  if (video_id != "" && curr_url.indexOf(standard_prefix) == -1) {
+    // create standard url for autoplay and maintaining position in video
+    standard_url = [standard_prefix, video_id, "&t=", video_time.hours.toString(), "h", video_time.minutes.toString(), "m", video_time.seconds.toString(), "s"].join("");
+    // print url to console
+    _callBackgroundFunction("_printConsoleMessage", [standard_url]);
+    // open the standard url in the tab at the correct position in time
+    _callBackgroundFunction("_finishOpeningURL", [standard_url, true]);
+    return "success";
+  } else {
+    return "error";
+  }
+}
+
 function appendToLinks(){
   $("a").append("yep");
 }
@@ -167,24 +355,34 @@ function nextVideo(){
 
 function openFullscreen(){
   var doc = $(window).scrollTop();
-  $("button[title='Full screen']").each(function(){
-    var relative = $(this).offset().top - doc;
-    if(relative > 0){
-      $(this).click();
-      return false;
-    }
-  });
+  var is_youtube = window.location.href.indexOf("youtube") > -1;
+  if (is_youtube) {
+      _openYoutubeFullscreen();
+  } else {
+    $("button[title='Full screen']").each(function(){
+        var relative = $(this).offset().top - doc;
+        if(relative > 0){
+          $(this).click();
+          return false;
+        }
+    });
+  }
 }
 
 function closeFullscreen(){
   var doc = $(window).scrollTop();
-  $("button[title='Exit full screen']").each(function(){
-    var relative = $(this).offset().top - doc;
-    if (relative > 0) {
-      $(this).click();
-      return false;
-    }
-  });
+  var is_youtube = window.location.href.indexOf("youtube") > -1;
+  if (is_youtube) {
+      _closeYoutubeFullscreen();
+  } else {
+    $("button[title='Exit full screen']").each(function(){
+      var relative = $(this).offset().top - doc;
+      if (relative > 0) {
+        $(this).click();
+        return false;
+      }
+    });
+  }
 }
 
 function playMusic(is_spotify){

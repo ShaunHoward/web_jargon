@@ -177,6 +177,10 @@ function _setError(){
   current_state = states.ERROR;
 }
 
+function _printConsoleMessage(msg) {
+   console.log(msg);
+}
+
 /**
  * Handles action request processing, sending a request to the API server,
  * extracting the request and executing it as well as notifying the user.
@@ -322,6 +326,17 @@ function _doCommand(cmd, params, context){
     });
   });
 }
+
+// listener for events from content script
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (typeof window[request.func] == 'function') {
+      window[request.func].apply(null, request.params);
+      sendResponse({msg: "success"});
+    } else {
+      sendResponse({msg: "error"});
+    }
+  });
 
 /**
  * Closes the tab at the specified index from the leftmost tab starting with choice 1 and ending at
