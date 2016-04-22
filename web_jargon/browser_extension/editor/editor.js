@@ -322,19 +322,23 @@ function zoomOut(amount){
  * @param str The string to search for in the object text.
  */
 function click(str){
-  var b = $("a:containsci("+str+")").first();
-  if(b[0] == undefined){
-    //only check direct text for matches, not the children's text.
-    b = $("div:containsci("+str+")").filter(function() {
-      return (
-      $(this).clone() //clone the element
-      .children() //select all the children
-      .remove() //remove all the children
-      .end() //again go back to selected element
-      .filter(":containsci("+str+")").length > 0)
-    });
-  } 
-  b[0].click();
+  str = str.trim();
+  // do not match to the empty string
+  if (str != "" && str.length > 0) {
+    var b = $("a:containsci("+str+")").first();
+    if(b[0] == undefined){
+      //only check direct text for matches, not the children's text.
+      b = $("div:containsci("+str+")").filter(function() {
+        return (
+        $(this).clone() //clone the element
+        .children() //select all the children
+        .remove() //remove all the children
+        .end() //again go back to selected element
+        .filter(":containsci("+str+")").length > 0)
+      });
+    }
+    b[0].click();
+  }
 }
 
 /**

@@ -368,17 +368,21 @@ function _closeTabAtIndex(tabId) {
 
 // Closes all the tabs containing the given name
 function _closeTabWithName(tabId) {
-  chrome.tabs.query({currentWindow: true}, function (tabs) {
-    // close all tabs containing the specified substring
-    for (t in tabs){
-      // normalize case of text for substring matching
-      lower_title = tabs[t].title.toLowerCase();
-      if(lower_title.indexOf(tabId) > -1){
-        // close the tab if match found
-        chrome.tabs.remove(tabs[t].id);
+  tabId = tabId.trim();
+  // do not match to the empty string
+  if (tabId != "" && tabId.length > 0) {
+    chrome.tabs.query({currentWindow: true}, function (tabs) {
+      // close all tabs containing the specified substring
+      for (t in tabs){
+        // normalize case of text for substring matching
+        lower_title = tabs[t].title.toLowerCase();
+        if(lower_title.indexOf(tabId) > -1){
+          // close the tab if match found
+          chrome.tabs.remove(tabs[t].id);
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 /**
@@ -395,18 +399,22 @@ function _switchToTabAtIndex(tabId) {
 
 // switches to the first tab including the specified name
 function _switchToTabWithName(tabId) {
-  // open the first tab including the input string id
-  chrome.tabs.query({currentWindow: true}, function (tabs) {
-    for (t in tabs){
-      // normalize case of title
-      lower_title = tabs[t].title.toLowerCase();
-      if(lower_title.indexOf(tabId) > -1){
-        // switch to matching tab and leave loop
-        chrome.tabs.update(tabs[t].id, {active: true});
-        break;
+  tabId = tabId.trim();
+  // do not match to the empty string
+  if (tabId != "" && tabId.length > 0) {
+    // open the first tab including the input string id
+    chrome.tabs.query({currentWindow: true}, function (tabs) {
+      for (t in tabs){
+        // normalize case of title
+        lower_title = tabs[t].title.toLowerCase();
+        if(lower_title.indexOf(tabId) > -1){
+          // switch to matching tab and leave loop
+          chrome.tabs.update(tabs[t].id, {active: true});
+          break;
+        }
       }
-    }
-  });
+    });
+  }
 }
 
 /**
