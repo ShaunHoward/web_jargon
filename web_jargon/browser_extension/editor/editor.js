@@ -1,11 +1,17 @@
 /**
-The editor controls tab-specific functions. It receives commands from the background page.
+ * The editor controls tab-specific functions. It receives commands from the background page.
+ * Functions starting with underscore(_) are not callable by the api. They are helper-functions only.
 */
 var zoomLevel = .25;
-var currentZoom = parseInt($('body').css('zoom'));//TODO css is not updated after a zoom
+//set current zoom level on load
+var currentZoom = parseInt($('body').css('zoom'));
+//stores last text input object. Used to enter text and submit forms.
 var lastEditedInput = null;
 
-//from https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
+/**
+ * from https://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
+ * Caps-insensitive contains method
+ */
 $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
   return function( elem ) {
     return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
@@ -13,7 +19,7 @@ $.expr[":"].containsci = $.expr.createPseudo(function(arg) {
 });
 
 /**
- * Called from the background page.
+ * Called from the background page to call a function.
  */
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
@@ -25,6 +31,9 @@ chrome.runtime.onMessage.addListener(
     }   
   });
 
+/**
+ * Calls a function in the backgroud page.
+ */
 function _callBackgroundFunction(cmd, params) {
   chrome.runtime.sendMessage({func: cmd, params: params}, function(response) {
     if(response && response.msg){
@@ -43,6 +52,9 @@ function _extractVideoID(url){
     return ""
 }
 
+/**
+ * Opens a new youtube page with the video as fullscreen.
+ */
 function _openYoutubeFullscreen() {
   // store the embedded player prefix for substring checking
   var embed_prefix = "http://www.youtube.com/embed/";
@@ -65,6 +77,9 @@ function _openYoutubeFullscreen() {
   }
 }
 
+/**
+ * Returns to the normal youtube page without fullscreen.
+ */
 function _closeYoutubeFullscreen() {
   // define the standard-sized youtube video prefix
   var standard_prefix = "https://www.youtube.com/watch?v=";
@@ -104,6 +119,10 @@ function _scrollVertical(dest){
   }, 1000);
 }
 
+/**
+ * Create a text box which displays the given string. Fades out quickly.
+ * @param str The string to display.
+ */
 function _addMessage(str){
   $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:55px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
   $("#WebJargonInfo").fadeOut(2000, function(){
@@ -244,7 +263,11 @@ function forwardPage(){
   parent.history.forward();
 }
 
-function zoomIn(amount){
+/**
+ * Zooms in by the given amount additively.
+ * @param amount The % to zoom in.
+ */
+function zoomIn(amount, context){
   var is_pdf = window.location.href.indexOf(".pdf") > -1;
   if (is_pdf) {
     _pdfZoom(true, amount);
@@ -254,6 +277,10 @@ function zoomIn(amount){
   }
 }
 
+/**
+ * Zooms out by the given amount additively.
+ * @param amount The % to zoom out.
+ */
 function zoomOut(amount){
   var is_pdf = window.location.href.indexOf(".pdf") > -1;
   if (is_pdf) {
@@ -264,9 +291,15 @@ function zoomOut(amount){
   }
 }
 
+/**
+ * Click an object on the current page.
+ * <a> objects are given priority over <div> objects.
+ * @param str The string to search for in the object text.
+ */
 function click(str){
   var b = $("a:containsci("+str+")").first();
   if(b[0] == undefined){
+    //only check direct text for matches, not the children's text.
     b = $("div:containsci("+str+")").filter(function() {
       return (
       $(this).clone() //clone the element
@@ -279,10 +312,19 @@ function click(str){
   b[0].click();
 }
 
+/**
+ * Set the value of the last edited input to the given string.
+ * @param str The string to input.
+ */
 function enterText(str){
   lastEditedInput.val(str);
 }
 
+/**
+ * Select and element by name.
+ * Name is searched for in element placeholder and title.
+ * @param name The name to search for in the input identifier.
+ */
 function selectElement(name){
   var re =  RegExp(name ,"i"); 
   var e;
@@ -301,12 +343,18 @@ function selectElement(name){
   }
 }
 
+/**
+ * Submits the form containing the last edited input.
+ */
 function submitText(){
   if (lastEditedInput != null) {
     lastEditedInput.closest('form').submit();
   }
 }
 
+/**
+ * Plays the topmost visible video.
+ */
 function playVideo(){
   var doc = $(window).scrollTop();
   $("button[aria-label='Play']").each(function(){
@@ -318,6 +366,9 @@ function playVideo(){
   });
 }
 
+/**
+ * Pauses the topmost visible video.
+ */
 function pauseVideo(){
   var doc = $(window).scrollTop();
   $("button[aria-label='Pause']").each(function(){
@@ -329,6 +380,9 @@ function pauseVideo(){
   });
 }
 
+/**
+ * Loads the next video in the topmost visible video frame.
+ */
 function nextVideo(){
   var doc = $(window).scrollTop();
   $("a[title='Next']").each(function(){
@@ -340,6 +394,9 @@ function nextVideo(){
   });
 }
 
+/**
+ * Sets the topmost visible video fullscreen.
+ */
 function openFullscreen(){
   var doc = $(window).scrollTop();
   var is_youtube = window.location.href.indexOf("youtube") > -1;
@@ -356,6 +413,9 @@ function openFullscreen(){
   }
 }
 
+/**
+ * Sets the current fullscreen video to normal.
+ */
 function closeFullscreen(){
   var doc = $(window).scrollTop();
   var is_youtube = window.location.href.indexOf("youtube") > -1;
@@ -384,6 +444,9 @@ function playMusic(is_spotify){
   }
 }
 
+/**
+ * Pause currently selected music.
+ */
 function pauseMusic(is_spotify){
   var is_spotify = _getBool(is_spotify);
   if (is_spotify) {
@@ -396,6 +459,9 @@ function pauseMusic(is_spotify){
   }
 }
 
+/**
+ * Plays the next song in the current playlist.
+ */
 function nextSong(is_spotify){
   var is_spotify = _getBool(is_spotify);
   if (is_spotify) {
@@ -408,6 +474,78 @@ function nextSong(is_spotify){
   }
 }
 
+/**
+ * Returns true if the given string is valid artist input.
+ * @param str The string to check.
+ */
+function _isValidArtistInfo(str) {
+  return str != undefined && typeof(str) == "string" && str.length > 0;
+}
+
+/**
+ * Searches spotify for the specified artist.
+ * @param artist The artist name.
+ */
+function _doArtistSearch(artist) {
+  if (!_isValidArtistInfo(artist)) {
+    return;
+  }
+  $.get( "https://api.spotify.com/v1/search?q="+artist+"&type=artist&limit=1", function( data ) {
+    window.location.href = data["artists"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
+/**
+ * Searches spotify for the specified album.
+ * @param album The album name.
+ */
+function _doAlbumSearch(album) {
+  if (!_isValidArtistInfo(album)) {
+    return;
+  }
+  $.get( "https://api.spotify.com/v1/search?q="+album+"&type=album&limit=1", function( data ) {
+    window.location.href = data["albums"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
+/**
+ * Searches spotify for the specified song.
+ * @param song The song name.
+ */
+function _doSongSearch(song) {
+  if (!_isValidArtistInfo(song)) {
+    return;
+  }
+  $.get( "https://api.spotify.com/v1/search?q="+song+"&type=track&limit=1", function( data ) {
+    window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
+/**
+ * Searches spotify for the a song which matches the specified artist/album/song.
+ * @param artist The artist name.
+ * @param album The album name.
+ * @param song The song name.
+ */
+function _doArtistInfoSearch(artist, album, song) {
+  var query = "https://api.spotify.com/v1/search?q=";
+  if (_isValidArtistInfo(artist)) { query += "artist:"+artist; }
+  if (_isValidArtistInfo(album)) { query += "%20album:"+album; }
+  if (_isValidArtistInfo(song)) { query += "%20track:"+song; }
+  query += "&type=track&limit=1";
+  $.get(query, function( data ) {
+    window.location.href = data["tracks"]["items"][0]["external_urls"]["spotify"];
+  });
+}
+
+/**
+ * Search music for the given type.
+ * @param is_spotify True if current site is spotify
+ * @param artist The artist name.
+ * @param album The album name.
+ * @param song The song name.
+ * @param type The result type, "artist", "album", or "song".
+ */
 function searchMusic(is_spotify, artist, album, song, type){
   var is_spotify = _getBool(is_spotify);
   if(is_spotify){
@@ -425,6 +563,10 @@ function searchMusic(is_spotify, artist, album, song, type){
   }
 }
 
+/**
+ * Goes to specified page in the pdf.
+ * @param num The page number.
+ */
 function goToPage(page_number){
   if (page_number > 0) {
     var zoom_str = "&zoom=";
