@@ -3,7 +3,7 @@ import json
 
 import web
 from optparse import OptionParser
-from helpers import log_to_console, is_json
+from helpers import log_to_console
 from text_processor import TextProcessor
 from mapper import Mapper
 

@@ -135,7 +135,28 @@ function forwardPage(){
 
 function zoomIn(amount, context){
   if (context == "D") {
-    var tb = $("viewer-toolbar");
+    // zoom only works given a page number and zoom level
+    // extract current zoom info
+    var curr_zoom = 100;
+    var url_split = window.location.href.split("&zoom=")[1];
+    var zoom = url_split[1];
+    if (zoom != undefined && zoom != "") {
+      curr_zoom = Number(zoom);
+    }
+    var new_url = url_split[0];
+    // get the current page number if page is not already set in URL
+    if (new_url.indexOf("#page=") == -1) {
+      var curr_page = $("#input").val();
+      // default to using first page if page number undefined
+      if (curr_page == undefined || curr_page == "") {
+        curr_page = 1;
+      }
+      new_url += "#page=" + Number(curr_page);
+    }
+    var new_zoom_level = curr_zoom + amount;
+    new_url += "&zoom=" + new_zoom_level.toString();
+    window.location.href = new_url
+    window.location.reload(true);
   } else {
     var dec_amount = amount / 100;
     _setZoom(currentZoom + dec_amount);
