@@ -208,6 +208,22 @@ function _processExecuteAndNotify(command){
 }
 
 /**
+ * Gets the URL of the currently open web page in the current tab.
+ */
+function _getURL() {
+  var url;
+  chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+    // either get the current url or assume google.com
+    if (tabs != undefined) {
+      url = tabs[0].url;
+    } else {
+      url = "www.google.com";
+    }
+  });
+  return url;
+}
+
+/**
  * Sends the given action command request to the API server,
  * attempts to execute the received web action sequence,
  * and notifies the user of success or error based on desired options.
