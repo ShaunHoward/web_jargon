@@ -14,7 +14,7 @@
 * Select HTML Element<br />
 * Enter Text in Form<br />
 * Submit Form<br />
-* Control Youtube Web Player<br />
+* Control Web Video Player<br />
 * Control Pandora and Spotify Online Media Players<br />
 * Control Adobe Acrobat Reader in Browser<br />
 
