@@ -31,6 +31,77 @@ chrome.runtime.onMessage.addListener(
     }   
   });
 
+/**
+ * Calls a function in the backgroud page.
+ */
+function _callBackgroundFunction(cmd, params) {
+  chrome.runtime.sendMessage({func: cmd, params: params}, function(response) {
+    if(response && response.msg){
+      return response.msg;
+    }
+  });
+}
+
+// https://ctrlq.org/code/19797-regex-youtube-id
+function _extractVideoID(url){
+    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    if (match && match[7].length == 11){
+        return match[7];
+    }
+    return ""
+}
+
+/**
+ * Opens a new youtube page with the video as fullscreen.
+ */
+function _openYoutubeFullscreen() {
+  // store the embedded player prefix for substring checking
+  var embed_prefix = "http://www.youtube.com/embed/";
+  // get the current web page url
+  var curr_url = window.location.href;
+  // extract the video id from the url
+  var video_id = _extractVideoID(curr_url);
+
+  // open maximized almost full-screen player if not already in maximized mode
+  if (video_id != "" && curr_url.indexOf(embed_prefix) == -1) {
+    // create fullscreen url with autoplay
+    fullscreen_url = embed_prefix + video_id + "?autoplay=1";
+    // print url to console
+    _callBackgroundFunction("_printConsoleMessage", [fullscreen_url]);
+    // open the fullscreen url in the current open tab
+    _callBackgroundFunction("_finishOpeningURL", [fullscreen_url, true]);
+    return "success";
+  } else {
+    return "error";
+  }
+}
+
+/**
+ * Returns to the normal youtube page without fullscreen.
+ */
+function _closeYoutubeFullscreen() {
+  // define the standard-sized youtube video prefix
+  var standard_prefix = "https://www.youtube.com/watch?v=";
+  // get the current web page url
+  var curr_url = window.location.href;
+  // extract the video id from the url
+  var video_id = _extractVideoID(curr_url);
+
+  // open the standard video player page if possible
+  if (video_id != "" && curr_url.indexOf(standard_prefix) == -1) {
+    // create standard url for autoplay and maintaining position in video
+    standard_url = standard_prefix + video_id + "?autoplay=1";
+    // print url to console
+    _callBackgroundFunction("_printConsoleMessage", [standard_url]);
+    // open the standard url in the tab at the correct position in time
+    _callBackgroundFunction("_finishOpeningURL", [standard_url, true]);
+    return "success";
+  } else {
+    return "error";
+  }
+}
+
 function scrollDown(num){
   if (num == undefined) {
     num = 1;
@@ -208,13 +279,18 @@ function nextVideo(){
  */
 function openFullscreen(){
   var doc = $(window).scrollTop();
-  $("button[title='Full screen']").each(function(){
-    var relative = $(this).offset().top - doc;
-    if(relative > 0){
-      $(this).click();
-      return false;
-    }
-  });
+  var is_youtube = window.location.href.indexOf("youtube") > -1;
+  if (is_youtube) {
+      _openYoutubeFullscreen();
+  } else {
+    $("button[title='Full screen']").each(function(){
+        var relative = $(this).offset().top - doc;
+        if(relative > 0){
+          $(this).click();
+          return false;
+        }
+    });
+  }
 }
 
 /**
@@ -222,13 +298,18 @@ function openFullscreen(){
  */
 function closeFullscreen(){
   var doc = $(window).scrollTop();
-  $("button[title='Exit full screen']").each(function(){
-    var relative = $(this).offset().top - doc;
-    if (relative > 0) {
-      $(this).click();
-      return false;
-    }
-  });
+  var is_youtube = window.location.href.indexOf("youtube") > -1;
+  if (is_youtube) {
+      _closeYoutubeFullscreen();
+  } else {
+    $("button[title='Exit full screen']").each(function(){
+      var relative = $(this).offset().top - doc;
+      if (relative > 0) {
+        $(this).click();
+        return false;
+      }
+    });
+  }
 }
 
 /**
