@@ -102,17 +102,20 @@ function _closeYoutubeFullscreen() {
   }
 }
 
+// set zoom level
 function _setZoom(z){
   $('body').css('zoom', z.toString());
   currentZoom = z;
 }
 
+// scroll amount of pixels given to the left or right
 function _scrollHorizontal(dest){
   $('html, body').animate({
     scrollLeft: dest
   }, 1000);
 }
 
+// scroll amount of pixels given up or down
 function _scrollVertical(dest){
   $('html, body').animate({
     scrollTop: dest
@@ -130,12 +133,13 @@ function _addMessage(str){
   });
 }
 
+// turns a string into a boolean type if possible, else returns false
 function _getBool(str){
   var bool = (str === "true");
   return bool;
 }
 
-
+// checks if the input string is a non-empty string
 function _isValidArtistInfo(str) {
   return str != undefined && typeof(str) == "string" && str.length > 0;
 }
@@ -182,6 +186,9 @@ function _doArtistInfoSearch(artist, album, song) {
   });
 }
 
+/**
+ * Zoom the pdf document in or out, as specified, by the given amount.
+ */
 function _pdfZoom(zoomIn, amount) {
   // zoom only works given a page number and zoom level
   // extract current zoom info
@@ -189,13 +196,14 @@ function _pdfZoom(zoomIn, amount) {
   // define page and zoom substrings of url
   var page_str = "#page=";
   var zoom_str = "&zoom=";
+  // extract zoom level from current url, if possible
   var zoom_split = window.location.href.split(zoom_str);
   var zoom = zoom_split[1];
   // attempt to get and set the current zoom level
   if (zoom != undefined && zoom != "") {
     curr_zoom = Number(zoom);
   }
-  // start the new url
+  // start the new doc url using shortest available part of current url
   var new_url = window.location.href.split(page_str)[0];
   var curr_page = 1;
   // get the page number from the url, if possible
@@ -216,11 +224,14 @@ function _pdfZoom(zoomIn, amount) {
   }
   // add zoom level to the new url
   new_url = new_url + zoom_str + new_zoom_level.toString();
-  // set url and reload the page
+  // set new url and reload the page
   window.location.href = new_url;
   window.location.reload(true);
 }
 
+/**
+ * Scrolls down the specified number of pages.
+ */
 function scrollDown(num){
   if (num == undefined) {
     num = 1;
@@ -230,6 +241,9 @@ function scrollDown(num){
   _scrollVertical(dest);
 }
 
+/**
+ * Scrolls up the specified number of pages.
+ */
 function scrollUp(num){
   if (num == undefined) {
     num = 1;
@@ -239,26 +253,35 @@ function scrollUp(num){
   _scrollVertical(dest);
 }
 
+/**
+ * Scrolls left as much as possible.
+ */
 function scrollLeft(){
   var current = $(document).scrollLeft();
   var dest = current - $(window).width();
   _scrollHorizontal(dest);
 }
 
+/**
+ * Scrolls right as much as possible.
+ */
 function scrollRight(){
   var current = $(document).scrollLeft();
   var dest = current + $(window).width();
   _scrollHorizontal(dest);
 }
 
+// refresh the current page
 function refresh(){
   location.reload();
 }
 
+// go back a page in the current browsing session
 function backwardPage(){
   parent.history.back();
 }
 
+// go forward a page in the current browsing session
 function forwardPage(){
   parent.history.forward();
 }
@@ -268,6 +291,7 @@ function forwardPage(){
  * @param amount The % to zoom in.
  */
 function zoomIn(amount, context){
+  // determine whether to zoom pdf or normal web page
   var is_pdf = window.location.href.indexOf(".pdf") > -1;
   if (is_pdf) {
     _pdfZoom(true, amount);
@@ -282,6 +306,7 @@ function zoomIn(amount, context){
  * @param amount The % to zoom out.
  */
 function zoomOut(amount){
+  // determine whether to zoom pdf or normal web page
   var is_pdf = window.location.href.indexOf(".pdf") > -1;
   if (is_pdf) {
     _pdfZoom(false, amount);
@@ -328,15 +353,19 @@ function enterText(str){
 function selectElement(name){
   var re =  RegExp(name ,"i"); 
   var e;
+
+  // try to get the input placeholder element
   e = $("input[placeholder]").filter(function() {
    return re.test(this.placeholder);
   }).first();
 
+  // try to get the input title element
   if (e.val() == undefined) {
     e = $("input[title]").filter(function() {
       return re.test(this.title);
     }).first();
   }
+  // set the element in focus if it was found
   if (e.val() != undefined){
     lastEditedInput = e;
     e.focus();
@@ -432,6 +461,11 @@ function closeFullscreen(){
   }
 }
 
+/**
+ * Plays music on either pandora or spotify
+ * depending on the input parameter.
+ * It is required that the media player desired is loaded as a web page.
+ */
 function playMusic(is_spotify){
   var is_spotify = _getBool(is_spotify);
   if (is_spotify) {
@@ -445,7 +479,8 @@ function playMusic(is_spotify){
 }
 
 /**
- * Pause currently selected music.
+ * Pause currently selected music on either spotify or pandora.
+ * It is required that the media player desired is loaded as a web page.
  */
 function pauseMusic(is_spotify){
   var is_spotify = _getBool(is_spotify);
@@ -460,7 +495,8 @@ function pauseMusic(is_spotify){
 }
 
 /**
- * Plays the next song in the current playlist.
+ * Plays the next song in the current playlist for either pandora or spotify.
+ * It is required that the media player desired is loaded as a web page.
  */
 function nextSong(is_spotify){
   var is_spotify = _getBool(is_spotify);
