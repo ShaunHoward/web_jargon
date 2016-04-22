@@ -59,5 +59,4 @@ NEXT_SONG:["next", "next song", "next tune", "next on playlist", "next in playli
 SEARCH_MUSIC:["search artist (ARTIST) (TYPE=artist)", "search for artist (ARTIST) (TYPE=artist)", "search album (ALBUM) (TYPE=album)", "search for album (ALBUM) (TYPE=album)", "search song (SONG) (TYPE=song)", "search for song (SONG) (TYPE=song)"]
 
 # requirement 4.16
-SEARCH_PDF:["search for (EXCERPT)", "search (EXCERPT)"]
 GO_TO_PDF_PAGE:["go to page number (PAGE_NUM)", "go to page (PAGE_NUM)", "go to (PAGE_NUM)"]

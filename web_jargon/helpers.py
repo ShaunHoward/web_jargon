@@ -48,7 +48,6 @@ PLAY_MUSIC = 'PLAY_MUSIC'
 PAUSE_MUSIC = 'PAUSE_MUSIC'
 NEXT_SONG = 'NEXT_SONG'
 SEARCH_MUSIC = 'SEARCH_MUSIC'
-SEARCH_PDF = 'SEARCH_PDF'
 GO_TO_PDF_PAGE = 'GO_TO_PDF_PAGE'
 
 DIR = path.dirname(path.dirname(__file__))
@@ -57,7 +56,7 @@ DEFAULT_ACTIONS_PATH = DIR + '/templates/action_command_templates.txt'
 # context lists to outline functions available only in the given context
 VIDEO_CONTEXT = {PLAY_VIDEO, PAUSE_VIDEO, NEXT_VIDEO, OPEN_FULLSCREEN, CLOSE_FULLSCREEN}
 MUSIC_CONTEXT = {PLAY_MUSIC, PAUSE_MUSIC, NEXT_SONG, SEARCH_MUSIC}
-DOC_CONTEXT = {SEARCH_PDF, GO_TO_PDF_PAGE}
+DOC_CONTEXT = {GO_TO_PDF_PAGE}
 DOMAINS = {"facebook": (VIDEO_CONTEXT, "V"), "youtube": (VIDEO_CONTEXT, "V"), "pandora": (MUSIC_CONTEXT, "M"),
            "spotify": (MUSIC_CONTEXT, "M"), ".pdf": (DOC_CONTEXT, "D")}
 

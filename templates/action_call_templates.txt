@@ -58,5 +58,4 @@ NEXT_SONG:[nextSong(IS_SPOTIFY=false)]
 SEARCH_MUSIC:[searchMusic(IS_SPOTIFY=false, ARTIST, ALBUM, SONG, TYPE)]
 
 # requirement 4.16
-SEARCH_PDF:[searchPDF(EXCERPT)]
 GO_TO_PDF_PAGE:[goToPage(PAGE_NUM)]

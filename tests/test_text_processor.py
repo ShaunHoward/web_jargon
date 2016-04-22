@@ -217,12 +217,6 @@ class TextProcessorTest(unittest.TestCase):
         self.validate_phrases(template_phrases, h.SEARCH_MUSIC, args, urls=urls)
 
     # start doc context
-    def test_search_pdf(self):
-        template_phrases = ["search for the blue knight and dark horse", "search chapter 5 questions"]
-        args = [['the blue knight and dark horse'], ['chapter 5 questions']]
-        urls = [pdf] * 2
-        self.validate_phrases(template_phrases, h.SEARCH_PDF, args, urls=urls)
-
     def test_go_to_page_pdf(self):
         template_phrases = ["go to page four hundred five", "go to page sixty seven", "go to two thousand seven hundred fifty three"]
         args = [[405], [67], [2753]]
