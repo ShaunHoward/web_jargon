@@ -127,7 +127,11 @@ function _scrollVertical(dest){
  * @param str The string to display.
  */
 function _addMessage(str){
-  $('<div id="WebJargonInfo" style="position:fixed;color:white;background-color:black;right:5px;top:55px;width:100px;height:60px;z-index:1000;">'+str+'</div>').appendTo('html');
+  var m = $("#WebJargonInfo");
+  if(m != undefined){
+    m.remove();
+  }
+  $('<div id="WebJargonInfo" style="position:fixed; color:white; background-color:black; right:5px; top:55px; width:100px; height:40px; z-index:1000; text-align:center; padding-top:10px; background-color: #a5c7ef; color:black;">'+str+'</div>').appendTo('html');
   $("#WebJargonInfo").fadeOut(2000, function(){
     $("#WebJargonInfo").remove();
   });
