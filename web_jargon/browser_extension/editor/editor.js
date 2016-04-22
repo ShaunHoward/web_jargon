@@ -426,14 +426,16 @@ function searchMusic(is_spotify, artist, album, song, type){
 }
 
 function goToPage(page_number){
-  var zoom_str = "&zoom=";
-  var curr_url = window.location.href;
-  var regex = new RegExp("#page=([0-9])+");
-  var split_url = window.location.href.split(regex);
-  var new_url = split_url[0] + "#page=" + page_number;
-  if (split_url.length > 2) {
-    new_url = new_url + split_url[2];
+  if (page_number > 0) {
+    var zoom_str = "&zoom=";
+    var curr_url = window.location.href;
+    var regex = new RegExp("#page=([0-9])+");
+    var split_url = window.location.href.split(regex);
+    var new_url = split_url[0] + "#page=" + page_number;
+    if (split_url.length > 2) {
+      new_url = new_url + split_url[2];
+    }
+    window.location.href = new_url;
+    window.location.reload(true);
   }
-  window.location.href = new_url;
-  window.location.reload(true);
 }
